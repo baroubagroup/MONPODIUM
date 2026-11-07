@@ -58,17 +58,71 @@ function SocialIcon({ platform }: { platform: SocialPlatform }) {
 
 const SOCIAL_CONFIG: Record<
   SocialPlatform,
-  { name: string; bg: string }
+  { name: string; bg: string; btnBg: string; btnText: string; btnShadow?: string }
 > = {
-  facebook: { name: 'Facebook Officiel', bg: '#1877F2' },
-  instagram: { name: 'Instagram Officiel', bg: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' },
-  tiktok: { name: 'TikTok Officiel', bg: '#000000' },
-  youtube: { name: 'Chaîne YouTube Officielle', bg: '#FF0000' },
-  twitter: { name: 'X (Twitter) Officiel', bg: '#0f0f12' },
-  snapchat: { name: 'Snapchat Officiel', bg: '#FFFC00' },
-  threads: { name: 'Threads Officiel', bg: '#101010' },
-  telegram: { name: 'Canal Telegram', bg: '#229ED9' },
-  website: { name: 'Site Web Officiel', bg: '#3b82f6' },
+  facebook: {
+    name: 'Facebook Officiel',
+    bg: '#1877F2',
+    btnBg: '#1877F2',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(24, 119, 242, 0.35)',
+  },
+  instagram: {
+    name: 'Instagram Officiel',
+    bg: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+    btnBg: 'linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%)',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(220, 39, 67, 0.35)',
+  },
+  tiktok: {
+    name: 'TikTok Officiel',
+    bg: '#000000',
+    btnBg: '#000000',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+  },
+  youtube: {
+    name: 'Chaîne YouTube Officielle',
+    bg: '#FF0000',
+    btnBg: '#FF0000',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(255, 0, 0, 0.35)',
+  },
+  twitter: {
+    name: 'X (Twitter) Officiel',
+    bg: '#0f0f12',
+    btnBg: '#0f0f12',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(15, 15, 18, 0.35)',
+  },
+  snapchat: {
+    name: 'Snapchat Officiel',
+    bg: '#FFFC00',
+    btnBg: '#FFFC00',
+    btnText: '#000000',
+    btnShadow: '0 2px 10px rgba(255, 252, 0, 0.35)',
+  },
+  threads: {
+    name: 'Threads Officiel',
+    bg: '#101010',
+    btnBg: '#101010',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(16, 16, 16, 0.35)',
+  },
+  telegram: {
+    name: 'Canal Telegram',
+    bg: '#229ED9',
+    btnBg: '#229ED9',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(34, 158, 217, 0.35)',
+  },
+  website: {
+    name: 'Site Web Officiel',
+    bg: '#3b82f6',
+    btnBg: '#3b82f6',
+    btnText: '#ffffff',
+    btnShadow: '0 2px 10px rgba(59, 130, 246, 0.35)',
+  },
 }
 
 export function SocialLinks({
@@ -136,15 +190,13 @@ export function SocialLinks({
                 </div>
               </div>
 
-              {/* Clean 'Accéder' Button - No raw URL displayed */}
+              {/* Colored 'Accéder' Button matching platform branding */}
               <div
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
-                  isLight
-                    ? 'bg-slate-100 text-slate-700 group-hover:text-white'
-                    : 'bg-zinc-800/90 text-zinc-300 group-hover:text-white'
-                }`}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all duration-200 group-hover:scale-105 group-hover:brightness-110 active:scale-95 shadow-sm"
                 style={{
-                  // On hover or subtle border
+                  background: cfg.btnBg,
+                  color: cfg.btnText,
+                  boxShadow: cfg.btnShadow,
                 }}
               >
                 <span>Accéder</span>

@@ -376,6 +376,7 @@ function ArtistHubContent() {
                   bookingPhone={bookingPhone}
                   bookingEnabled={bookingEnabled}
                   themeColor={themeColor}
+                  themeMode={themeMode}
                 />
               </div>
             )}

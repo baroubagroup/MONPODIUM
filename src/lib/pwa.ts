@@ -1,0 +1,40 @@
+import { User } from '@/types'
+
+export function generateManifest(user: User) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://monpodium.com'
+  const startUrl = `${baseUrl}/${user.username}`
+
+  const appName = user.pwa_name || user.artist_name
+  const appIcon = user.pwa_icon_url || user.avatar_url
+
+  return {
+    name: appName,
+    short_name: appName,
+    description: user.bio
+      ? `${user.bio.slice(0, 100)}...`
+      : `Toute la musique officielle de ${appName}`,
+    start_url: startUrl,
+    scope: startUrl,
+    display: 'standalone',
+    orientation: 'portrait',
+    theme_color: user.theme_color || '#7C3AED',
+    background_color: '#08080a',
+    icons: [
+      {
+        src: appIcon ? appIcon : `${baseUrl}/icons/default-192.png`,
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any maskable',
+      },
+      {
+        src: appIcon ? appIcon : `${baseUrl}/icons/default-512.png`,
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any maskable',
+      },
+    ],
+    categories: ['music', 'entertainment'],
+    lang: 'fr',
+    dir: 'ltr',
+  }
+}

@@ -445,11 +445,11 @@ export default function ProfilePage() {
                 <h2 className={`text-sm font-bold flex items-center gap-2 ${
                   isLight ? 'text-slate-900' : 'text-white'
                 }`}>
-                  <ImageIcon className="w-4 h-4 text-purple-600" />
+                  <ImageIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Image de Couverture (Bannière) & Photo de Profil</span>
                 </h2>
                 <p className={`text-xs mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-                  Personnalise l&apos;ambiance visuelle : 5 photos musicales officielles, upload de ton image, ou dégradé à ton code couleur.
+                  Personnalise l&apos;ambiance visuelle : 5 photos officielles, upload de ton image, ou dégradé à ton code couleur.
                 </p>
               </div>
 
@@ -467,7 +467,7 @@ export default function ProfilePage() {
                   }}
                   className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer press-scale ${
                     coverMode === 'image'
-                      ? 'bg-purple-600 text-white shadow-md'
+                      ? 'bg-emerald-500 text-zinc-950 font-black shadow-md'
                       : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                   }}
                   className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer press-scale ${
                     coverMode === 'gradient'
-                      ? 'bg-purple-600 text-white shadow-md'
+                      ? 'bg-emerald-500 text-zinc-950 font-black shadow-md'
                       : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -499,7 +499,7 @@ export default function ProfilePage() {
               <span className={`text-xs font-bold flex items-center gap-1.5 ${
                 isLight ? 'text-slate-700' : 'text-zinc-300'
               }`}>
-                <Palette className="w-3.5 h-3.5 text-purple-600" />
+                <Palette className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Thème de ta vitrine publique :</span>
               </span>
               <div className={`flex items-center gap-1.5 p-1 rounded-xl border ${
@@ -510,7 +510,7 @@ export default function ProfilePage() {
                   onClick={() => setThemeMode('dark')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer press-scale ${
                     themeMode === 'dark'
-                      ? 'bg-purple-600 text-white shadow-md'
+                      ? 'bg-emerald-500 text-zinc-950 font-black shadow-md'
                       : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -574,7 +574,7 @@ export default function ProfilePage() {
                 {/* Quick Upload Action on Banner */}
                 <div className="flex items-center gap-2">
                   <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/75 hover:bg-black/90 border border-white/20 text-white font-bold text-xs shadow-lg backdrop-blur-md transition-colors press-scale">
-                    <Upload className="w-3.5 h-3.5 text-purple-400" />
+                    <Upload className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Importer ma photo</span>
                     <input
                       type="file"
@@ -594,11 +594,11 @@ export default function ProfilePage() {
                   <label className={`text-xs font-bold flex items-center gap-1.5 ${
                     isLight ? 'text-slate-800' : 'text-zinc-300'
                   }`}>
-                    <Music2 className="w-3.5 h-3.5 text-purple-600" />
-                    <span>Choisis l&apos;une des 5 images de musique officielles ou importe ton fichier :</span>
+                    <Music2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Choisis l&apos;une des 5 images officielles ou importe ton fichier :</span>
                   </label>
                   <span className={`text-[11px] font-medium ${isLight ? 'text-slate-500' : 'text-zinc-500'}`}>
-                    5 thèmes de scène
+                    5 thèmes visuels
                   </span>
                 </div>
 
@@ -613,7 +613,7 @@ export default function ProfilePage() {
                         onClick={() => applyPresetImage(preset.url)}
                         className={`group relative rounded-xl overflow-hidden border text-left transition-all p-1.5 flex flex-col gap-1.5 cursor-pointer press-scale ${
                           isSelected
-                            ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-50 dark:bg-purple-950/20'
+                            ? 'border-emerald-500 ring-2 ring-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/20'
                             : isLight
                             ? 'border-slate-200 hover:border-slate-300 bg-slate-50'
                             : 'border-zinc-800 hover:border-zinc-700 bg-zinc-950/60'
@@ -628,7 +628,7 @@ export default function ProfilePage() {
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                           {isSelected && (
-                            <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-md">
+                            <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-emerald-500 text-zinc-950 flex items-center justify-center shadow-md">
                               <Check className="w-3 h-3 stroke-[3]" />
                             </div>
                           )}
@@ -638,7 +638,7 @@ export default function ProfilePage() {
                         <div className="px-0.5 pb-0.5">
                           <p className={`text-[11px] font-bold truncate ${
                             isSelected
-                              ? 'text-purple-600 dark:text-purple-300'
+                              ? 'text-emerald-600 dark:text-emerald-300'
                               : isLight ? 'text-slate-800' : 'text-zinc-300'
                           }`}>
                             {preset.name}
@@ -663,7 +663,7 @@ export default function ProfilePage() {
                   <label className={`text-xs font-bold flex items-center gap-1.5 ${
                     isLight ? 'text-slate-900' : 'text-white'
                   }`}>
-                    <Palette className="w-4 h-4 text-purple-600" />
+                    <Palette className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>Sélecteur de code couleur personnalisé :</span>
                   </label>
                   <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
@@ -704,7 +704,7 @@ export default function ProfilePage() {
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer press-scale ${
                         customColor.toLowerCase() === swatch.hex.toLowerCase()
                           ? isLight
-                            ? 'border-purple-600 bg-purple-50 text-purple-700 shadow-sm scale-105'
+                            ? 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-sm scale-105'
                             : 'border-white text-white shadow-md scale-105'
                           : isLight
                           ? 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
@@ -733,8 +733,8 @@ export default function ProfilePage() {
                         onClick={() => applyPresetGradient(grad.value)}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer press-scale ${
                           isLight
-                            ? 'border-slate-200 bg-white hover:border-purple-500 text-slate-700'
-                            : 'border-zinc-800 bg-zinc-900/80 hover:border-purple-500 text-zinc-300'
+                            ? 'border-slate-200 bg-white hover:border-emerald-500 text-slate-700'
+                            : 'border-zinc-800 bg-zinc-900/80 hover:border-emerald-500 text-zinc-300'
                         }`}
                       >
                         <div className="w-3.5 h-3.5 rounded-full shadow-inner" style={{ background: grad.value }} />
@@ -756,14 +756,14 @@ export default function ProfilePage() {
           <h2 className={`text-sm font-bold flex items-center gap-2 ${
             isLight ? 'text-slate-900' : 'text-white'
           }`}>
-            <User className="w-4 h-4 text-purple-600" />
+            <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Identité & Styles Musicaux (Polyvalence)</span>
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className={`text-xs font-bold flex items-center gap-1 ${
-                isLight ? 'text-purple-700' : 'text-purple-400'
+                isLight ? 'text-emerald-700' : 'text-emerald-400'
               }`}>
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Nom d&apos;artiste (public)</span>
@@ -775,8 +775,8 @@ export default function ProfilePage() {
                 onChange={(e) => setArtistName(e.target.value)}
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm font-bold focus:outline-none transition-colors ${
                   isLight
-                    ? 'bg-slate-50 border-purple-300 focus:border-purple-600 text-slate-900'
-                    : 'bg-zinc-950 border-purple-500/60 focus:border-purple-500 text-white'
+                    ? 'bg-slate-50 border-emerald-300 focus:border-emerald-500 text-slate-900'
+                    : 'bg-zinc-950 border-emerald-500/60 focus:border-emerald-500 text-white'
                 }`}
               />
             </div>
@@ -792,8 +792,8 @@ export default function ProfilePage() {
                 placeholder="Ex: Jean-Luc Kouassi"
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
                   isLight
-                    ? 'bg-slate-50 border-slate-300 focus:border-purple-600 text-slate-900'
-                    : 'bg-zinc-950 border-zinc-800 focus:border-purple-500 text-white'
+                    ? 'bg-slate-50 border-slate-300 focus:border-emerald-500 text-slate-900'
+                    : 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
                 }`}
               />
             </div>
@@ -809,8 +809,8 @@ export default function ProfilePage() {
               onChange={(e) => setCountry(e.target.value)}
               className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
                 isLight
-                  ? 'bg-slate-50 border-slate-300 focus:border-purple-600 text-slate-900'
-                  : 'bg-zinc-950 border-zinc-800 focus:border-purple-500 text-white'
+                  ? 'bg-slate-50 border-slate-300 focus:border-emerald-500 text-slate-900'
+                  : 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
               }`}
             />
           </div>
@@ -842,7 +842,7 @@ export default function ProfilePage() {
                     onClick={() => toggleGenre(g)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer press-scale ${
                       isSelected
-                        ? 'border-purple-500 bg-purple-600 text-white shadow-sm'
+                        ? 'border-emerald-500 bg-emerald-500 text-zinc-950 font-bold shadow-sm'
                         : isLight
                         ? 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                         : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white hover:border-zinc-700'
@@ -870,8 +870,8 @@ export default function ProfilePage() {
                 placeholder="Ajouter un autre style (ex: Afro-Gospel, Mandingue...)"
                 className={`flex-1 px-3.5 py-2 rounded-xl border text-xs focus:outline-none transition-colors ${
                   isLight
-                    ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-purple-600'
-                    : 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-600 focus:border-purple-500'
+                    ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
+                    : 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-600 focus:border-emerald-500'
                 }`}
               />
               <button
@@ -883,7 +883,7 @@ export default function ProfilePage() {
                     : 'bg-zinc-800 hover:bg-zinc-700 text-white'
                 }`}
               >
-                <Plus className="w-3.5 h-3.5 text-purple-600" />
+                <Plus className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Ajouter</span>
               </button>
             </div>
@@ -894,7 +894,7 @@ export default function ProfilePage() {
                 {selectedGenres.map((g) => (
                   <span
                     key={g}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 text-[11px] font-bold"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-[11px] font-bold"
                   >
                     <span>{g}</span>
                     <button
@@ -922,8 +922,8 @@ export default function ProfilePage() {
               placeholder="Rédige ici ta biographie officielle..."
               className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none resize-none transition-colors ${
                 isLight
-                  ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-purple-600'
-                  : 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-600 focus:border-purple-500'
+                  ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
+                  : 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-600 focus:border-emerald-500'
               }`}
             />
           </div>
@@ -1080,11 +1080,11 @@ export default function ProfilePage() {
               <h2 className={`text-sm font-bold flex items-center gap-2 ${
                 isLight ? 'text-slate-900' : 'text-white'
               }`}>
-                <Mail className="w-4 h-4 text-purple-600" />
+                <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Contact & Booking Professionnel</span>
               </h2>
               <p className={`text-xs mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-                Principalement destiné au management et aux demandes de concerts par email (pas de WhatsApp personnel).
+                Principalement destiné au management et aux demandes de concerts ou collaborations par email.
               </p>
             </div>
 
@@ -1096,14 +1096,14 @@ export default function ProfilePage() {
                 onChange={(e) => setBookingEnabled(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-zinc-300 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              <div className="w-11 h-6 bg-zinc-300 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
             </label>
           </div>
 
           {bookingEnabled && (
             <div className={`space-y-4 pt-3 border-t ${isLight ? 'border-slate-200' : 'border-zinc-800'}`}>
               <div className="space-y-1">
-                <label className={`text-xs font-bold ${isLight ? 'text-purple-700' : 'text-purple-300'}`}>
+                <label className={`text-xs font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-300'}`}>
                   Email de booking / management officiel *
                 </label>
                 <input
@@ -1114,8 +1114,8 @@ export default function ProfilePage() {
                   placeholder="booking@monlabel.com"
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
                     isLight
-                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-purple-600'
-                      : 'bg-zinc-950 border-zinc-800 text-white focus:border-purple-500'
+                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-500'
+                      : 'bg-zinc-950 border-zinc-800 text-white focus:border-emerald-500'
                   }`}
                 />
               </div>
@@ -1131,8 +1131,8 @@ export default function ProfilePage() {
                   placeholder="Ex: +225 07 00 00 00 00 (optionnel)"
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
                     isLight
-                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-purple-600'
-                      : 'bg-zinc-950 border-zinc-800 text-white focus:border-purple-500'
+                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-500'
+                      : 'bg-zinc-950 border-zinc-800 text-white focus:border-emerald-500'
                   }`}
                 />
                 <p className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-zinc-500'}`}>
@@ -1145,7 +1145,7 @@ export default function ProfilePage() {
 
         <button
           type="submit"
-          className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/30 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer press-scale"
+          className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer press-scale"
         >
           <Save className="w-4 h-4" />
           <span>Enregistrer toutes les modifications</span>

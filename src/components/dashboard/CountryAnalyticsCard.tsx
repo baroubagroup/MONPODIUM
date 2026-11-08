@@ -42,7 +42,7 @@ export function CountryAnalyticsCard({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1 text-left">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center text-purple-600">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <Globe className="w-4 h-4 animate-pulse" />
             </div>
             <h2 className="text-base sm:text-lg font-black tracking-tight">
@@ -62,7 +62,7 @@ export function CountryAnalyticsCard({
             onClick={() => setTimeRange('7d')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer press-scale ${
               timeRange === '7d'
-                ? 'bg-purple-600 text-white shadow-xs'
+                ? 'bg-emerald-500 text-zinc-950 font-black shadow-xs'
                 : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -72,7 +72,7 @@ export function CountryAnalyticsCard({
             onClick={() => setTimeRange('30d')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer press-scale ${
               timeRange === '30d'
-                ? 'bg-purple-600 text-white shadow-xs'
+                ? 'bg-emerald-500 text-zinc-950 font-black shadow-xs'
                 : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -82,7 +82,7 @@ export function CountryAnalyticsCard({
             onClick={() => setTimeRange('all')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer press-scale ${
               timeRange === 'all'
-                ? 'bg-purple-600 text-white shadow-xs'
+                ? 'bg-emerald-500 text-zinc-950 font-black shadow-xs'
                 : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -121,7 +121,7 @@ export function CountryAnalyticsCard({
           <span className={`text-[11px] block font-bold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
             Clics Streaming
           </span>
-          <span className="text-lg sm:text-xl font-black text-purple-600 dark:text-purple-400 mt-0.5 block">
+          <span className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 block">
             {displayedClicks.toLocaleString('fr-FR')}
           </span>
         </div>
@@ -171,7 +171,7 @@ export function CountryAnalyticsCard({
                     <span className="font-mono font-bold">
                       {countryVisits.toLocaleString('fr-FR')} visites
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-black bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-black bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">
                       {country.percentage}%
                     </span>
                   </div>
@@ -182,7 +182,7 @@ export function CountryAnalyticsCard({
                   isLight ? 'bg-slate-200' : 'bg-zinc-800'
                 }`}>
                   <div
-                    className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-purple-600 to-indigo-500"
+                    className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-emerald-500 to-teal-500"
                     style={{ width: `${Math.max(country.percentage, 3)}%` }}
                   />
                 </div>
@@ -196,7 +196,7 @@ export function CountryAnalyticsCard({
         isLight ? 'border-slate-200' : 'border-zinc-800'
       }`}>
         <span>Données anonymisées géolocalisées via Cloudflare & Fastly CDN</span>
-        <span className="font-semibold text-purple-600">Mise à jour en temps réel</span>
+        <span className="font-semibold text-emerald-600 dark:text-emerald-400">Mise à jour en temps réel</span>
       </div>
     </div>
   )

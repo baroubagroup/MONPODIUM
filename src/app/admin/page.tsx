@@ -338,9 +338,9 @@ export default function AdminDashboardPage() {
         }`}>
           <div className="flex items-center justify-between">
             <span className={`text-xs font-bold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-              Artistes Inscrits
+              Membres Inscrits
             </span>
-            <Users className="w-4 h-4 text-purple-600" />
+            <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-black">{totalUsers}</span>
@@ -406,10 +406,10 @@ export default function AdminDashboardPage() {
             <span className={`text-xs font-bold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
               Revenus Mensuels
             </span>
-            <Crown className="w-4 h-4 text-purple-600" />
+            <Crown className="w-4 h-4 text-amber-500" />
           </div>
           <div className="mt-2">
-            <span className="text-xl sm:text-2xl font-black text-purple-600">
+            <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
               {estimatedRevenue.toLocaleString()} <span className="text-xs font-bold">FCFA</span>
             </span>
             <span className={`text-[10px] block font-bold mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
@@ -426,7 +426,7 @@ export default function AdminDashboardPage() {
             onClick={() => setActiveTab('users')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer press-scale ${
               activeTab === 'users'
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                ? 'bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/20'
                 : isLight
                 ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                 : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white'
@@ -502,7 +502,7 @@ export default function AdminDashboardPage() {
                 onClick={() => setFilterMode('all')}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer press-scale ${
                   filterMode === 'all'
-                    ? 'bg-purple-600 text-white shadow-xs'
+                    ? 'bg-emerald-500 text-zinc-950 font-black shadow-xs'
                     : isLight
                     ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                     : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
@@ -650,13 +650,13 @@ export default function AdminDashboardPage() {
                           {/* Sous-domaine */}
                           <td className="py-3.5 px-4">
                             <div className="space-y-0.5">
-                              <div className="font-mono text-xs font-semibold text-purple-600">
+                              <div className="font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                                 {user.username}.monpodium.com
                               </div>
                               <Link
                                 href={`/${user.username}`}
                                 target="_blank"
-                                className="inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-purple-600 transition-colors"
+                                className="inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-emerald-500 transition-colors"
                               >
                                 <span>Inspecter la vitrine</span>
                                 <ExternalLink className="w-3 h-3" />
@@ -674,7 +674,7 @@ export default function AdminDashboardPage() {
                                   user.plan === 'pro'
                                     ? 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400'
                                     : user.plan === 'starter'
-                                    ? 'bg-purple-500/15 border-purple-500/30 text-purple-600 dark:text-purple-400'
+                                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
                                     : isLight
                                     ? 'bg-slate-100 border-slate-200 text-slate-700'
                                     : 'bg-zinc-800 border-zinc-700 text-zinc-300'
@@ -742,7 +742,7 @@ export default function AdminDashboardPage() {
                                   setUserToInspect(user)
                                   setInspectTimeRange('30d')
                                 }}
-                                className="p-1.5 rounded-xl text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer"
                                 title="Inspecter l'audience et les statistiques de cet artiste"
                               >
                                 <BarChart3 className="w-4 h-4" />
@@ -919,7 +919,7 @@ export default function AdminDashboardPage() {
                 <span className={`text-[11px] block font-bold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
                   Clics vers Streaming
                 </span>
-                <span className="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400 mt-0.5 block">
+                <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 block">
                   {GLOBAL_PLATFORM_TRAFFIC.totalStreamingClicks.toLocaleString('fr-FR')}
                 </span>
               </div>
@@ -1007,7 +1007,7 @@ export default function AdminDashboardPage() {
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 font-mono font-semibold text-purple-600 dark:text-purple-400">
+                      <td className="py-3.5 px-4 font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                         {country.streamingClicks.toLocaleString('fr-FR')}
                       </td>
 
@@ -1109,7 +1109,7 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-black text-xl">{userToInspect.artist_name}</h3>
                       {userToInspect.verified && <ShieldCheck className="w-5 h-5 text-blue-500" />}
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                         {userToInspect.plan.toUpperCase()}
                       </span>
                     </div>
@@ -1119,7 +1119,7 @@ export default function AdminDashboardPage() {
                       <Link
                         href={`/${userToInspect.username}`}
                         target="_blank"
-                        className="text-xs font-semibold text-purple-500 hover:underline flex items-center gap-1"
+                        className="text-xs font-semibold text-emerald-500 hover:underline flex items-center gap-1"
                       >
                         <span>Voir page publique</span>
                         <ExternalLink className="w-3 h-3" />
@@ -1151,7 +1151,7 @@ export default function AdminDashboardPage() {
                       onClick={() => setInspectTimeRange(r)}
                       className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         inspectTimeRange === r
-                          ? 'bg-purple-600 text-white shadow-sm'
+                          ? 'bg-emerald-500 text-zinc-950 font-black shadow-sm'
                           : 'text-zinc-400 hover:text-white'
                       }`}
                     >
@@ -1176,8 +1176,8 @@ export default function AdminDashboardPage() {
                   <span className="text-xl font-black font-mono text-emerald-500 mt-1 block">{stats.total_streaming_clicks.toLocaleString('fr-FR')}</span>
                 </div>
                 <div className={`p-3.5 rounded-2xl border ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950/60 border-zinc-800'}`}>
-                  <span className="text-[10px] font-bold uppercase text-purple-500 block">Conversion Globale</span>
-                  <span className="text-xl font-black font-mono text-purple-500 mt-1 block">{stats.global_conversion_rate}</span>
+                  <span className="text-[10px] font-bold uppercase text-amber-500 block">Conversion Globale</span>
+                  <span className="text-xl font-black font-mono text-amber-500 mt-1 block">{stats.global_conversion_rate}</span>
                 </div>
               </div>
 
@@ -1251,7 +1251,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setUserToInspect(null)}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
+                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-black shadow-md cursor-pointer transition-all"
                 >
                   Fermer l&apos;inspection
                 </button>

@@ -29,10 +29,10 @@ export function PlanBadge({ plan, currentReleasesCount }: PlanBadgeProps) {
       case 'starter':
         return {
           label: 'Plan Starter',
-          color: 'from-purple-600 to-indigo-500 text-white',
+          color: 'from-emerald-500 to-teal-500 text-zinc-950 font-black',
           badgeBg: isLight
-            ? 'bg-purple-100 text-purple-800 border-purple-300'
-            : 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
         }
       default:
         return {
@@ -65,7 +65,7 @@ export function PlanBadge({ plan, currentReleasesCount }: PlanBadgeProps) {
       {plan === 'free' && (
         <Link
           href="/dashboard/upgrade"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-sm transition-all hover:scale-105 active:scale-95 press-scale"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-black shadow-sm transition-all hover:scale-105 active:scale-95 press-scale"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>Débloquer plus de sorties</span>

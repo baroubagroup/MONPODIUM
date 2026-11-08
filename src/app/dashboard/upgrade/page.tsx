@@ -98,20 +98,20 @@ export default function UpgradePlanPage() {
               isLight ? 'border-slate-200 text-slate-700' : 'border-zinc-800 text-zinc-300'
             }`}>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span>1 musique active</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>1 musique active (pour artistes)</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span>Extrait audio 15s</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Liens & WhatsApp illimités</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Tous les liens plateformes</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span>Application PWA pour fans</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Application PWA pour ton audience</span>
               </li>
             </ul>
           </div>
@@ -135,17 +135,17 @@ export default function UpgradePlanPage() {
         </div>
 
         {/* Starter (10 000 FCFA) */}
-        <div className={`rounded-3xl border-2 border-purple-500 p-6 sm:p-7 flex flex-col justify-between space-y-6 relative shadow-xl ${
+        <div className={`rounded-3xl border-2 border-emerald-500 p-6 sm:p-7 flex flex-col justify-between space-y-6 relative shadow-xl ${
           isLight
-            ? 'bg-white text-slate-900 shadow-purple-500/10'
-            : 'bg-zinc-900/90 text-white shadow-purple-600/20'
+            ? 'bg-white text-slate-900 shadow-emerald-500/10'
+            : 'bg-zinc-900/90 text-white shadow-emerald-600/20'
         }`}>
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-purple-600 text-white text-[11px] font-black uppercase tracking-wider shadow-md">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-emerald-500 text-zinc-950 text-[11px] font-black uppercase tracking-wider shadow-md">
             Populaire
           </div>
 
           <div className="space-y-4">
-            <div className="inline-block px-3 py-1 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 text-xs font-bold uppercase tracking-wider">
+            <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider">
               Starter
             </div>
             <div>
@@ -162,20 +162,20 @@ export default function UpgradePlanPage() {
               isLight ? 'border-slate-200 text-slate-700' : 'border-zinc-800 text-zinc-300'
             }`}>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span><strong>Jusqu&apos;à 5 musiques</strong></span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Carrousel & Discographie complète</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span>Réseaux sociaux vérifiés</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Réseaux sociaux & WhatsApp vérifiés</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span>Page d&apos;accueil artiste vitrine</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Page d&apos;accueil vitrine certifiée</span>
               </li>
             </ul>
           </div>
@@ -187,9 +187,9 @@ export default function UpgradePlanPage() {
             className={`w-full py-3 rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer press-scale ${
               currentPlan === 'starter'
                 ? isLight
-                  ? 'bg-purple-100 text-purple-700 cursor-default'
-                  : 'bg-purple-900/50 text-purple-300 cursor-default border border-purple-500/40'
-                : 'bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/30 hover:scale-105 active:scale-95'
+                  ? 'bg-emerald-100 text-emerald-800 cursor-default'
+                  : 'bg-emerald-900/50 text-emerald-300 cursor-default border border-emerald-500/40'
+                : 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black shadow-emerald-500/30 hover:scale-105 active:scale-95'
             }`}
           >
             {currentPlan === 'starter' ? 'Plan Actuel' : 'Choisir Starter (10 000 FCFA)'}
@@ -220,20 +220,20 @@ export default function UpgradePlanPage() {
               isLight ? 'border-slate-200 text-slate-700' : 'border-zinc-800 text-zinc-300'
             }`}>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span><strong>Jusqu&apos;à 20 musiques</strong></span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span><strong>Sous-domaine officiel dédié</strong> (ex: ksbloom.monpodium.com)</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span><strong>Sous-domaine officiel dédié</strong> (ex: tonnom.monpodium.com)</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Support prioritaire</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                <span>Statistiques des écoutes</span>
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Statistiques complètes</span>
               </li>
             </ul>
           </div>
@@ -262,7 +262,7 @@ export default function UpgradePlanPage() {
         isLight ? 'bg-slate-100/70 border-slate-200 text-slate-800' : 'bg-zinc-950 border-zinc-800 text-zinc-300'
       }`}>
         <div className="flex items-center justify-center gap-2 text-xs font-bold">
-          <Smartphone className="w-4 h-4 text-purple-600" />
+          <Smartphone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Moyens de paiement acceptés prochainement</span>
         </div>
         <p className={`text-xs max-w-md mx-auto ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>

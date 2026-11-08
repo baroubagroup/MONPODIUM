@@ -33,7 +33,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           {/* Logo & Super-Admin Badge */}
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-600/30 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-rose-600 to-amber-600 flex items-center justify-center text-white shadow-md shadow-red-600/30 group-hover:scale-105 transition-transform">
                 <ShieldAlert className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
@@ -66,7 +66,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             >
               {isLight ? (
                 <>
-                  <Moon className="w-3.5 h-3.5 text-purple-600" />
+                  <Moon className="w-3.5 h-3.5 text-emerald-600" />
                   <span className="hidden sm:inline">Mode Sombre</span>
                 </>
               ) : (
@@ -86,15 +86,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                   : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300'
               }`}
             >
-              <LayoutDashboard className="w-3.5 h-3.5 text-purple-500" />
-              <span className="hidden sm:inline">Mon Espace Artiste</span>
+              <LayoutDashboard className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="hidden sm:inline">Mon Espace</span>
             </Link>
 
             {/* Link to public homepage */}
             <Link
               href="/"
               target="_blank"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md transition-all press-scale"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-black shadow-md transition-all press-scale"
             >
               <span>Voir le site</span>
               <ExternalLink className="w-3.5 h-3.5" />

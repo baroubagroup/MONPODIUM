@@ -147,14 +147,14 @@ export default function SettingsPage() {
               <h2 className={`text-sm font-bold flex items-center gap-2 ${
                 isLight ? 'text-slate-900' : 'text-white'
               }`}>
-                <Globe className="w-4 h-4 text-purple-600" />
+                <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Ton Sous-Domaine Officiel MonPodium</span>
               </h2>
               <p className={`text-xs leading-relaxed ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-                Chaque artiste possède une adresse courte et exclusive propulsée par MonPodium.
+                Chaque profil possède une adresse courte et exclusive propulsée par MonPodium.
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 text-[10px] font-black uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
               Inclus
             </span>
           </div>
@@ -165,7 +165,7 @@ export default function SettingsPage() {
             <div className={`flex items-center gap-2 font-bold truncate ${
               isLight ? 'text-slate-900' : 'text-white'
             }`}>
-              <span className="text-purple-600">https://</span>
+              <span className="text-emerald-500">https://</span>
               <span>{username}.monpodium.com</span>
             </div>
             <button
@@ -196,7 +196,7 @@ export default function SettingsPage() {
               <h2 className={`text-sm font-bold flex items-center gap-2 ${
                 isLight ? 'text-slate-900' : 'text-white'
               }`}>
-                <Smartphone className="w-4 h-4 text-purple-600" />
+                <Smartphone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Application Mobile Dédiée (PWA)</span>
               </h2>
               <p className={`text-xs leading-relaxed max-w-xl ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
@@ -211,7 +211,7 @@ export default function SettingsPage() {
                 onChange={(e) => setPwaEnabled(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-zinc-300 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              <div className="w-11 h-6 bg-zinc-300 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
             </label>
           </div>
 
@@ -219,7 +219,7 @@ export default function SettingsPage() {
             <div className={`space-y-5 pt-4 border-t ${isLight ? 'border-slate-200' : 'border-zinc-800'}`}>
               {/* Nom exact */}
               <div className="space-y-1.5">
-                <label className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-purple-300'}`}>
+                <label className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-emerald-300'}`}>
                   Nom exact de ton application mobile *
                 </label>
                 <input
@@ -230,8 +230,8 @@ export default function SettingsPage() {
                   placeholder="Ex: KS Bloom"
                   className={`w-full px-4 py-2.5 rounded-xl border text-sm font-bold focus:outline-none transition-colors ${
                     isLight
-                      ? 'bg-slate-50 border-slate-300 focus:border-purple-600 text-slate-900'
-                      : 'bg-zinc-950 border-purple-500/60 focus:border-purple-500 text-white'
+                      ? 'bg-slate-50 border-slate-300 focus:border-emerald-500 text-slate-900'
+                      : 'bg-zinc-950 border-emerald-500/60 focus:border-emerald-500 text-white'
                   }`}
                 />
                 <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
@@ -330,7 +330,7 @@ export default function SettingsPage() {
             <label className={`text-xs font-bold flex items-center gap-2 ${
               isLight ? 'text-slate-700' : 'text-zinc-300'
             }`}>
-              <Palette className="w-4 h-4 text-purple-600" />
+              <Palette className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Couleur d&apos;accentuation de ta vitrine</span>
             </label>
             <div className="flex items-center gap-3">
@@ -363,7 +363,7 @@ export default function SettingsPage() {
             <h2 className={`text-sm font-bold flex items-center gap-2 ${
               isLight ? 'text-slate-900' : 'text-white'
             }`}>
-              <Palette className="w-4 h-4 text-purple-600" />
+              <Palette className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Thème Visuel de ta Vitrine Publique</span>
             </h2>
             <p className={`text-xs mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
@@ -378,7 +378,7 @@ export default function SettingsPage() {
               onClick={() => setThemeMode('dark')}
               className={`p-4 rounded-2xl border text-left transition-all flex flex-col gap-3 group relative overflow-hidden cursor-pointer press-scale ${
                 themeMode === 'dark'
-                  ? 'bg-zinc-950 border-purple-500 ring-2 ring-purple-500/30 shadow-xl'
+                  ? 'bg-zinc-950 border-emerald-500 ring-2 ring-emerald-500/30 shadow-xl'
                   : isLight
                   ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
                   : 'bg-zinc-950/60 border-zinc-800 hover:border-zinc-700'
@@ -386,7 +386,7 @@ export default function SettingsPage() {
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                     <Moon className="w-4 h-4" />
                   </div>
                   <div>
@@ -397,7 +397,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 {themeMode === 'dark' && (
-                  <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-bold">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-zinc-950 text-[10px] font-black">
                     Actif
                   </span>
                 )}
@@ -406,12 +406,12 @@ export default function SettingsPage() {
               {/* Visual Mini Mockup */}
               <div className="w-full h-16 rounded-xl bg-[#08080c] border border-zinc-800 p-2 flex flex-col justify-between">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 rounded-full bg-purple-500" />
+                  <div className="w-4 h-4 rounded-full bg-emerald-500" />
                   <div className="w-16 h-2 rounded-full bg-zinc-700" />
                 </div>
                 <div className="flex gap-1">
                   <div className="flex-1 h-3 rounded-md bg-zinc-800" />
-                  <div className="flex-1 h-3 rounded-md bg-purple-600/40" />
+                  <div className="flex-1 h-3 rounded-md bg-emerald-500/30" />
                 </div>
               </div>
 
@@ -426,7 +426,7 @@ export default function SettingsPage() {
               onClick={() => setThemeMode('light')}
               className={`p-4 rounded-2xl border text-left transition-all flex flex-col gap-3 group relative overflow-hidden cursor-pointer press-scale ${
                 themeMode === 'light'
-                  ? 'bg-white text-zinc-900 border-purple-500 ring-2 ring-purple-500/40 shadow-xl'
+                  ? 'bg-white text-zinc-900 border-emerald-500 ring-2 ring-emerald-500/40 shadow-xl'
                   : isLight
                   ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
                   : 'bg-zinc-950/60 border-zinc-800 hover:border-zinc-700'
@@ -451,7 +451,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 {themeMode === 'light' && (
-                  <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-bold">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-zinc-950 text-[10px] font-black">
                     Actif
                   </span>
                 )}
@@ -460,12 +460,12 @@ export default function SettingsPage() {
               {/* Visual Mini Mockup */}
               <div className="w-full h-16 rounded-xl bg-slate-100 border border-slate-300 p-2 flex flex-col justify-between">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 rounded-full bg-purple-600" />
+                  <div className="w-4 h-4 rounded-full bg-emerald-600" />
                   <div className="w-16 h-2 rounded-full bg-slate-400" />
                 </div>
                 <div className="flex gap-1">
                   <div className="flex-1 h-3 rounded-md bg-white border border-slate-200" />
-                  <div className="flex-1 h-3 rounded-md bg-purple-500/20" />
+                  <div className="flex-1 h-3 rounded-md bg-emerald-500/20" />
                 </div>
               </div>
 
@@ -482,7 +482,7 @@ export default function SettingsPage() {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm shadow-lg shadow-purple-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer press-scale"
+            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-sm shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer press-scale"
           >
             <Save className="w-4 h-4" />
             <span>Enregistrer mes paramètres</span>

@@ -200,7 +200,7 @@ export default function NewReleasePage() {
           <span>Retour aux sorties</span>
         </Link>
         <span className={`text-xs font-bold ${
-          isLight ? 'text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200' : 'text-purple-400'
+          isLight ? 'text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200' : 'text-emerald-400'
         }`}>
           Quota : {currentCount} / {maxAllowed}
         </span>
@@ -266,8 +266,8 @@ export default function NewReleasePage() {
             {/* Cover upload square */}
             <div className={`relative w-36 h-36 rounded-2xl overflow-hidden border-2 border-dashed flex-shrink-0 flex items-center justify-center cursor-pointer group transition-colors ${
               isLight
-                ? 'bg-slate-50 border-slate-300 hover:border-purple-500 hover:bg-slate-100'
-                : 'bg-zinc-950 border-zinc-700 hover:border-purple-500'
+                ? 'bg-slate-50 border-slate-300 hover:border-emerald-500 hover:bg-slate-100'
+                : 'bg-zinc-950 border-zinc-700 hover:border-emerald-500'
             }`}>
               {coverPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -278,7 +278,7 @@ export default function NewReleasePage() {
                 />
               ) : (
                 <div className={`text-center p-3 transition-colors ${
-                  isLight ? 'text-slate-400 group-hover:text-purple-600' : 'text-zinc-500 group-hover:text-purple-400'
+                  isLight ? 'text-slate-400 group-hover:text-emerald-600' : 'text-zinc-500 group-hover:text-emerald-400'
                 }`}>
                   <ImageIcon className="w-8 h-8 mx-auto mb-1 opacity-70" />
                   <span className="text-[10px] font-semibold block leading-tight">
@@ -308,7 +308,7 @@ export default function NewReleasePage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Ex: C'est Dieu, Coup de Marteau, etc."
-                  className={`w-full px-3.5 py-2.5 rounded-xl border focus:border-purple-500 text-sm focus:outline-none transition-colors ${
+                  className={`w-full px-3.5 py-2.5 rounded-xl border focus:border-emerald-500 text-sm focus:outline-none transition-colors ${
                     isLight
                       ? 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                       : 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-600'
@@ -324,7 +324,7 @@ export default function NewReleasePage() {
                   <select
                     value={releaseType}
                     onChange={(e) => setReleaseType(e.target.value as ReleaseType)}
-                    className={`w-full px-3 py-2 rounded-xl border focus:border-purple-500 text-xs focus:outline-none transition-colors ${
+                    className={`w-full px-3 py-2 rounded-xl border focus:border-emerald-500 text-xs focus:outline-none transition-colors ${
                       isLight
                         ? 'bg-slate-50 border-slate-200 text-slate-900'
                         : 'bg-zinc-950 border-zinc-800 text-white'
@@ -344,7 +344,7 @@ export default function NewReleasePage() {
                     type="date"
                     value={releaseDate}
                     onChange={(e) => setReleaseDate(e.target.value)}
-                    className={`w-full px-3 py-2 rounded-xl border focus:border-purple-500 text-xs focus:outline-none transition-colors ${
+                    className={`w-full px-3 py-2 rounded-xl border focus:border-emerald-500 text-xs focus:outline-none transition-colors ${
                       isLight
                         ? 'bg-slate-50 border-slate-200 text-slate-900'
                         : 'bg-zinc-950 border-zinc-800 text-white'
@@ -378,7 +378,7 @@ export default function NewReleasePage() {
               type="checkbox"
               checked={isPublished}
               onChange={(e) => setIsPublished(e.target.checked)}
-              className="accent-purple-600 w-4 h-4 rounded cursor-pointer"
+              className="accent-emerald-500 w-4 h-4 rounded cursor-pointer"
             />
             <span className="font-semibold">Rendre immédiatement visible sur ma page</span>
           </label>
@@ -386,7 +386,7 @@ export default function NewReleasePage() {
           <button
             type="submit"
             disabled={loading || isQuotaReached}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition-all hover:scale-105 active:scale-95 press-scale"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-zinc-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 press-scale"
           >
             <Save className="w-4 h-4" />
             <span>{loading ? 'Publication...' : 'Publier ma sortie'}</span>

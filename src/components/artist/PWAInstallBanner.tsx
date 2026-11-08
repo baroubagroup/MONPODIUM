@@ -205,15 +205,15 @@ export function PWAInstallBanner({
 
             <ol className="space-y-3 text-sm text-zinc-300">
               <li className="flex items-start gap-3">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-purple-400 flex-shrink-0">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-emerald-400 flex-shrink-0">
                   1
                 </span>
                 <span>
-                  Appuie sur le bouton <strong>Partager</strong> en bas de Safari (icône <Share className="w-3.5 h-3.5 inline mx-1 text-blue-400" />).
+                  Appuie sur le bouton <strong>Partager</strong> en bas de Safari (icône <Share className="w-3.5 h-3.5 inline mx-1 text-emerald-400" />).
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-purple-400 flex-shrink-0">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-emerald-400 flex-shrink-0">
                   2
                 </span>
                 <span>
@@ -221,7 +221,7 @@ export function PWAInstallBanner({
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-purple-400 flex-shrink-0">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-emerald-400 flex-shrink-0">
                   3
                 </span>
                 <span>
@@ -232,7 +232,7 @@ export function PWAInstallBanner({
 
             <button
               onClick={() => setShowIosGuide(false)}
-              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm transition-colors"
+              className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-sm transition-all press-scale cursor-pointer"
             >
               J&apos;ai compris
             </button>

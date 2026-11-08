@@ -26,7 +26,7 @@ export function LocaleSwitcher() {
         onClick={() => switchLocale('fr')}
         className={`px-2 py-0.5 rounded-full font-semibold transition-all ${
           currentLocale === 'fr'
-            ? 'bg-purple-600 text-white shadow-sm'
+            ? 'bg-emerald-500 text-zinc-950 font-bold shadow-sm'
             : 'hover:text-zinc-200'
         }`}
       >
@@ -36,7 +36,7 @@ export function LocaleSwitcher() {
         onClick={() => switchLocale('en')}
         className={`px-2 py-0.5 rounded-full font-semibold transition-all ${
           currentLocale === 'en'
-            ? 'bg-purple-600 text-white shadow-sm'
+            ? 'bg-emerald-500 text-zinc-950 font-bold shadow-sm'
             : 'hover:text-zinc-200'
         }`}
       >

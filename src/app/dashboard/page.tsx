@@ -73,7 +73,7 @@ export default function DashboardOverviewPage() {
               : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700/80 text-white'
           }`}
         >
-          <Eye className="w-4 h-4 text-purple-600" />
+          <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Voir ma vitrine en direct</span>
           <ExternalLink className={`w-3.5 h-3.5 ${isLight ? 'text-slate-400' : 'text-zinc-500'}`} />
         </Link>
@@ -92,7 +92,7 @@ export default function DashboardOverviewPage() {
             isLight ? 'text-slate-500' : 'text-zinc-400'
           }`}>
             <span>Musiques actives</span>
-            <Music className="w-4 h-4 text-purple-600" />
+            <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div className="text-2xl font-black">
             {releasesCount} / {plan === 'free' ? '1' : plan === 'starter' ? '5' : '20'}
@@ -180,7 +180,7 @@ export default function DashboardOverviewPage() {
         ) : (
           <div className="flex items-center gap-4">
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 border shadow-inner ${
-              isLight ? 'bg-purple-50 text-purple-600 border-purple-200' : 'bg-purple-950/40 text-purple-400 border-purple-500/30'
+              isLight ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30'
             }`}>
               <Music className="w-8 h-8" />
             </div>
@@ -210,7 +210,7 @@ export default function DashboardOverviewPage() {
           )}
           <Link
             href="/dashboard/releases/new"
-            className="flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition-all hover:scale-105 press-scale"
+            className="flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105 press-scale"
           >
             {latestRelease ? 'Ajouter un son' : 'Créer une sortie'}
           </Link>
@@ -231,13 +231,13 @@ export default function DashboardOverviewPage() {
       {/* Pro Tips Banner */}
       <div className={`p-6 rounded-3xl border transition-all space-y-2.5 text-left ${
         isLight
-          ? 'bg-purple-50/60 border-purple-200 text-slate-800'
+          ? 'bg-emerald-50/60 border-emerald-200 text-slate-800'
           : 'bg-zinc-950/80 border-zinc-800/80 text-zinc-300'
       }`}>
         <h3 className={`text-sm font-bold flex items-center gap-2 ${
-          isLight ? 'text-purple-900' : 'text-white'
+          isLight ? 'text-emerald-900' : 'text-white'
         }`}>
-          <Sparkles className="w-4 h-4 text-purple-600" />
+          <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Conseil pour maximiser tes écoutes</span>
         </h3>
         <p className={`text-xs leading-relaxed ${isLight ? 'text-slate-600' : 'text-zinc-400'}`}>

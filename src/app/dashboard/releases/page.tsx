@@ -147,7 +147,7 @@ export default function ReleasesListPage() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className={`text-xs font-black uppercase tracking-wider ${
-                isLight ? 'text-purple-600' : 'text-purple-400'
+                isLight ? 'text-emerald-600' : 'text-emerald-400'
               }`}>
                 Studio Discographie
               </span>
@@ -167,7 +167,7 @@ export default function ReleasesListPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/releases/new"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs shadow-lg shadow-purple-600/30 transition-all hover:scale-105 active:scale-95 press-scale"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 press-scale"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Nouvelle sortie</span>
@@ -205,7 +205,7 @@ export default function ReleasesListPage() {
             <span className={`text-[11px] block font-bold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
               Aperçus 15s
             </span>
-            <span className={`text-xl font-black ${isLight ? 'text-purple-600' : 'text-purple-400'}`}>
+            <span className={`text-xl font-black ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>
               100% Découpés
             </span>
           </div>
@@ -226,18 +226,18 @@ export default function ReleasesListPage() {
       {isQuotaReached && (
         <div className={`p-4 rounded-2xl border text-xs flex items-center justify-between transition-colors ${
           isLight
-            ? 'bg-purple-50 border-purple-200 text-purple-900'
-            : 'bg-purple-950/40 border-purple-500/30 text-purple-200'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+            : 'bg-emerald-950/40 border-emerald-500/30 text-emerald-200'
         }`}>
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-purple-500 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
             <span>
               Quota de ton plan actuel atteint ({releases.length}/{maxAllowed}). Débloque jusqu&apos;à 20 musiques avec le plan Pro.
             </span>
           </div>
           <Link
             href="/dashboard/upgrade"
-            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs whitespace-nowrap ml-2 shadow-md press-scale"
+            className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs whitespace-nowrap ml-2 shadow-md press-scale"
           >
             Passer en Pro
           </Link>
@@ -250,7 +250,7 @@ export default function ReleasesListPage() {
           onClick={() => setFilterType('all')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all press-scale cursor-pointer ${
             filterType === 'all'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              ? 'bg-emerald-500 text-zinc-950 font-black shadow-md shadow-emerald-500/20'
               : isLight
               ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shadow-xs'
               : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
@@ -262,7 +262,7 @@ export default function ReleasesListPage() {
           onClick={() => setFilterType('single')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all press-scale cursor-pointer ${
             filterType === 'single'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              ? 'bg-emerald-500 text-zinc-950 font-black shadow-md shadow-emerald-500/20'
               : isLight
               ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shadow-xs'
               : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
@@ -274,7 +274,7 @@ export default function ReleasesListPage() {
           onClick={() => setFilterType('album_ep')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all press-scale cursor-pointer ${
             filterType === 'album_ep'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              ? 'bg-emerald-500 text-zinc-950 font-black shadow-md shadow-emerald-500/20'
               : isLight
               ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shadow-xs'
               : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
@@ -289,7 +289,7 @@ export default function ReleasesListPage() {
         <div className={`p-12 rounded-3xl border text-center space-y-4 shadow-sm ${
           isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-zinc-900/90 border-zinc-800 text-white'
         }`}>
-          <div className="w-16 h-16 rounded-2xl bg-purple-600/15 border border-purple-500/30 text-purple-600 flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 flex items-center justify-center mx-auto shadow-inner">
             <Music className="w-8 h-8" />
           </div>
           <div className="space-y-1 max-w-sm mx-auto">
@@ -300,7 +300,7 @@ export default function ReleasesListPage() {
           </div>
           <Link
             href="/dashboard/releases/new"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs shadow-lg shadow-purple-600/30 transition-all hover:scale-105 active:scale-95 press-scale"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 press-scale"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Créer ma première sortie</span>
@@ -319,8 +319,8 @@ export default function ReleasesListPage() {
               className={`p-5 rounded-3xl border transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-5 group relative overflow-hidden ${
                 isPlaying
                   ? isLight
-                    ? 'bg-purple-50/70 border-purple-400 ring-2 ring-purple-400/20 shadow-lg'
-                    : 'bg-purple-950/20 border-purple-500 ring-2 ring-purple-500/20 shadow-xl'
+                    ? 'bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-400/20 shadow-lg'
+                    : 'bg-emerald-950/20 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xl'
                   : isLight
                   ? 'bg-white border-slate-200/90 hover:border-slate-300 shadow-sm hover:shadow-md text-slate-900'
                   : 'bg-zinc-900/90 border-zinc-800 hover:border-zinc-700 shadow-md hover:shadow-xl text-white'
@@ -347,11 +347,11 @@ export default function ReleasesListPage() {
                     className="absolute inset-0 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white transition-opacity cursor-pointer"
                     title={isPlaying ? 'Mettre en pause' : 'Écouter l’extrait 15s'}
                   >
-                    <div className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 press-scale">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500 text-zinc-950 flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 press-scale">
                       {isPlaying ? (
-                        <Pause className="w-5 h-5 fill-white" />
+                        <Pause className="w-5 h-5 fill-zinc-950" />
                       ) : (
-                        <Play className="w-5 h-5 fill-white ml-0.5" />
+                        <Play className="w-5 h-5 fill-zinc-950 ml-0.5" />
                       )}
                     </div>
                   </button>
@@ -360,7 +360,7 @@ export default function ReleasesListPage() {
                 <div className="space-y-1.5 min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className={`text-base sm:text-lg font-black truncate transition-colors ${
-                      isLight ? 'text-slate-900 group-hover:text-purple-600' : 'text-white group-hover:text-purple-400'
+                      isLight ? 'text-slate-900 group-hover:text-emerald-600' : 'text-white group-hover:text-emerald-400'
                     }`}>
                       {release.title}
                     </h3>
@@ -391,13 +391,13 @@ export default function ReleasesListPage() {
                   {/* Equalizer animation if playing */}
                   {isPlaying ? (
                     <div className={`flex items-center gap-1.5 h-5 ${
-                      isLight ? 'text-purple-600' : 'text-emerald-400'
+                      isLight ? 'text-emerald-600' : 'text-emerald-400'
                     }`}>
                       <div className="flex items-center gap-0.5 h-4">
-                        <span className={`w-1 h-3 rounded-full animate-bounce ${isLight ? 'bg-purple-600' : 'bg-emerald-400'}`} />
-                        <span className={`w-1 h-4 rounded-full animate-pulse ${isLight ? 'bg-purple-600' : 'bg-emerald-400'}`} />
-                        <span className={`w-1 h-2 rounded-full animate-bounce ${isLight ? 'bg-purple-600' : 'bg-emerald-400'}`} />
-                        <span className={`w-1 h-3.5 rounded-full animate-pulse ${isLight ? 'bg-purple-600' : 'bg-emerald-400'}`} />
+                        <span className={`w-1 h-3 rounded-full animate-bounce ${isLight ? 'bg-emerald-600' : 'bg-emerald-400'}`} />
+                        <span className={`w-1 h-4 rounded-full animate-pulse ${isLight ? 'bg-emerald-600' : 'bg-emerald-400'}`} />
+                        <span className={`w-1 h-2 rounded-full animate-bounce ${isLight ? 'bg-emerald-600' : 'bg-emerald-400'}`} />
+                        <span className={`w-1 h-3.5 rounded-full animate-pulse ${isLight ? 'bg-emerald-600' : 'bg-emerald-400'}`} />
                       </div>
                       <span className="text-xs font-mono font-bold">
                         Extrait 15s en cours de lecture...
@@ -409,7 +409,7 @@ export default function ReleasesListPage() {
                     }`}>
                       <span>{release.release_date || 'Date non définie'}</span>
                       <span>•</span>
-                      <span className={`font-semibold ${isLight ? 'text-purple-600' : 'text-purple-400'}`}>
+                      <span className={`font-semibold ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>
                         Extrait 15s prêt
                       </span>
                     </div>
@@ -448,7 +448,7 @@ export default function ReleasesListPage() {
                   onClick={() => togglePlaySnippet(release)}
                   className={`flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer press-scale ${
                     isPlaying
-                      ? 'bg-purple-600 text-white shadow-purple-600/30'
+                      ? 'bg-emerald-500 text-zinc-950 font-black shadow-emerald-500/30'
                       : isLight
                       ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                       : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
@@ -482,8 +482,8 @@ export default function ReleasesListPage() {
                   target="_blank"
                   className={`flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all shadow-xs press-scale ${
                     isLight
-                      ? 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200'
-                      : 'bg-purple-600/20 hover:bg-purple-600 border border-purple-500/40 text-purple-300 hover:text-white'
+                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'
+                      : 'bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 hover:text-white'
                   }`}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />

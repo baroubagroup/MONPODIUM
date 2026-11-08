@@ -125,7 +125,7 @@ export function AudioTrimmer({
         <label className={`text-sm font-semibold flex items-center gap-2 ${
           isLight ? 'text-slate-900' : 'text-white'
         }`}>
-          <Scissors className="w-4 h-4 text-purple-600" />
+          <Scissors className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Extrait audio (15s max)</span>
         </label>
         <span className={`text-xs ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
@@ -136,10 +136,10 @@ export function AudioTrimmer({
       {!audioUrl ? (
         <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-6 cursor-pointer transition-colors ${
           isLight
-            ? 'border-slate-300 bg-slate-50/70 hover:bg-slate-100 hover:border-purple-500'
-            : 'border-zinc-700 bg-zinc-950/40 hover:bg-zinc-800/40 hover:border-purple-500'
+            ? 'border-slate-300 bg-slate-50/70 hover:bg-slate-100 hover:border-emerald-500'
+            : 'border-zinc-700 bg-zinc-950/40 hover:bg-zinc-800/40 hover:border-emerald-500'
         }`}>
-          <div className="w-12 h-12 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center mb-3">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-3">
             <Upload className="w-6 h-6" />
           </div>
           <p className={`text-sm font-semibold mb-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
@@ -170,11 +170,11 @@ export function AudioTrimmer({
               : 'bg-zinc-950/60 border-zinc-800 text-zinc-300'
           }`}>
             <div className="flex items-center gap-2 truncate">
-              <Music className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <span className="truncate font-semibold">{file?.name}</span>
               <span className={isLight ? 'text-slate-400' : 'text-zinc-500'}>({formatTime(duration)})</span>
             </div>
-            <label className="cursor-pointer text-purple-600 hover:text-purple-700 font-bold flex items-center gap-1">
+            <label className="cursor-pointer text-emerald-600 hover:text-emerald-500 font-bold flex items-center gap-1">
               <span>Changer</span>
               <input
                 type="file"
@@ -203,7 +203,7 @@ export function AudioTrimmer({
                     className="w-1.5 rounded-full transition-colors"
                     style={{
                       height: `${12 + Math.abs(Math.sin(i * 1.5)) * 36}px`,
-                      backgroundColor: inSnippet ? '#a855f7' : '#475569',
+                      backgroundColor: inSnippet ? '#10b981' : '#475569',
                     }}
                   />
                 )
@@ -229,11 +229,11 @@ export function AudioTrimmer({
                 step={0.5}
                 value={startTime}
                 onChange={(e) => handleStartChange(parseFloat(e.target.value))}
-                className="w-full accent-purple-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none"
+                className="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none"
               />
               <div className="flex justify-between text-[11px] text-slate-400 font-mono">
                 <span>Début : {formatTime(startTime)}</span>
-                <span className="text-purple-400 font-semibold">
+                <span className="text-emerald-400 font-semibold">
                   Extrait : {windowLength.toFixed(0)}s sélectionnées
                 </span>
                 <span>Fin : {formatTime(startTime + windowLength)}</span>
@@ -246,7 +246,7 @@ export function AudioTrimmer({
             <button
               type="button"
               onClick={togglePlaySnippet}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-colors shadow-md press-scale"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs transition-colors shadow-md press-scale cursor-pointer"
             >
               {isPlaying ? (
                 <>

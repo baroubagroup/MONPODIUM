@@ -515,13 +515,13 @@ function DiscographyContent() {
           rel="noopener noreferrer"
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all shadow-lg group ${
             isLight
-              ? 'bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-900 hover:border-purple-400'
-              : 'bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-purple-500/50 text-zinc-300 hover:text-white'
+              ? 'bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-900 hover:border-emerald-400'
+              : 'bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-emerald-500/50 text-zinc-300 hover:text-white'
           }`}
         >
-          <span className="w-2 h-2 rounded-full bg-purple-500 group-hover:scale-125 transition-transform" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 group-hover:scale-125 transition-transform" />
           <span>Plateforme officielle propulsée par</span>
-          <span className="text-purple-600 font-extrabold group-hover:text-purple-500 transition-colors">MonPodium</span>
+          <span className="text-emerald-500 font-extrabold group-hover:text-emerald-400 transition-colors">MonPodium</span>
         </a>
       </footer>
     </div>

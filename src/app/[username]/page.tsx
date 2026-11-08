@@ -461,12 +461,12 @@ function ArtistHubContent() {
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold transition-all shadow-md group ${
             isLight
               ? 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-slate-200/60'
-              : 'bg-zinc-900/90 hover:bg-zinc-800 border-white/15 text-zinc-300 hover:text-white hover:shadow-purple-500/20'
+              : 'bg-zinc-900/90 hover:bg-zinc-800 border-white/15 text-zinc-300 hover:text-white hover:shadow-emerald-500/20'
           }`}
         >
-          <span className="w-2 h-2 rounded-full bg-purple-500 group-hover:scale-125 transition-transform" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 group-hover:scale-125 transition-transform" />
           <span>Plateforme officielle propulsée par</span>
-          <span className="text-purple-600 dark:text-purple-400 font-extrabold transition-colors">MonPodium</span>
+          <span className="text-emerald-500 font-extrabold transition-colors">MonPodium</span>
         </a>
       </footer>
     </div>

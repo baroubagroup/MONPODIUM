@@ -41,7 +41,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [username, setUsername] = useState('')
   const [accountType, setAccountType] = useState<'musician' | 'public_figure'>('musician')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const [themeColor, setThemeColor] = useState('#9333ea')
+  const [themeColor, setThemeColor] = useState('#10b981')
   const [plan, setPlan] = useState<'free' | 'starter' | 'pro'>('free')
 
   useEffect(() => {
@@ -115,7 +115,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="max-w-6xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 group press-scale">
-              <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-md shadow-purple-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 shadow-md shadow-emerald-500/30 group-hover:scale-105 transition-transform flex-shrink-0">
                 <Disc3 className="w-5 h-5 animate-spin-slow" />
               </div>
               <span className={`font-black text-base sm:text-lg tracking-tight ${
@@ -136,7 +136,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </span>
               <button
                 onClick={copyLink}
-                className="flex items-center gap-1 text-purple-600 hover:text-purple-500 font-bold transition-colors cursor-pointer press-scale"
+                className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-bold transition-colors cursor-pointer press-scale"
                 title="Copier mon lien"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -167,7 +167,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               title={isLight ? 'Basculer en Mode Sombre' : 'Basculer en Mode Clair'}
               aria-label="Basculer le thème"
             >
-              {isLight ? <Moon className="w-4 h-4 text-purple-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+              {isLight ? <Moon className="w-4 h-4 text-emerald-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
               <span className="hidden md:inline">{isLight ? 'Mode Sombre' : 'Mode Clair'}</span>
             </button>
 
@@ -188,7 +188,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             {/* Desktop Add Release Button */}
             <Link
               href="/dashboard/releases/new"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition-all hover:scale-105 active:scale-95 press-scale"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 press-scale"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Nouvelle sortie</span>
@@ -232,13 +232,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold whitespace-nowrap border-b-2 transition-all press-scale ${
                   isActive
-                    ? 'border-purple-600 text-purple-600'
+                    ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
                     : isLight
                     ? 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
                     : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-600' : isLight ? 'text-slate-400' : 'text-zinc-500'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : isLight ? 'text-slate-400' : 'text-zinc-500'}`} />
                 <span>{item.label}</span>
               </Link>
             )
@@ -266,14 +266,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             href="/dashboard"
             className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-black transition-all press-scale ${
               pathname === '/dashboard'
-                ? 'text-purple-600 dark:text-purple-400 scale-105'
+                ? 'text-emerald-600 dark:text-emerald-400 scale-105'
                 : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
           >
             <div className="relative">
               <Disc3 className={`w-5 h-5 mb-0.5 ${pathname === '/dashboard' ? 'animate-spin-slow' : ''}`} />
               {pathname === '/dashboard' && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-600" />
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
               )}
             </div>
             <span>Accueil</span>
@@ -284,14 +284,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             href="/dashboard/releases"
             className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-black transition-all press-scale ${
               pathname === '/dashboard/releases'
-                ? 'text-purple-600 dark:text-purple-400 scale-105'
+                ? 'text-emerald-600 dark:text-emerald-400 scale-105'
                 : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
           >
             <div className="relative">
               <Music className="w-5 h-5 mb-0.5" />
               {pathname === '/dashboard/releases' && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-600" />
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
               )}
             </div>
             <span>Sorties</span>
@@ -303,10 +303,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             aria-label="Ajouter une nouvelle sortie musicale"
             className="flex flex-col items-center justify-center -mt-5 group press-scale"
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-700 to-fuchsia-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/40 border-2 border-white dark:border-zinc-950 group-hover:scale-105 group-active:scale-95 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-zinc-950 flex items-center justify-center shadow-lg shadow-emerald-500/40 border-2 border-white dark:border-zinc-950 group-hover:scale-105 group-active:scale-95 transition-transform">
               <PlusCircle className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 mt-0.5">
+            <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
               Ajouter
             </span>
           </Link>
@@ -316,14 +316,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             href="/dashboard/analytics"
             className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-black transition-all press-scale ${
               pathname === '/dashboard/analytics'
-                ? 'text-purple-600 dark:text-purple-400 scale-105'
+                ? 'text-emerald-600 dark:text-emerald-400 scale-105'
                 : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
           >
             <div className="relative">
               <BarChart3 className="w-5 h-5 mb-0.5" />
               {pathname === '/dashboard/analytics' && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-600" />
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
               )}
             </div>
             <span>Stats</span>
@@ -334,7 +334,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileMenuOpen(true)}
             className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-black transition-all cursor-pointer press-scale ${
               mobileMenuOpen
-                ? 'text-purple-600 dark:text-purple-400'
+                ? 'text-emerald-600 dark:text-emerald-400'
                 : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
             }`}
             aria-label="Ouvrir le menu complet"
@@ -366,7 +366,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             {/* Header with Artist Profile */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-zinc-800/80">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-purple-500/30 flex-shrink-0">
+                <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-emerald-500/30 flex-shrink-0">
                   <SafeImage
                     src={avatarUrl}
                     alt={artistName}
@@ -379,11 +379,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 <div className="text-left">
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-black text-base truncate max-w-[170px]">{artistName}</h3>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-purple-600 text-white shadow-xs">
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500 text-zinc-950 shadow-xs">
                       {plan.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-xs font-mono text-purple-600 dark:text-purple-400 font-bold truncate">
+                  <p className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold truncate">
                     @{username}
                   </p>
                 </div>
@@ -401,9 +401,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Quick Public Link Card */}
-            <div className="mt-4 p-3.5 rounded-2xl border bg-purple-500/10 border-purple-500/25 flex items-center justify-between gap-3 text-left">
+            <div className="mt-4 p-3.5 rounded-2xl border bg-emerald-500/10 border-emerald-500/25 flex items-center justify-between gap-3 text-left">
               <div className="min-w-0">
-                <span className="text-[10px] uppercase font-black tracking-wider text-purple-600 dark:text-purple-400 block">
+                <span className="text-[10px] uppercase font-black tracking-wider text-emerald-600 dark:text-emerald-400 block">
                   Ma vitrine publique
                 </span>
                 <span className="text-xs font-mono font-bold truncate block">
@@ -413,7 +413,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <button
                   onClick={copyLink}
-                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1 shadow-md press-scale cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-black flex items-center gap-1 shadow-md press-scale cursor-pointer"
                 >
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copié' : 'Copier'}</span>
@@ -437,15 +437,15 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 href="/dashboard/profile"
                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between font-bold text-sm transition-all press-scale ${
                   pathname === '/dashboard/profile'
-                    ? 'bg-purple-600 text-white shadow-md'
+                    ? 'bg-emerald-500 text-zinc-950 font-black shadow-md'
                     : isLight
                     ? 'hover:bg-slate-100 text-slate-800'
                     : 'hover:bg-zinc-900 text-zinc-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <User className="w-4 h-4 text-purple-500" />
-                  <span>Mon Profil & Bio</span>
+                  <User className="w-4 h-4 text-emerald-500" />
+                  <span>Mon Profil & Liens</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-50" />
               </Link>
@@ -454,7 +454,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 href="/dashboard/settings"
                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between font-bold text-sm transition-all press-scale ${
                   pathname === '/dashboard/settings'
-                    ? 'bg-purple-600 text-white shadow-md'
+                    ? 'bg-emerald-500 text-zinc-950 font-black shadow-md'
                     : isLight
                     ? 'hover:bg-slate-100 text-slate-800'
                     : 'hover:bg-zinc-900 text-zinc-200'
@@ -471,7 +471,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 href="/dashboard/upgrade"
                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between font-bold text-sm transition-all press-scale ${
                   pathname === '/dashboard/upgrade'
-                    ? 'bg-purple-600 text-white shadow-md'
+                    ? 'bg-emerald-500 text-zinc-950 font-black shadow-md'
                     : isLight
                     ? 'hover:bg-slate-100 text-slate-800'
                     : 'hover:bg-zinc-900 text-zinc-200'
@@ -512,7 +512,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     : 'bg-zinc-900 border-zinc-800 text-zinc-200'
                 }`}
               >
-                {isLight ? <Moon className="w-4 h-4 text-purple-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+                {isLight ? <Moon className="w-4 h-4 text-emerald-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
                 <span>{isLight ? 'Mode Sombre' : 'Mode Clair'}</span>
               </button>
 

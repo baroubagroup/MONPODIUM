@@ -50,7 +50,7 @@ export function PlatformSelector({ selectedLinks, onChange }: PlatformSelectorPr
         <h3 className={`text-sm font-semibold flex items-center gap-2 ${
           isLight ? 'text-slate-900' : 'text-white'
         }`}>
-          <Link2 className="w-4 h-4 text-purple-600" />
+          <Link2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Où ta musique est-elle disponible ?</span>
         </h3>
         <p className={`text-xs mt-0.5 ${
@@ -72,8 +72,8 @@ export function PlatformSelector({ selectedLinks, onChange }: PlatformSelectorPr
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 ${
                 selected
                   ? isLight
-                    ? 'border-purple-500 bg-purple-50 text-purple-900 shadow-sm ring-1 ring-purple-400/40'
-                    : 'border-purple-500 bg-purple-500/15 text-white shadow-sm'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900 shadow-sm ring-1 ring-emerald-400/40'
+                    : 'border-emerald-500 bg-emerald-500/15 text-white shadow-sm'
                   : isLight
                     ? 'border-slate-200 bg-slate-50/80 text-slate-600 hover:text-slate-900 hover:border-slate-300'
                     : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:text-white hover:border-zinc-700'
@@ -110,7 +110,7 @@ export function PlatformSelector({ selectedLinks, onChange }: PlatformSelectorPr
             return (
               <div
                 key={link.platform}
-                className={`flex items-center gap-3 p-2.5 rounded-xl border focus-within:border-purple-500 transition-colors ${
+                className={`flex items-center gap-3 p-2.5 rounded-xl border focus-within:border-emerald-500 transition-colors ${
                   isLight
                     ? 'bg-slate-50 border-slate-200/90 text-slate-900'
                     : 'bg-zinc-950/70 border-zinc-800 text-white'

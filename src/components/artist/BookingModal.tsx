@@ -41,16 +41,15 @@ export function BookingModal({
     <>
       <button
         onClick={handleOpen}
-        className="w-full py-3.5 px-6 rounded-2xl font-black text-sm flex items-center justify-center gap-2.5 shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] press-scale border group cursor-pointer"
+        className="w-full py-3.5 px-6 rounded-2xl font-black text-sm flex items-center justify-center gap-2.5 shadow-lg transition-all hover:scale-[1.01] hover:brightness-105 active:scale-[0.99] press-scale cursor-pointer group"
         style={{
-          backgroundColor: isLight ? `${themeColor}15` : `${themeColor}18`,
-          borderColor: isLight ? `${themeColor}55` : `${themeColor}45`,
-          color: isLight ? themeColor : '#ffffff',
-          boxShadow: isLight ? `0 4px 16px ${themeColor}22` : `0 4px 20px ${themeColor}20`,
+          backgroundColor: themeColor,
+          color: '#ffffff',
+          boxShadow: `0 4px 18px ${themeColor}40`,
         }}
       >
-        <Calendar className="w-4 h-4 transition-transform group-hover:scale-110 flex-shrink-0" style={{ color: themeColor }} />
-        <span style={{ color: isLight ? themeColor : '#ffffff' }}>Contact & Booking Officiel</span>
+        <Calendar className="w-4 h-4 transition-transform group-hover:scale-110 flex-shrink-0 text-white" />
+        <span className="text-white font-black tracking-wide">Contact & Booking Officiel</span>
       </button>
 
       {isOpen && (

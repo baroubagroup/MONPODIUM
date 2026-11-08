@@ -362,15 +362,16 @@ export default function HomePage() {
       <section className="py-12 sm:py-20 px-3.5 sm:px-4 border-t border-zinc-800/80 bg-zinc-950/70 w-full max-w-full overflow-hidden">
         <div className="max-w-5xl mx-auto space-y-8 sm:space-y-12">
           <div className="text-center space-y-2.5 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
-              <Flame className="w-3.5 h-3.5" />
-              <span>La réalité des artistes indépendants</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span>LE CONSTAT DU TERRAIN</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Pourquoi perds-tu jusqu&apos;à 70% de tes auditeurs aujourd&apos;hui ?
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+              Des nuits blanches en studio, des clips financés... <br />
+              <span className="text-emerald-400">Pour tout perdre à cause d&apos;un simple lien ?</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              Partager un simple lien YouTube ou un linktree générique sans extrait audio détruit l&apos;impact de tes sorties. Voici la différence.
+              En 2026, un fan décide en 3 secondes s&apos;il écoute ton morceau ou s&apos;il zappe. Balader ton public avec un lien YouTube inaccessible ou un Linktree muet divise tes streams par 3. Regarde la différence.
             </p>
           </div>
 
@@ -385,11 +386,11 @@ export default function HomePage() {
                     </span>
                     <div>
                       <h3 className="font-black text-base text-white">Sans MonPodium</h3>
-                      <span className="text-[11px] text-red-400 font-bold">La galère habituelle</span>
+                      <span className="text-[11px] text-red-400 font-bold">L&apos;ancienne méthode bricolée</span>
                     </div>
                   </div>
                   <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-                    Pertes d&apos;écoutes
+                    Perte de 70% d&apos;écoutes
                   </span>
                 </div>
 
@@ -397,40 +398,40 @@ export default function HomePage() {
                   <li className="flex items-start gap-3">
                     <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Trafic dispersé & fans perdus</strong>
-                      <span className="text-zinc-400 text-[11px]">Tu partages un lien YouTube : les fans sur Spotify ou Boomplay abandonnent sans écouter.</span>
+                      <strong className="text-white block font-bold">Le lien unique qui exclut tes auditeurs</strong>
+                      <span className="text-zinc-400 text-[11px]">Tu mets un lien YouTube dans ta bio TikTok ou Instagram : tes fans abonnés à Spotify, Apple Music ou Boomplay abandonnent immédiatement.</span>
                     </div>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Linktrees froids & sans extrait audio</strong>
-                      <span className="text-zinc-400 text-[11px]">Une liste de boutons sans âme. Aucune musique ne démarre, aucun frisson.</span>
+                      <strong className="text-white block font-bold">Le Linktree muet et sans âme</strong>
+                      <span className="text-zinc-400 text-[11px]">Une simple liste de boutons froids et gris. Aucune musique ne démarre, aucune ambiance : le fan clique, s&apos;ennuie et ferme la page.</span>
                     </div>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Arnaques & faux comptes de booking</strong>
-                      <span className="text-zinc-400 text-[11px]">Des faux managers encaissent des avances de concerts à ta place sans canal certifié.</span>
+                      <strong className="text-white block font-bold">Les arnaques de faux managers & faux bookings</strong>
+                      <span className="text-zinc-400 text-[11px]">Sans canal officiel vérifié, des faux comptes créent des numéros WhatsApp à ton nom et encaissent les acomptes de concerts à ta place.</span>
                     </div>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Zéro rétention ni présence durable</strong>
-                      <span className="text-zinc-400 text-[11px]">Le fan quitte ta page et t&apos;oublie. Tu n&apos;es nulle part sur son téléphone.</span>
+                      <strong className="text-white block font-bold">Le fan d&apos;un jour qui t&apos;oublie en 5 minutes</strong>
+                      <span className="text-zinc-400 text-[11px]">Une fois le son écouté, l&apos;algorithme l&apos;envoie vers un autre artiste. Tu n&apos;as aucun moyen direct de le recontacter.</span>
                     </div>
                   </li>
                 </ul>
               </div>
 
-              <div className="p-3 rounded-2xl bg-red-950/20 border border-red-500/20 text-[11px] text-red-300 flex items-center gap-2 mt-4">
-                <span className="font-black text-sm">📉</span>
-                <span>Résultat : Des mois de travail en studio pour des sorties qui tombent dans l&apos;oubli.</span>
+              <div className="p-3.5 rounded-2xl bg-red-950/20 border border-red-500/20 text-[11px] text-red-300 flex items-start gap-2.5 mt-4">
+                <span className="font-black text-sm flex-shrink-0">⚠️</span>
+                <span><strong>Bilan :</strong> Beaucoup d&apos;argent et d&apos;énergie dépensés en studio et en clip, mais une audience qui s&apos;évapore dans la nature.</span>
               </div>
             </div>
 
@@ -447,11 +448,11 @@ export default function HomePage() {
                     </span>
                     <div>
                       <h3 className="font-black text-base text-white">Avec MonPodium</h3>
-                      <span className="text-[11px] text-emerald-400 font-bold">La vitrine officielle</span>
+                      <span className="text-[11px] text-emerald-400 font-bold">La nouvelle norme • Ton Hub Officiel</span>
                     </div>
                   </div>
                   <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    100% Optimisé
+                    Conversion Maximale
                   </span>
                 </div>
 
@@ -459,42 +460,61 @@ export default function HomePage() {
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">1 seul lien vers tous les stores</strong>
-                      <span className="text-zinc-400 text-[11px]">Spotify, YouTube, Boomplay, Apple Music... Chacun écoute sur son appli favorite en 1 tap.</span>
+                      <strong className="text-white block font-bold">1 Seul Lien Universel pour 100% de tes fans</strong>
+                      <span className="text-zinc-400 text-[11px]">Spotify, YouTube, Boomplay, Apple Music, Deezer, Audiomack... Chaque visiteur ouvre son application de streaming préférée en 1 tap.</span>
                     </div>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Extrait 15s instantané sur le refrain</strong>
-                      <span className="text-zinc-400 text-[11px]">Ton son démarre direct dès le clic. L&apos;auditeur est captivé en 3 secondes.</span>
+                      <strong className="text-white block font-bold">L&apos;Extrait Audio 15s découpé sur ton meilleur refrain</strong>
+                      <span className="text-zinc-400 text-[11px]">Ton son démarre instantanément dès le clic. Ton fan est accroché en 3 secondes sans attendre le chargement d&apos;une vidéo.</span>
                     </div>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Booking direct & anti-arnaque</strong>
-                      <span className="text-zinc-400 text-[11px]">Bouton officiel sécurisé relié à ton management pour signer de vraies dates de concert.</span>
+                      <strong className="text-white block font-bold">Canal Booking & Management 100% Officiel</strong>
+                      <span className="text-zinc-400 text-[11px]">Badge vérifié certifié et bouton de contact direct vers ton management. Zéro intermédiaire douteux, tes contrats sont protégés.</span>
                     </div>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white block font-bold">Ton application PWA sur leur écran</strong>
-                      <span className="text-zinc-400 text-[11px]">Tes fans installent ton icône comme WhatsApp. Tu restes sur leur smartphone à vie.</span>
+                      <strong className="text-white block font-bold">Ton Application Mobile installée sur leur écran</strong>
+                      <span className="text-zinc-400 text-[11px]">Un bandeau discret invite tes fans à installer ton icône comme une vraie application (PWA). Tu restes sur leur téléphone pour toujours.</span>
                     </div>
                   </li>
                 </ul>
               </div>
 
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 flex items-center gap-2 mt-4">
-                <span className="font-black text-sm">🚀</span>
-                <span>Résultat : Chaque visiteur devient un auditeur, et chaque auditeur installe ton application.</span>
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 flex items-start gap-2.5 mt-4">
+                <span className="font-black text-sm flex-shrink-0">🚀</span>
+                <span><strong>Bilan :</strong> Chaque clic devient un auditeur fidèle, chaque promoteur trouve ton contact officiel, et chaque fan t&apos;installe sur son téléphone.</span>
               </div>
             </div>
+          </div>
+
+          {/* Micro-CTA d'accroche direct après comparaison */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/80 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div>
+              <p className="text-sm font-bold text-white">
+                Tu mérites mieux qu&apos;un simple lien texte ou un Linktree générique.
+              </p>
+              <p className="text-xs text-zinc-400">
+                Teste avec ton morceau phare aujourd&apos;hui. Configuration en 2 minutes chrono.
+              </p>
+            </div>
+            <Link
+              href="/auth/register"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs transition-all shadow-md hover:scale-105 active:scale-95 whitespace-nowrap"
+            >
+              <span>Créer ma vitrine gratuite (0 FCFA)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       </section>

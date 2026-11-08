@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DashboardThemeProvider, useDashboardTheme } from '@/context/DashboardThemeContext'
 import { toast } from 'sonner'
+import { getActiveUserProfile } from '@/lib/authSync'
 import {
   Disc3,
   Music,
@@ -30,41 +31,22 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const { isLight, toggleTheme } = useDashboardTheme()
 
   // Local state for artist info (fetched or mock fallback)
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [username, setUsername] = useState('ksbloom')
+  const [artistName, setArtistName] = useState('Mon Espace')
+  const [username, setUsername] = useState('')
 
   useEffect(() => {
-    // Check localStorage fallback demo user
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.artist_name) setArtistName(parsed.artist_name)
-        if (parsed.username) setUsername(parsed.username)
-      } catch {}
+    const loadUser = async () => {
+      const profile = await getActiveUserProfile()
+      if (profile) {
+        setArtistName(profile.artist_name || 'Mon Espace')
+        setUsername(profile.username || 'artiste')
+      } else {
+        // If no user is logged in at all, redirect to login
+        router.push('/auth/login')
+      }
     }
-
-    // Try fetching from Supabase session
-    const fetchUser = async () => {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-
-          if (profile) {
-            setArtistName(profile.artist_name || 'Artiste')
-            setUsername(profile.username || 'artiste')
-          }
-        }
-      } catch {}
-    }
-    fetchUser()
-  }, [])
+    loadUser()
+  }, [router])
 
   const copyLink = () => {
     const url = `${window.location.origin}/${username}`

@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Disc3, ArrowRight, AlertCircle } from 'lucide-react'
+import { isSupabaseConfigured, UserProfileData, registerInAdminUsers } from '@/lib/authSync'
+import { AdminArtistUser, INITIAL_ADMIN_USERS } from '@/lib/adminData'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,25 +20,141 @@ export default function LoginPage() {
     setError(null)
     setLoading(true)
 
-    try {
-      const supabase = createClient()
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+    const cleanEmail = email.trim().toLowerCase()
 
-      if (signInError) {
-        // Fallback for local demo preview if Supabase config is pending
-        if (signInError.message.includes('fetch') || signInError.message.includes('URL')) {
-          router.push('/dashboard')
-          return
+    try {
+      // 1. If Supabase is configured, authenticate with Supabase Auth
+      if (isSupabaseConfigured()) {
+        const supabase = createClient()
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        })
+
+        if (signInError) {
+          throw signInError
         }
-        throw signInError
+
+        if (data?.user) {
+          // Fetch corresponding profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single()
+
+          if (profile) {
+            const profileData: UserProfileData = {
+              id: profile.id,
+              email: profile.email,
+              full_name: profile.full_name || '',
+              artist_name: profile.artist_name || 'Artiste',
+              username: profile.username,
+              bio: profile.bio || '',
+              genre: profile.genre || 'Afrobeats',
+              genres: profile.genres || [profile.genre || 'Afrobeats'],
+              country: profile.country || "Côte d'Ivoire",
+              theme_color: profile.theme_color || '#9333ea',
+              theme_mode: profile.theme_mode || 'dark',
+              avatar_url: profile.avatar_url,
+              banner_url: profile.banner_url,
+              booking_email: profile.booking_email,
+              booking_phone: profile.booking_phone,
+              booking_enabled: Boolean(profile.booking_email),
+              plan: profile.plan || 'free',
+              verified: profile.is_verified || false,
+              account_status: profile.account_status || 'active',
+              pwa_enabled: profile.pwa_enabled ?? true,
+              pwa_name: profile.pwa_name || profile.artist_name,
+            }
+            localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
+            registerInAdminUsers(profileData)
+
+            // Fetch releases
+            const { data: dbReleases } = await supabase
+              .from('releases')
+              .select('*, platform_links(*)')
+              .eq('user_id', profile.id)
+              .order('display_order', { ascending: true })
+
+            if (dbReleases) {
+              localStorage.setItem('monpodium_releases', JSON.stringify(dbReleases))
+              localStorage.setItem(`monpodium_releases_${profile.username}`, JSON.stringify(dbReleases))
+            }
+
+            router.push('/dashboard')
+            return
+          }
+        }
       }
+
+      // 2. Check local accounts registry (fallback or local testing)
+      const rawUsers = localStorage.getItem('monpodium_admin_users')
+      const adminUsers: AdminArtistUser[] = rawUsers ? JSON.parse(rawUsers) : [...INITIAL_ADMIN_USERS]
+      const matchedUser = adminUsers.find((u) => u.email.toLowerCase() === cleanEmail)
+
+      if (matchedUser) {
+        const profileData: UserProfileData = {
+          id: matchedUser.id,
+          email: matchedUser.email,
+          full_name: matchedUser.full_name || '',
+          artist_name: matchedUser.artist_name,
+          username: matchedUser.username,
+          bio: matchedUser.bio || '',
+          genre: matchedUser.genres?.[0] || 'Afrobeats',
+          genres: matchedUser.genres || ['Afrobeats'],
+          country: matchedUser.country || "Côte d'Ivoire",
+          theme_color: matchedUser.theme_color || '#9333ea',
+          theme_mode: matchedUser.theme_mode || 'dark',
+          avatar_url: matchedUser.avatar_url,
+          banner_url: matchedUser.banner_url,
+          booking_email: matchedUser.booking_email,
+          booking_phone: matchedUser.booking_phone,
+          plan: matchedUser.plan || 'free',
+          verified: matchedUser.verified || false,
+          account_status: matchedUser.account_status || 'active',
+          pwa_enabled: true,
+          pwa_name: matchedUser.pwa_name || matchedUser.artist_name,
+        }
+        localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
+
+        // Retrieve user specific releases or start empty
+        const userReleases = localStorage.getItem(`monpodium_releases_${matchedUser.username}`)
+        if (userReleases) {
+          localStorage.setItem('monpodium_releases', userReleases)
+        } else {
+          localStorage.setItem('monpodium_releases', JSON.stringify([]))
+        }
+
+        router.push('/dashboard')
+        return
+      }
+
+      // 3. Fallback: if not found and password length >= 6, auto-provision
+      const fallbackUsername = cleanEmail.split('@')[0].replace(/[^a-z0-9_-]/g, '') || 'artiste'
+      const newProfile: UserProfileData = {
+        id: `user-${fallbackUsername}`,
+        email: cleanEmail,
+        full_name: '',
+        artist_name: fallbackUsername,
+        username: fallbackUsername,
+        genre: 'Afrobeats',
+        country: "Côte d'Ivoire",
+        plan: 'free',
+        theme_color: '#9333ea',
+        theme_mode: 'dark',
+      }
+      localStorage.setItem('monpodium_demo_user', JSON.stringify(newProfile))
+      registerInAdminUsers(newProfile)
+      localStorage.setItem('monpodium_releases', JSON.stringify([]))
+      localStorage.setItem(`monpodium_releases_${fallbackUsername}`, JSON.stringify([]))
 
       router.push('/dashboard')
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Identifiants invalides ou problème de connexion.'
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Identifiants invalides ou problème de connexion.'
       setError(errorMessage)
     } finally {
       setLoading(false)

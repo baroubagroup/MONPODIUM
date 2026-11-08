@@ -10,71 +10,69 @@ import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
 import { Release } from '@/types'
 import { Share2, Check, ArrowLeft, Disc3, ShieldCheck, Sparkles } from 'lucide-react'
 import { recordPageView } from '@/lib/tracker'
+import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { SafeImage } from '@/components/common/SafeImage'
 
 function ReleaseDetailContent() {
   const params = useParams()
-  const username = (params?.username as string) || 'ksbloom'
-  const slug = (params?.slug as string) || 'cest-dieu'
+  const rawUsername = (params?.username as string) || 'ksbloom'
+  const username = rawUsername.toLowerCase().trim()
+  const slug = (params?.slug as string) || ''
 
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [pwaName, setPwaName] = useState('KS Bloom')
+  const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
+  const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
   const [themeColor, setThemeColor] = useState('#9333ea')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
 
-  // Find release from localStorage or fallback
+  // Find release from database or storage
   const [release, setRelease] = useState<Release>({
-    id: 'rel-1',
+    id: 'rel-placeholder',
     user_id: 'u1',
-    title: "C'est Dieu",
-    slug: 'cest-dieu',
+    title: slug.replace(/-/g, ' ').toUpperCase(),
+    slug: slug,
     cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
-    preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
+    preview_audio_url: '',
     preview_start_ms: 0,
     preview_end_ms: 15000,
     release_type: 'single',
-    release_date: '2024-05-10',
+    release_date: new Date().toISOString().split('T')[0],
     is_published: true,
     display_order: 0,
     created_at: new Date().toISOString(),
-    platform_links: [
-      { id: '1', release_id: 'rel-1', platform: 'spotify', url: 'https://open.spotify.com', display_order: 0 },
-      { id: '2', release_id: 'rel-1', platform: 'boomplay', url: 'https://www.boomplay.com', display_order: 1 },
-      { id: '3', release_id: 'rel-1', platform: 'youtube', url: 'https://www.youtube.com', display_order: 2 },
-      { id: '4', release_id: 'rel-1', platform: 'apple_music', url: 'https://music.apple.com', display_order: 3 },
-      { id: '5', release_id: 'rel-1', platform: 'deezer', url: 'https://www.deezer.com', display_order: 4 },
-    ],
+    platform_links: [],
   })
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.artist_name) {
-          setArtistName(parsed.artist_name)
-          if (!parsed.pwa_name) setPwaName(parsed.artist_name)
-        }
-        if (parsed.pwa_name) setPwaName(parsed.pwa_name)
-        if (parsed.pwa_icon_url) setPwaIconUrl(parsed.pwa_icon_url)
-        if (parsed.theme_color) setThemeColor(parsed.theme_color)
-        if (parsed.theme_mode === 'light' || parsed.theme_mode === 'dark') {
-          setThemeMode(parsed.theme_mode)
-        }
-      } catch {}
-    }
+    const loadReleasePage = async () => {
+      // 1. Fetch public profile
+      const profile = await getPublicProfile(username)
+      if (profile) {
+        if (profile.artist_name) setArtistName(profile.artist_name)
+        setPwaName(profile.pwa_name || profile.artist_name)
+        if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
+        if (profile.theme_color) setThemeColor(profile.theme_color)
+        if (profile.theme_mode) setThemeMode(profile.theme_mode)
 
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed: Release[] = JSON.parse(localReleases)
-        const match = parsed.find(
+        // 2. Fetch releases for this artist
+        const userReleases = await getArtistReleases(username, profile.id)
+        const match = userReleases.find(
+          r => r.slug === slug || r.title.toLowerCase().replace(/\s+/g, '-') === slug
+        )
+        if (match) {
+          setRelease(match)
+        }
+      } else if (username === 'ksbloom') {
+        const userReleases = await getArtistReleases('ksbloom')
+        const match = userReleases.find(
           r => r.slug === slug || r.title.toLowerCase().replace(/\s+/g, '-') === slug
         )
         if (match) setRelease(match)
-      } catch {}
+      }
     }
+
+    loadReleasePage()
 
     document.title = `${release.title} — ${artistName} (Liens Officiels)`
 
@@ -142,10 +140,13 @@ function ReleaseDetailContent() {
           isLight ? 'bg-white border-slate-200' : 'bg-zinc-900 border-white/10'
         }`}>
           <div className="aspect-square w-full relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={release.cover_url || ''}
+            <SafeImage
+              src={release.cover_url}
               alt={release.title}
+              fallbackType="cover"
+              fallbackText={release.title}
+              themeColor={themeColor}
+              isLight={isLight}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {/* Dark glass gradient bottom */}

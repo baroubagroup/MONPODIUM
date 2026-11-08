@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Release, Platform, PLATFORMS } from '@/types'
 import { ChevronLeft, ChevronRight, Play, ArrowRight, Disc3 } from 'lucide-react'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
+import { SafeImage } from '@/components/common/SafeImage'
 
 interface ReleasesCarouselProps {
   releases: Release[]
@@ -163,11 +164,16 @@ export function ReleasesCarousel({
             }`}
           >
             {/* Square Cover */}
-            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-950 shadow-md">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={rel.cover_url || ''}
+            <div className={`relative aspect-square w-full rounded-xl overflow-hidden shadow-md ${
+              isLight ? 'bg-slate-100' : 'bg-zinc-950'
+            }`}>
+              <SafeImage
+                src={rel.cover_url}
                 alt={rel.title}
+                fallbackType="cover"
+                fallbackText={rel.title}
+                themeColor={themeColor}
+                isLight={isLight}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
 

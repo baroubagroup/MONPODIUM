@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Disc3, Sparkles, ArrowRight, Music2, User, Mail, Lock, AlertCircle } from 'lucide-react'
+import { registerInAdminUsers, UserProfileData, isSupabaseConfigured } from '@/lib/authSync'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -31,44 +32,96 @@ export default function RegisterPage() {
     setError(null)
     setLoading(true)
 
+    const cleanUsername = slugify(username || artistName || 'artiste')
+    const finalArtistName = artistName.trim() || 'Artiste'
+
+    // Build the initial dedicated profile
+    const profileData: UserProfileData = {
+      id: `user-${cleanUsername}-${Date.now()}`,
+      email: email.trim(),
+      full_name: fullName.trim(),
+      artist_name: finalArtistName,
+      username: cleanUsername,
+      genre: genre,
+      genres: [genre],
+      country: "Côte d'Ivoire",
+      booking_email: email.trim(),
+      theme_color: '#9333ea',
+      theme_mode: 'dark',
+      plan: 'free',
+      verified: false,
+      account_status: 'active',
+      pwa_enabled: true,
+      pwa_name: finalArtistName,
+    }
+
     try {
-      const supabase = createClient()
-
-      // Sign up with Supabase Auth + metadata
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            artist_name: artistName,
-            username: slugify(username),
-            genre,
-          },
-        },
-      })
-
-      if (signUpError) {
-        // If Supabase keys aren't set in dev, simulate mock login to test UI
-        if (signUpError.message.includes('fetch') || signUpError.message.includes('URL')) {
-          localStorage.setItem('monpodium_demo_user', JSON.stringify({
-            id: 'demo-user-1',
+      // 1. If Supabase is configured, create the auth user
+      if (isSupabaseConfigured()) {
+        try {
+          const supabase = createClient()
+          const { data, error: signUpError } = await supabase.auth.signUp({
             email,
-            full_name: fullName,
-            artist_name: artistName,
-            username: slugify(username),
-            genre,
-            plan: 'free',
-          }))
-          router.push('/dashboard')
-          return
+            password,
+            options: {
+              data: {
+                full_name: fullName,
+                artist_name: finalArtistName,
+                username: cleanUsername,
+                genre,
+              },
+            },
+          })
+
+          if (signUpError) {
+            // If user already registered, display clear message
+            if (signUpError.message.includes('already registered')) {
+              throw new Error('Un compte avec cette adresse email existe déjà. Veuillez vous connecter.')
+            }
+          }
+
+          if (data?.user) {
+            profileData.id = data.user.id
+            // Upsert profile in Supabase table
+            await supabase.from('profiles').upsert({
+              id: data.user.id,
+              email: email.trim(),
+              full_name: fullName.trim(),
+              artist_name: finalArtistName,
+              username: cleanUsername,
+              genre,
+              genres: [genre],
+              country: "Côte d'Ivoire",
+              booking_email: email.trim(),
+              theme_color: '#9333ea',
+              theme_mode: 'dark',
+              plan: 'free',
+              is_verified: false,
+              account_status: 'active',
+            })
+          }
+        } catch (err: any) {
+          if (err.message && err.message.includes('déjà')) {
+            throw err
+          }
+          console.debug('Supabase sign-up proceeding with synchronized profile', err)
         }
-        throw signUpError
       }
+
+      // 2. Always persist to localStorage for instant dedicated workspace
+      localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
+      registerInAdminUsers(profileData)
+
+      // Start new artist with their own fresh releases list (empty array)
+      localStorage.setItem('monpodium_releases', JSON.stringify([]))
+      localStorage.setItem(`monpodium_releases_${cleanUsername}`, JSON.stringify([]))
 
       router.push('/dashboard')
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue lors de la création de votre compte.'
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Une erreur est survenue lors de la création de votre compte.'
       setError(errorMessage)
     } finally {
       setLoading(false)

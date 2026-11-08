@@ -9,6 +9,8 @@ import { ReleaseType, Plan, PLAN_LIMITS } from '@/types'
 import { slugify } from '@/lib/utils'
 import { useDashboardTheme } from '@/context/DashboardThemeContext'
 import { toast } from 'sonner'
+import { getActiveUserProfile, isSupabaseConfigured } from '@/lib/authSync'
+import { createClient } from '@/lib/supabase/client'
 import {
   ArrowLeft,
   Upload,
@@ -46,23 +48,29 @@ export default function NewReleasePage() {
 
   // Quota enforcement check
   const [plan, setPlan] = useState<Plan>('free')
-  const [currentCount, setCurrentCount] = useState<number>(1)
+  const [currentCount, setCurrentCount] = useState<number>(0)
+  const [currentUsername, setCurrentUsername] = useState<string>('')
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.plan) setPlan(parsed.plan)
-      } catch {}
+    const initProfile = async () => {
+      const profile = await getActiveUserProfile()
+      if (profile) {
+        if (profile.plan) setPlan(profile.plan)
+        if (profile.username) setCurrentUsername(profile.username)
+        if (profile.id) setUserId(profile.id)
+
+        const userReleases = localStorage.getItem(`monpodium_releases_${profile.username}`)
+          || localStorage.getItem('monpodium_releases')
+        if (userReleases) {
+          try {
+            const parsed = JSON.parse(userReleases)
+            if (Array.isArray(parsed)) setCurrentCount(parsed.length)
+          } catch {}
+        }
+      }
     }
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed = JSON.parse(localReleases)
-        setCurrentCount(parsed.length)
-      } catch {}
-    }
+    initProfile()
   }, [])
 
   const maxAllowed = PLAN_LIMITS[plan]
@@ -72,8 +80,12 @@ export default function NewReleasePage() {
     const file = e.target.files?.[0]
     if (!file) return
     setCoverFile(file)
-    setCoverPreview(URL.createObjectURL(file))
-    toast.success('Pochette importée avec succès !')
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setCoverPreview(reader.result as string)
+      toast.success('Pochette importée avec succès !')
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleAudioSelected = (file: File | null, start: number, end: number) => {
@@ -100,25 +112,69 @@ export default function NewReleasePage() {
     setError(null)
 
     try {
+      const releaseSlug = slugify(title)
+      const newReleaseId = `rel-${Date.now()}`
+      const filteredLinks = platformLinks.filter(l => l.url.trim() !== '')
+
       const newRelease = {
-        id: `rel-${Date.now()}`,
+        id: newReleaseId,
+        user_id: userId || 'u1',
         title,
-        slug: slugify(title),
+        slug: releaseSlug,
         cover_url: coverPreview || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
         release_type: releaseType,
         release_date: releaseDate,
         preview_start_ms: startMs,
         preview_end_ms: endMs,
         is_published: isPublished,
-        platform_links: platformLinks.filter(l => l.url.trim() !== ''),
+        platform_links: filteredLinks,
         created_at: new Date().toISOString(),
       }
 
-      // Save to localStorage
+      // 1. If Supabase is configured and userId exists, insert into DB
+      if (isSupabaseConfigured() && userId) {
+        try {
+          const supabase = createClient()
+          const { data: dbRel, error: relErr } = await supabase
+            .from('releases')
+            .insert({
+              user_id: userId,
+              title,
+              slug: releaseSlug,
+              cover_url: newRelease.cover_url,
+              release_type: releaseType,
+              release_date: releaseDate,
+              preview_start_ms: startMs,
+              preview_end_ms: endMs,
+              is_published: isPublished,
+            })
+            .select()
+            .single()
+
+          if (dbRel?.id && filteredLinks.length > 0) {
+            await supabase.from('platform_links').insert(
+              filteredLinks.map((l, idx) => ({
+                release_id: dbRel.id,
+                platform: l.platform,
+                url: l.url,
+                display_order: idx,
+              }))
+            )
+          }
+        } catch (err) {
+          console.debug('Failed to insert release into Supabase', err)
+        }
+      }
+
+      // 2. Save to local storage for instant reactivity
       const existing = localStorage.getItem('monpodium_releases')
       const list = existing ? JSON.parse(existing) : []
       list.unshift(newRelease)
       localStorage.setItem('monpodium_releases', JSON.stringify(list))
+
+      if (currentUsername) {
+        localStorage.setItem(`monpodium_releases_${currentUsername}`, JSON.stringify(list))
+      }
 
       toast.success('Sortie publiée avec succès !')
       router.push('/dashboard/releases')

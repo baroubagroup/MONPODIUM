@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { PlanBadge } from '@/components/dashboard/PlanBadge'
 import { CountryAnalyticsCard } from '@/components/dashboard/CountryAnalyticsCard'
 import { getArtistTraffic } from '@/lib/analyticsData'
-import { Plan } from '@/types'
+import { Plan, Release } from '@/types'
 import { useDashboardTheme } from '@/context/DashboardThemeContext'
+import { getActiveUserProfile, getArtistReleases } from '@/lib/authSync'
+import { SafeImage } from '@/components/common/SafeImage'
 import {
   Music,
   ExternalLink,
@@ -20,33 +22,30 @@ import {
 
 export default function DashboardOverviewPage() {
   const { isLight } = useDashboardTheme()
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [username, setUsername] = useState('ksbloom')
+  const [artistName, setArtistName] = useState('Artiste')
+  const [username, setUsername] = useState('')
   const [plan, setPlan] = useState<Plan>('free')
-  const [releasesCount, setReleasesCount] = useState(1)
+  const [releasesCount, setReleasesCount] = useState(0)
+  const [latestRelease, setLatestRelease] = useState<Release | null>(null)
 
-  const trafficData = getArtistTraffic(username)
+  const trafficData = getArtistTraffic(username || 'artiste')
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.artist_name) setArtistName(parsed.artist_name)
-        if (parsed.username) setUsername(parsed.username)
-        if (parsed.plan) setPlan(parsed.plan)
-      } catch {}
-    }
+    const initOverview = async () => {
+      const profile = await getActiveUserProfile()
+      if (profile) {
+        setArtistName(profile.artist_name || 'Artiste')
+        setUsername(profile.username || 'artiste')
+        if (profile.plan) setPlan(profile.plan)
 
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed = JSON.parse(localReleases)
-        if (Array.isArray(parsed)) {
-          setReleasesCount(parsed.length)
+        const userReleases = await getArtistReleases(profile.username, profile.id)
+        setReleasesCount(userReleases.length)
+        if (userReleases.length > 0) {
+          setLatestRelease(userReleases[0])
         }
-      } catch {}
+      }
     }
+    initOverview()
   }, [])
 
   return (
@@ -146,50 +145,74 @@ export default function DashboardOverviewPage() {
           ? 'bg-white border-slate-200 text-slate-900'
           : 'bg-zinc-900/90 border-zinc-800 text-white'
       }`}>
-        <div className="flex items-center gap-4">
-          <div className={`w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 border shadow-md ${
-            isLight ? 'bg-slate-100 border-slate-200' : 'bg-zinc-800 border-zinc-700'
-          }`}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80"
-              alt="Cover"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="space-y-1 text-left">
-            <div className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-              isLight
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+        {latestRelease ? (
+          <div className="flex items-center gap-4 min-w-0">
+            <div className={`w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 border shadow-md ${
+              isLight ? 'bg-slate-100 border-slate-200' : 'bg-zinc-800 border-zinc-700'
             }`}>
-              En ligne
+              <SafeImage
+                src={latestRelease.cover_url}
+                alt={latestRelease.title}
+                fallbackType="cover"
+                fallbackText={latestRelease.title}
+                isLight={isLight}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h3 className={`text-base font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              C&apos;est Dieu (Single)
-            </h3>
-            <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-              Disponible sur Spotify, Boomplay, YouTube, Apple Music, Deezer
-            </p>
+            <div className="space-y-1 text-left min-w-0">
+              <div className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                isLight
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+              }`}>
+                {latestRelease.is_published ? 'En ligne' : 'Brouillon'}
+              </div>
+              <h3 className={`text-base font-black truncate ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                {latestRelease.title} ({latestRelease.release_type})
+              </h3>
+              <p className={`text-xs truncate ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                {latestRelease.platform_links && latestRelease.platform_links.length > 0
+                  ? `${latestRelease.platform_links.length} plateforme(s) connectée(s)`
+                  : 'Extrait 15s prêt • Ajoute tes liens'}
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 border shadow-inner ${
+              isLight ? 'bg-purple-50 text-purple-600 border-purple-200' : 'bg-purple-950/40 text-purple-400 border-purple-500/30'
+            }`}>
+              <Music className="w-8 h-8" />
+            </div>
+            <div className="space-y-1 text-left">
+              <h3 className={`text-base font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                Publie ton premier titre musical
+              </h3>
+              <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                Découpe 15s d&apos;extrait audio et ajoute tes liens de streaming (Spotify, YouTube, Apple Music...)
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <Link
-            href="/dashboard/releases"
-            className={`flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl font-bold text-xs transition-all shadow-xs press-scale ${
-              isLight
-                ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                : 'bg-zinc-800 hover:bg-zinc-700 text-white'
-            }`}
-          >
-            Gérer les plateformes
-          </Link>
+          {latestRelease && (
+            <Link
+              href="/dashboard/releases"
+              className={`flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl font-bold text-xs transition-all shadow-xs press-scale ${
+                isLight
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                  : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+              }`}
+            >
+              Gérer les plateformes
+            </Link>
+          )}
           <Link
             href="/dashboard/releases/new"
             className="flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition-all hover:scale-105 press-scale"
           >
-            Ajouter un son
+            {latestRelease ? 'Ajouter un son' : 'Créer une sortie'}
           </Link>
         </div>
       </div>

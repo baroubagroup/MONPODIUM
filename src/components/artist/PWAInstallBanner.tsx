@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Download, Smartphone, X, Share } from 'lucide-react'
+import { SafeImage } from '@/components/common/SafeImage'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -113,18 +114,14 @@ export function PWAInstallBanner({
             <div className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center shadow-md ${
               isLight ? 'bg-slate-100 border border-slate-300' : 'bg-zinc-900 border border-white/20'
             }`}>
-              {iconUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={iconUrl}
-                  alt={appName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className={`text-base font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                  {appName.charAt(0).toUpperCase()}
-                </span>
-              )}
+              <SafeImage
+                src={iconUrl}
+                alt={appName}
+                fallbackType="pwa"
+                fallbackText={appName}
+                themeColor={themeColor}
+                isLight={isLight}
+              />
               <div
                 className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-tl-md flex items-center justify-center shadow-xs"
                 style={{ backgroundColor: themeColor }}

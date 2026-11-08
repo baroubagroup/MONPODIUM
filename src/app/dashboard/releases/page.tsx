@@ -6,6 +6,9 @@ import { toast } from 'sonner'
 import { Release, Plan, PLATFORMS, PLAN_LIMITS } from '@/types'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { useDashboardTheme } from '@/context/DashboardThemeContext'
+import { getActiveUserProfile, getArtistReleases, isSupabaseConfigured } from '@/lib/authSync'
+import { createClient } from '@/lib/supabase/client'
+import { SafeImage } from '@/components/common/SafeImage'
 import {
   PlusCircle,
   Music,
@@ -22,57 +25,15 @@ import {
 
 export default function ReleasesListPage() {
   const { isLight } = useDashboardTheme()
-  const [username, setUsername] = useState('ksbloom')
+  const [username, setUsername] = useState('')
+  const [userId, setUserId] = useState<string | null>(null)
   const [plan, setPlan] = useState<Plan>('free')
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [playingId, setPlayingId] = useState<string | null>(null)
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null)
 
-  // Default mock releases
-  const defaultReleases: Release[] = [
-    {
-      id: 'rel-1',
-      user_id: 'u1',
-      title: "C'est Dieu",
-      slug: 'cest-dieu',
-      cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
-      preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
-      preview_start_ms: 0,
-      preview_end_ms: 15000,
-      release_type: 'single',
-      release_date: '2024-05-10',
-      is_published: true,
-      display_order: 0,
-      created_at: new Date().toISOString(),
-      platform_links: [
-        { id: '1', release_id: 'rel-1', platform: 'spotify', url: 'https://spotify.com', display_order: 0 },
-        { id: '2', release_id: 'rel-1', platform: 'boomplay', url: 'https://boomplay.com', display_order: 1 },
-        { id: '3', release_id: 'rel-1', platform: 'youtube', url: 'https://youtube.com', display_order: 2 },
-        { id: '4', release_id: 'rel-1', platform: 'apple_music', url: 'https://apple.com', display_order: 3 },
-      ],
-    },
-    {
-      id: 'rel-2',
-      user_id: 'u1',
-      title: 'Enfant de Dieu',
-      slug: 'enfant-de-dieu',
-      cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80',
-      preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
-      preview_start_ms: 0,
-      preview_end_ms: 15000,
-      release_type: 'album',
-      release_date: '2023-11-20',
-      is_published: true,
-      display_order: 1,
-      created_at: new Date().toISOString(),
-      platform_links: [
-        { id: '5', release_id: 'rel-2', platform: 'spotify', url: 'https://spotify.com', display_order: 0 },
-        { id: '6', release_id: 'rel-2', platform: 'deezer', url: 'https://deezer.com', display_order: 1 },
-      ],
-    },
-  ]
-
-  const [releases, setReleases] = useState<Release[]>(defaultReleases)
+  const [releases, setReleases] = useState<Release[]>([])
+  const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState<'all' | 'single' | 'album_ep'>('all')
 
   // Audio Playback
@@ -113,32 +74,41 @@ export default function ReleasesListPage() {
   }
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.username) setUsername(parsed.username)
-        if (parsed.plan) setPlan(parsed.plan)
-      } catch {}
-    }
+    const initReleases = async () => {
+      setLoading(true)
+      const profile = await getActiveUserProfile()
+      if (profile) {
+        if (profile.username) setUsername(profile.username)
+        if (profile.id) setUserId(profile.id)
+        if (profile.plan) setPlan(profile.plan)
 
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed = JSON.parse(localReleases)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setReleases(parsed)
-        }
-      } catch {}
+        const userReleases = await getArtistReleases(profile.username, profile.id)
+        setReleases(userReleases)
+      }
+      setLoading(false)
     }
+    initReleases()
   }, [])
 
-  const deleteRelease = (id: string) => {
-    if (!confirm('Supprimer cette sortie ?')) return
+  const deleteRelease = async (id: string) => {
+    if (!confirm('Supprimer cette sortie musicale ?')) return
     const updated = releases.filter(r => r.id !== id)
     setReleases(updated)
     localStorage.setItem('monpodium_releases', JSON.stringify(updated))
-    toast.success('Sortie supprimée')
+    if (username) {
+      localStorage.setItem(`monpodium_releases_${username}`, JSON.stringify(updated))
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient()
+        await supabase.from('releases').delete().eq('id', id)
+      } catch (err) {
+        console.debug('Failed to delete release on Supabase', err)
+      }
+    }
+
+    toast.success('Morceau supprimé avec succès.')
   }
 
   const copyReleaseLink = (slug: string, id: string) => {
@@ -314,6 +284,30 @@ export default function ReleasesListPage() {
         </button>
       </div>
 
+      {/* Empty State */}
+      {filteredReleases.length === 0 && (
+        <div className={`p-12 rounded-3xl border text-center space-y-4 shadow-sm ${
+          isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-zinc-900/90 border-zinc-800 text-white'
+        }`}>
+          <div className="w-16 h-16 rounded-2xl bg-purple-600/15 border border-purple-500/30 text-purple-600 flex items-center justify-center mx-auto shadow-inner">
+            <Music className="w-8 h-8" />
+          </div>
+          <div className="space-y-1 max-w-sm mx-auto">
+            <h3 className="font-black text-lg">Aucune sortie musicale pour le moment</h3>
+            <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+              Découpe ton extrait audio 15 secondes, ajoute tes plateformes (Spotify, YouTube, Apple Music...) et commence à partager ta musique !
+            </p>
+          </div>
+          <Link
+            href="/dashboard/releases/new"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs shadow-lg shadow-purple-600/30 transition-all hover:scale-105 active:scale-95 press-scale"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Créer ma première sortie</span>
+          </Link>
+        </div>
+      )}
+
       {/* Modernized Releases Cards */}
       <div className="space-y-3.5">
         {filteredReleases.map((release) => {
@@ -338,18 +332,14 @@ export default function ReleasesListPage() {
                 <div className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-md group-hover:scale-102 transition-transform ${
                   isLight ? 'bg-slate-100 border border-slate-200' : 'bg-zinc-950 border border-zinc-700/80'
                 }`}>
-                  {release.cover_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={release.cover_url}
-                      alt={release.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                      <Music className="w-8 h-8" />
-                    </div>
-                  )}
+                  <SafeImage
+                    src={release.cover_url}
+                    alt={release.title}
+                    fallbackType="cover"
+                    fallbackText={release.title}
+                    isLight={isLight}
+                    className="w-full h-full object-cover"
+                  />
 
                   {/* Play/Pause Snippet Button directly on cover */}
                   <button

@@ -22,6 +22,9 @@ import {
   Moon,
 } from 'lucide-react'
 import { SocialPlatform } from '@/types'
+import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
+import { SafeImage } from '@/components/common/SafeImage'
+import { createClient } from '@/lib/supabase/client'
 
 const PRESET_GENRES = [
   'Afrobeats',
@@ -103,67 +106,74 @@ const AVAILABLE_NETWORKS: { id: SocialPlatform; label: string; placeholder: stri
 
 export default function ProfilePage() {
   const { isLight } = useDashboardTheme()
-  const [fullName, setFullName] = useState('Jean Koné')
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [username, setUsername] = useState('ksbloom')
-  const [bio, setBio] = useState('Artiste Gospel & Musique Urbaine. Que toute la gloire revienne à Dieu.')
+  const [userId, setUserId] = useState<string | null>(null)
+  const [fullName, setFullName] = useState('')
+  const [artistName, setArtistName] = useState('')
+  const [username, setUsername] = useState('')
+  const [bio, setBio] = useState('')
   const [country, setCountry] = useState('Côte d\'Ivoire')
-  const [selectedGenres, setSelectedGenres] = useState<string[]>(['Gospel', 'Afrobeats'])
+  const [selectedGenres, setSelectedGenres] = useState<string[]>(['Afrobeats'])
   const [customGenreInput, setCustomGenreInput] = useState('')
 
   // Cover settings
   const [coverMode, setCoverMode] = useState<'image' | 'gradient'>('image')
   const [bannerUrl, setBannerUrl] = useState<string | null>(DEFAULT_COVER_PRESETS[0].url)
   const [bannerColor, setBannerColor] = useState<string>('linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #18181b 100%)')
-  const [customColor, setCustomColor] = useState<string>('#7c3aed')
+  const [customColor, setCustomColor] = useState<string>('#9333ea')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
 
   // Avatar & Booking
-  const [avatarUrl, setAvatarUrl] = useState<string>('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80')
-  const [bookingEnabled, setBookingEnabled] = useState(true)
-  const [bookingEmail, setBookingEmail] = useState('booking@ksbloom.ci')
+  const [avatarUrl, setAvatarUrl] = useState<string>('')
+  const [bookingEnabled, setBookingEnabled] = useState(false)
+  const [bookingEmail, setBookingEmail] = useState('')
   const [bookingPhone, setBookingPhone] = useState('')
 
   // Social Links
   const [socialLinks, setSocialLinks] = useState<{ platform: SocialPlatform; url: string }[]>([
-    { platform: 'facebook', url: 'https://facebook.com/ksbloom' },
-    { platform: 'instagram', url: 'https://instagram.com/ksbloom' },
-    { platform: 'tiktok', url: 'https://tiktok.com/@ksbloomofficiel' },
-    { platform: 'youtube', url: 'https://youtube.com/@ksbloom' },
+    { platform: 'facebook', url: '' },
+    { platform: 'instagram', url: '' },
+    { platform: 'tiktok', url: '' },
+    { platform: 'youtube', url: '' },
   ])
 
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.full_name) setFullName(parsed.full_name)
-        if (parsed.artist_name) setArtistName(parsed.artist_name)
-        if (parsed.username) setUsername(parsed.username)
-        if (parsed.bio !== undefined) setBio(parsed.bio)
-        if (parsed.country) setCountry(parsed.country)
-        if (parsed.genres && Array.isArray(parsed.genres)) setSelectedGenres(parsed.genres)
-        if (parsed.banner_url !== undefined) {
-          setBannerUrl(parsed.banner_url)
-          if (parsed.banner_url) setCoverMode('image')
+    const loadProfile = async () => {
+      const profile = await getActiveUserProfile()
+      if (profile) {
+        if (profile.id) setUserId(profile.id)
+        if (profile.full_name) setFullName(profile.full_name)
+        if (profile.artist_name) setArtistName(profile.artist_name)
+        if (profile.username) setUsername(profile.username)
+        if (profile.bio !== undefined) setBio(profile.bio)
+        if (profile.country) setCountry(profile.country)
+        if (profile.genres && Array.isArray(profile.genres) && profile.genres.length > 0) {
+          setSelectedGenres(profile.genres)
+        } else if (profile.genre) {
+          setSelectedGenres([profile.genre])
         }
-        if (parsed.banner_color) {
-          setBannerColor(parsed.banner_color)
-          if (!parsed.banner_url) setCoverMode('gradient')
+        if (profile.banner_url !== undefined) {
+          setBannerUrl(profile.banner_url)
+          if (profile.banner_url) setCoverMode('image')
         }
-        if (parsed.custom_color) setCustomColor(parsed.custom_color)
-        if (parsed.theme_mode) setThemeMode(parsed.theme_mode)
-        if (parsed.avatar_url) setAvatarUrl(parsed.avatar_url)
-        if (parsed.booking_enabled !== undefined) setBookingEnabled(parsed.booking_enabled)
-        if (parsed.booking_email) setBookingEmail(parsed.booking_email)
-        if (parsed.booking_phone) setBookingPhone(parsed.booking_phone)
-        if (parsed.social_links && Array.isArray(parsed.social_links)) {
-          setSocialLinks(parsed.social_links)
+        if (profile.banner_color) {
+          setBannerColor(profile.banner_color)
+          if (!profile.banner_url) setCoverMode('gradient')
         }
-      } catch {}
+        if (profile.theme_color) setCustomColor(profile.theme_color)
+        if (profile.theme_mode) setThemeMode(profile.theme_mode)
+        if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
+        if (profile.booking_enabled !== undefined) setBookingEnabled(profile.booking_enabled)
+        else if (profile.booking_email) setBookingEnabled(true)
+        if (profile.booking_email) setBookingEmail(profile.booking_email)
+        if (profile.booking_phone) setBookingPhone(profile.booking_phone)
+        if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
+          setSocialLinks(profile.social_links)
+        }
+      }
     }
+    loadProfile()
   }, [])
 
   const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,13 +246,14 @@ export default function ProfilePage() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const localUser = localStorage.getItem('monpodium_demo_user')
     const current = localUser ? JSON.parse(localUser) : {}
 
     const updated = {
       ...current,
+      id: userId || current.id,
       full_name: fullName,
       artist_name: artistName,
       username,
@@ -251,7 +262,7 @@ export default function ProfilePage() {
       genres: selectedGenres,
       banner_url: bannerUrl,
       banner_color: bannerColor,
-      custom_color: customColor,
+      theme_color: customColor,
       theme_mode: themeMode,
       avatar_url: avatarUrl,
       booking_enabled: bookingEnabled,
@@ -260,7 +271,33 @@ export default function ProfilePage() {
       social_links: socialLinks.filter(l => l.url.trim() !== ''),
     }
 
+    // 1. Sync to Supabase if available
+    if (isSupabaseConfigured() && (userId || current.id)) {
+      try {
+        const supabase = createClient()
+        await supabase.from('profiles').update({
+          full_name: fullName,
+          artist_name: artistName,
+          bio,
+          country,
+          genres: selectedGenres,
+          banner_url: bannerUrl,
+          banner_color: bannerColor,
+          theme_color: customColor,
+          theme_mode: themeMode,
+          avatar_url: avatarUrl,
+          booking_email: bookingEmail,
+          booking_phone: bookingPhone,
+        }).eq('id', userId || current.id)
+      } catch (err) {
+        console.debug('Failed to sync profile update to Supabase', err)
+      }
+    }
+
+    // 2. Persist locally and update in admin directory
     localStorage.setItem('monpodium_demo_user', JSON.stringify(updated))
+    registerInAdminUsers(updated)
+
     setSaved(true)
     toast.success('Profil artiste mis à jour !', {
       description: 'Ta vitrine publique reflète désormais tes modifications.',
@@ -408,13 +445,16 @@ export default function ProfilePage() {
               <div className="relative z-10 flex items-end justify-between w-full gap-3">
                 {/* Overlapping Avatar */}
                 <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-white shadow-2xl bg-zinc-950 group flex-shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <SafeImage
                     src={avatarUrl}
                     alt={artistName}
+                    fallbackType="avatar"
+                    fallbackText={artistName}
+                    themeColor={customColor}
+                    isLight={isLight}
                     className="w-full h-full object-cover"
                   />
-                  <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[10px] font-bold cursor-pointer transition-opacity">
+                  <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[10px] font-bold cursor-pointer transition-opacity z-10">
                     <Camera className="w-4 h-4 mb-0.5" />
                     <span>Modifier</span>
                     <input

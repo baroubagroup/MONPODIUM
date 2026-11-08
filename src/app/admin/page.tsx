@@ -45,6 +45,8 @@ import { GLOBAL_PLATFORM_TRAFFIC } from '@/lib/analyticsData'
 import { computeArtistAnalytics, TIME_RANGE_LABELS } from '@/lib/analyticsEngine'
 import { AnalyticsTimeRange } from '@/types/analytics'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
+import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/authSync'
 
 export default function AdminDashboardPage() {
   const { isLight } = useDashboardTheme()
@@ -62,18 +64,80 @@ export default function AdminDashboardPage() {
   const [userToInspect, setUserToInspect] = useState<AdminArtistUser | null>(null)
   const [inspectTimeRange, setInspectTimeRange] = useState<AnalyticsTimeRange>('30d')
 
-  // Initialize and synchronize with localStorage
+  // Initialize and synchronize with localStorage and Supabase
   useEffect(() => {
+    let localList = INITIAL_ADMIN_USERS
     const savedUsers = localStorage.getItem('monpodium_admin_users')
     if (savedUsers) {
       try {
-        setUsers(JSON.parse(savedUsers))
+        localList = JSON.parse(savedUsers)
+        setUsers(localList)
       } catch {
         setUsers(INITIAL_ADMIN_USERS)
       }
     } else {
       setUsers(INITIAL_ADMIN_USERS)
       localStorage.setItem('monpodium_admin_users', JSON.stringify(INITIAL_ADMIN_USERS))
+    }
+
+    // Try fetching online registered users from Supabase if active
+    if (isSupabaseConfigured()) {
+      const fetchSupabaseUsers = async () => {
+        try {
+          const supabase = createClient()
+          const { data: profiles } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+          if (profiles && profiles.length > 0) {
+            setUsers((prev) => {
+              const merged = [...prev]
+              profiles.forEach((p) => {
+                const idx = merged.findIndex((u) => u.username.toLowerCase() === p.username.toLowerCase())
+                const entry: AdminArtistUser = {
+                  id: p.id,
+                  email: p.email,
+                  artist_name: p.artist_name || p.username,
+                  username: p.username,
+                  full_name: p.full_name || '',
+                  plan: p.plan || 'free',
+                  plan_expires_at: null,
+                  verified: p.is_verified || false,
+                  account_status: p.account_status || 'active',
+                  created_at: p.created_at || new Date().toISOString(),
+                  country: p.country || "Côte d'Ivoire",
+                  genres: p.genres || (p.genre ? [p.genre] : ['Afrobeats']),
+                  bio: p.bio || null,
+                  avatar_url: p.avatar_url || null,
+                  banner_url: p.banner_url || null,
+                  banner_color: p.banner_color || null,
+                  theme_color: p.theme_color || '#9333ea',
+                  theme_mode: p.theme_mode || 'dark',
+                  booking_email: p.booking_email || null,
+                  booking_phone: p.booking_phone || null,
+                  booking_enabled: Boolean(p.booking_email),
+                  pwa_enabled: true,
+                  pwa_name: p.pwa_name || p.artist_name,
+                  pwa_icon_url: p.pwa_icon_url || null,
+                  pwa_splash_url: null,
+                  releases_count: 0,
+                  total_streams_preview: 0,
+                  is_flagged_impostor: false,
+                  moderation_report_count: 0,
+                  admin_notes: '',
+                }
+                if (idx >= 0) {
+                  merged[idx] = { ...merged[idx], ...entry }
+                } else {
+                  merged.unshift(entry)
+                }
+              })
+              localStorage.setItem('monpodium_admin_users', JSON.stringify(merged))
+              return merged
+            })
+          }
+        } catch (err) {
+          console.debug('Failed to fetch admin users from Supabase', err)
+        }
+      }
+      fetchSupabaseUsers()
     }
 
     const savedReports = localStorage.getItem('monpodium_moderation_reports')

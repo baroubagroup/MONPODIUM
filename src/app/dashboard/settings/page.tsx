@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useDashboardTheme } from '@/context/DashboardThemeContext'
+import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
+import { createClient } from '@/lib/supabase/client'
 import {
   Smartphone,
   Globe,
@@ -19,35 +21,34 @@ import {
 
 export default function SettingsPage() {
   const { isLight } = useDashboardTheme()
+  const [userId, setUserId] = useState<string | null>(null)
   const [pwaEnabled, setPwaEnabled] = useState(true)
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [username, setUsername] = useState('ksbloom')
-  const [pwaName, setPwaName] = useState('KS Bloom')
-  const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(
-    'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&auto=format&fit=crop&q=80'
-  )
+  const [artistName, setArtistName] = useState('Artiste')
+  const [username, setUsername] = useState('')
+  const [pwaName, setPwaName] = useState('Artiste')
+  const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
   const [themeColor, setThemeColor] = useState('#9333ea')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [copiedSubdomain, setCopiedSubdomain] = useState(false)
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.artist_name) {
-          setArtistName(parsed.artist_name)
-          if (!parsed.pwa_name) setPwaName(parsed.artist_name)
+    const initSettings = async () => {
+      const profile = await getActiveUserProfile()
+      if (profile) {
+        if (profile.id) setUserId(profile.id)
+        if (profile.artist_name) {
+          setArtistName(profile.artist_name)
+          setPwaName(profile.pwa_name || profile.artist_name)
         }
-        if (parsed.username) setUsername(parsed.username)
-        if (parsed.pwa_name) setPwaName(parsed.pwa_name)
-        if (parsed.pwa_icon_url) setPwaIconUrl(parsed.pwa_icon_url)
-        if (parsed.theme_color) setThemeColor(parsed.theme_color)
-        if (parsed.theme_mode) setThemeMode(parsed.theme_mode)
-        if (parsed.pwa_enabled !== undefined) setPwaEnabled(parsed.pwa_enabled)
-      } catch {}
+        if (profile.username) setUsername(profile.username)
+        if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
+        if (profile.theme_color) setThemeColor(profile.theme_color)
+        if (profile.theme_mode) setThemeMode(profile.theme_mode)
+        if (profile.pwa_enabled !== undefined) setPwaEnabled(profile.pwa_enabled)
+      }
     }
+    initSettings()
   }, [])
 
   const handleIconFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,29 +63,49 @@ export default function SettingsPage() {
   }
 
   const copySubdomain = () => {
-    navigator.clipboard.writeText(`https://${username}.monpodium.com`)
+    navigator.clipboard.writeText(`https://${username || 'artiste'}.monpodium.com`)
     setCopiedSubdomain(true)
     toast.success('Lien copié !', {
-      description: `https://${username}.monpodium.com`,
+      description: `https://${username || 'artiste'}.monpodium.com`,
     })
     setTimeout(() => setCopiedSubdomain(false), 2000)
   }
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     const localUser = localStorage.getItem('monpodium_demo_user')
     const current = localUser ? JSON.parse(localUser) : {}
-    localStorage.setItem(
-      'monpodium_demo_user',
-      JSON.stringify({
-        ...current,
-        pwa_enabled: pwaEnabled,
-        pwa_name: pwaName || artistName,
-        pwa_icon_url: pwaIconUrl,
-        theme_color: themeColor,
-        theme_mode: themeMode,
-      })
-    )
+
+    const updated = {
+      ...current,
+      id: userId || current.id,
+      artist_name: artistName,
+      username: username || current.username,
+      pwa_enabled: pwaEnabled,
+      pwa_name: pwaName || artistName,
+      pwa_icon_url: pwaIconUrl,
+      theme_color: themeColor,
+      theme_mode: themeMode,
+    }
+
+    if (isSupabaseConfigured() && (userId || current.id)) {
+      try {
+        const supabase = createClient()
+        await supabase.from('profiles').update({
+          pwa_enabled: pwaEnabled,
+          pwa_name: pwaName || artistName,
+          pwa_icon_url: pwaIconUrl,
+          theme_color: themeColor,
+          theme_mode: themeMode,
+        }).eq('id', userId || current.id)
+      } catch (err) {
+        console.debug('Failed to update settings in Supabase', err)
+      }
+    }
+
+    localStorage.setItem('monpodium_demo_user', JSON.stringify(updated))
+    registerInAdminUsers(updated)
+
     setSaved(true)
     toast.success('Paramètres enregistrés !', {
       description: 'Tes préférences et ton application PWA sont à jour.',

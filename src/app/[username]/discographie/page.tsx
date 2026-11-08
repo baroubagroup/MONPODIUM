@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { Release, Platform, PLATFORMS } from '@/types'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
+import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { SafeImage } from '@/components/common/SafeImage'
 import {
   ArrowLeft,
   Search,
@@ -23,10 +25,11 @@ import {
 
 function DiscographyContent() {
   const params = useParams()
-  const username = (params?.username as string) || 'ksbloom'
+  const rawUsername = (params?.username as string) || 'ksbloom'
+  const username = rawUsername.toLowerCase().trim()
 
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [pwaName, setPwaName] = useState('KS Bloom')
+  const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
+  const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(
     'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80'
@@ -44,80 +47,32 @@ function DiscographyContent() {
   const [audioProgress, setAudioProgress] = useState(0)
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
 
-  const [releases, setReleases] = useState<Release[]>([
-    {
-      id: 'rel-1',
-      user_id: 'u1',
-      title: "C'est Dieu",
-      slug: 'cest-dieu',
-      cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
-      preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
-      preview_start_ms: 0,
-      preview_end_ms: 15000,
-      release_type: 'single',
-      release_date: '2024-05-10',
-      is_published: true,
-      display_order: 0,
-      created_at: new Date().toISOString(),
-      platform_links: [
-        { id: '1', release_id: 'rel-1', platform: 'spotify', url: 'https://open.spotify.com', display_order: 0 },
-        { id: '2', release_id: 'rel-1', platform: 'boomplay', url: 'https://www.boomplay.com', display_order: 1 },
-        { id: '3', release_id: 'rel-1', platform: 'youtube', url: 'https://www.youtube.com', display_order: 2 },
-        { id: '4', release_id: 'rel-1', platform: 'apple_music', url: 'https://music.apple.com', display_order: 3 },
-      ],
-    },
-    {
-      id: 'rel-2',
-      user_id: 'u1',
-      title: 'Enfant de Dieu',
-      slug: 'enfant-de-dieu',
-      cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80',
-      preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
-      preview_start_ms: 0,
-      preview_end_ms: 15000,
-      release_type: 'album',
-      release_date: '2023-11-20',
-      is_published: true,
-      display_order: 1,
-      created_at: new Date().toISOString(),
-      platform_links: [
-        { id: '5', release_id: 'rel-2', platform: 'spotify', url: 'https://open.spotify.com', display_order: 0 },
-        { id: '6', release_id: 'rel-2', platform: 'deezer', url: 'https://www.deezer.com', display_order: 1 },
-        { id: '7', release_id: 'rel-2', platform: 'boomplay', url: 'https://www.boomplay.com', display_order: 2 },
-      ],
-    },
-  ])
+  const [releases, setReleases] = useState<Release[]>([])
 
   useEffect(() => {
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.artist_name) setArtistName(parsed.artist_name)
-        if (parsed.pwa_name) setPwaName(parsed.pwa_name)
-        else if (parsed.artist_name) setPwaName(parsed.artist_name)
-        if (parsed.pwa_icon_url) setPwaIconUrl(parsed.pwa_icon_url)
-        if (parsed.avatar_url) setAvatarUrl(parsed.avatar_url)
-        if (parsed.theme_color) setThemeColor(parsed.theme_color)
-        if (parsed.theme_mode === 'light' || parsed.theme_mode === 'dark') {
-          setThemeMode(parsed.theme_mode)
-        }
-        if (parsed.pwa_enabled !== undefined) setPwaEnabled(parsed.pwa_enabled)
-      } catch {}
-    }
+    const loadDiscography = async () => {
+      const profile = await getPublicProfile(username)
+      if (profile) {
+        if (profile.artist_name) setArtistName(profile.artist_name)
+        setPwaName(profile.pwa_name || profile.artist_name)
+        if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
+        if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
+        if (profile.theme_color) setThemeColor(profile.theme_color)
+        if (profile.theme_mode) setThemeMode(profile.theme_mode)
 
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed = JSON.parse(localReleases)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setReleases(parsed)
-        }
-      } catch {}
+        const userReleases = await getArtistReleases(username, profile.id)
+        setReleases(userReleases)
+      } else if (username === 'ksbloom') {
+        const userReleases = await getArtistReleases('ksbloom')
+        setReleases(userReleases)
+      } else {
+        setReleases([])
+      }
     }
+    loadDiscography()
 
     document.title = `Discographie complète — ${artistName} (MonPodium)`
-  }, [artistName])
+  }, [artistName, username])
 
   // Handle in-page audio preview
   const handleTogglePlay = (rel: Release) => {
@@ -238,14 +193,14 @@ function DiscographyContent() {
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-zinc-950 border-2 flex-shrink-0 shadow-lg"
                 style={{ borderColor: `${themeColor}60` }}
               >
-                {avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatarUrl} alt={artistName} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center font-black text-xl text-white">
-                    {artistName.charAt(0)}
-                  </div>
-                )}
+                <SafeImage
+                  src={avatarUrl}
+                  alt={artistName}
+                  fallbackType="avatar"
+                  fallbackText={artistName}
+                  themeColor={themeColor}
+                  isLight={isLight}
+                />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -386,10 +341,13 @@ function DiscographyContent() {
                     <div className="flex items-center gap-4 min-w-0">
                       {/* Cover with Play/Pause button */}
                       <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-zinc-950 flex-shrink-0 shadow-lg group">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={rel.cover_url || ''}
+                        <SafeImage
+                          src={rel.cover_url}
                           alt={rel.title}
+                          fallbackType="cover"
+                          fallbackText={rel.title}
+                          themeColor={themeColor}
+                          isLight={isLight}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
 

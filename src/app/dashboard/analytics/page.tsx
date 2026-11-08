@@ -8,6 +8,7 @@ import { AnalyticsTimeRange, ArtistDetailedAnalytics } from '@/types/analytics'
 import { computeArtistAnalytics, TIME_RANGE_LABELS } from '@/lib/analyticsEngine'
 import { Release } from '@/types'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
+import { getActiveUserProfile, getArtistReleases } from '@/lib/authSync'
 import {
   BarChart3,
   TrendingUp,
@@ -32,8 +33,8 @@ export default function ArtistAnalyticsPage() {
   const { isLight } = useDashboardTheme()
 
   const [timeRange, setTimeRange] = useState<AnalyticsTimeRange>('30d')
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [username, setUsername] = useState('ksbloom')
+  const [artistName, setArtistName] = useState('Artiste')
+  const [username, setUsername] = useState('')
   const [releases, setReleases] = useState<Release[]>([])
   const [analytics, setAnalytics] = useState<ArtistDetailedAnalytics | null>(null)
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
@@ -41,38 +42,21 @@ export default function ArtistAnalyticsPage() {
 
   // Load artist info & releases
   useEffect(() => {
-    let currentUsername = 'ksbloom'
-    let currentName = 'KS Bloom'
+    const initAnalytics = async () => {
+      const profile = await getActiveUserProfile()
+      const currentUsername = profile?.username || 'artiste'
+      const currentName = profile?.artist_name || 'Artiste'
 
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.username) {
-          currentUsername = parsed.username
-          setUsername(parsed.username)
-        }
-        if (parsed.artist_name) {
-          currentName = parsed.artist_name
-          setArtistName(parsed.artist_name)
-        }
-      } catch {}
+      setUsername(currentUsername)
+      setArtistName(currentName)
+
+      const userReleases = await getArtistReleases(currentUsername, profile?.id)
+      setReleases(userReleases)
+
+      const data = computeArtistAnalytics(currentUsername, currentName, timeRange, userReleases)
+      setAnalytics(data)
     }
-
-    let loadedReleases: Release[] = []
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed = JSON.parse(localReleases)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          loadedReleases = parsed
-          setReleases(parsed)
-        }
-      } catch {}
-    }
-
-    const data = computeArtistAnalytics(currentUsername, currentName, timeRange, loadedReleases)
-    setAnalytics(data)
+    initAnalytics()
   }, [timeRange])
 
   const handleRefresh = () => {

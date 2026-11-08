@@ -11,6 +11,8 @@ import { ReleasesCarousel } from '@/components/artist/ReleasesCarousel'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { Release, SocialLink, PLATFORMS } from '@/types'
 import { recordPageView } from '@/lib/tracker'
+import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { SafeImage } from '@/components/common/SafeImage'
 import {
   Disc3,
   Share2,
@@ -29,159 +31,103 @@ import {
 
 function ArtistHubContent() {
   const params = useParams()
-  const username = (params?.username as string) || 'ksbloom'
+  const rawUsername = (params?.username as string) || 'ksbloom'
+  const username = rawUsername.toLowerCase().trim()
 
-  const [artistName, setArtistName] = useState('KS Bloom')
-  const [pwaName, setPwaName] = useState('KS Bloom')
+  const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
+  const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
   const [bio, setBio] = useState(
-    "Artiste chanteur gospel & afrobeats ivoirien. Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés."
+    username === 'ksbloom'
+      ? "Artiste chanteur gospel & afrobeats ivoirien. Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés."
+      : "Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés."
   )
   const [country, setCountry] = useState("Côte d'Ivoire")
-  const [genres, setGenres] = useState<string[]>(['Afrobeats', 'Gospel', 'Afro-Trap'])
+  const [genres, setGenres] = useState<string[]>(['Afrobeats'])
   const [themeColor, setThemeColor] = useState('#9333ea')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
-  const [isVerified, setIsVerified] = useState(true)
+  const [isVerified, setIsVerified] = useState(username === 'ksbloom')
   const [accountStatus, setAccountStatus] = useState<'active' | 'suspended' | 'banned'>('active')
   const [avatarUrl, setAvatarUrl] = useState(
     'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80'
   )
-  const [bannerUrl, setBannerUrl] = useState<string | null>(
-    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop&q=80'
-  )
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null)
   const [bannerColor, setBannerColor] = useState<string>(
     'linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #1e1b4b 100%)'
   )
 
-  const [bookingEnabled, setBookingEnabled] = useState(true)
-  const [bookingEmail, setBookingEmail] = useState<string | null>('booking@ksbloom.com')
+  const [bookingEnabled, setBookingEnabled] = useState(false)
+  const [bookingEmail, setBookingEmail] = useState<string | null>(null)
   const [bookingPhone, setBookingPhone] = useState<string | null>(null)
   const [pwaEnabled, setPwaEnabled] = useState(true)
   const [copied, setCopied] = useState(false)
 
   // Official verified social links (no raw URLs)
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
-    { id: '1', user_id: 'u1', platform: 'facebook', url: 'https://facebook.com/ksbloom' },
-    { id: '2', user_id: 'u1', platform: 'instagram', url: 'https://instagram.com/ksbloom_music' },
-    { id: '3', user_id: 'u1', platform: 'tiktok', url: 'https://tiktok.com/@ksbloom' },
-    { id: '4', user_id: 'u1', platform: 'youtube', url: 'https://youtube.com/@ksbloom' },
-  ])
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([])
 
   // Discography (Releases)
-  const [releases, setReleases] = useState<Release[]>([
-    {
-      id: 'rel-1',
-      user_id: 'u1',
-      title: "C'est Dieu",
-      slug: 'cest-dieu',
-      cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
-      preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
-      preview_start_ms: 0,
-      preview_end_ms: 15000,
-      release_type: 'single',
-      release_date: '2024-05-10',
-      is_published: true,
-      display_order: 0,
-      created_at: new Date().toISOString(),
-      platform_links: [
-        { id: '1', release_id: 'rel-1', platform: 'spotify', url: 'https://open.spotify.com', display_order: 0 },
-        { id: '2', release_id: 'rel-1', platform: 'boomplay', url: 'https://www.boomplay.com', display_order: 1 },
-        { id: '3', release_id: 'rel-1', platform: 'youtube', url: 'https://www.youtube.com', display_order: 2 },
-        { id: '4', release_id: 'rel-1', platform: 'apple_music', url: 'https://music.apple.com', display_order: 3 },
-      ],
-    },
-    {
-      id: 'rel-2',
-      user_id: 'u1',
-      title: 'Enfant de Dieu',
-      slug: 'enfant-de-dieu',
-      cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80',
-      preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
-      preview_start_ms: 0,
-      preview_end_ms: 15000,
-      release_type: 'album',
-      release_date: '2023-11-20',
-      is_published: true,
-      display_order: 1,
-      created_at: new Date().toISOString(),
-      platform_links: [
-        { id: '5', release_id: 'rel-2', platform: 'spotify', url: 'https://open.spotify.com', display_order: 0 },
-        { id: '6', release_id: 'rel-2', platform: 'deezer', url: 'https://www.deezer.com', display_order: 1 },
-        { id: '7', release_id: 'rel-2', platform: 'boomplay', url: 'https://www.boomplay.com', display_order: 2 },
-      ],
-    },
-  ])
+  const [releases, setReleases] = useState<Release[]>([])
 
   useEffect(() => {
-    // 1. Check Admin Users registry first
-    const adminUsersStr = localStorage.getItem('monpodium_admin_users')
-    if (adminUsersStr) {
-      try {
-        const adminUsers = JSON.parse(adminUsersStr)
-        const match = adminUsers.find((u: any) => u.username.toLowerCase() === username.toLowerCase())
-        if (match) {
-          if (match.artist_name) setArtistName(match.artist_name)
-          if (match.pwa_name) setPwaName(match.pwa_name)
-          if (match.pwa_icon_url) setPwaIconUrl(match.pwa_icon_url)
-          if (match.bio) setBio(match.bio)
-          if (match.country) setCountry(match.country)
-          if (match.avatar_url) setAvatarUrl(match.avatar_url)
-          if (match.banner_url !== undefined) setBannerUrl(match.banner_url)
-          if (match.theme_color) setThemeColor(match.theme_color)
-          if (match.theme_mode) setThemeMode(match.theme_mode)
-          if (match.genres) setGenres(match.genres)
-          if (match.verified !== undefined) setIsVerified(match.verified)
-          if (match.account_status) setAccountStatus(match.account_status)
-          if (match.booking_email) setBookingEmail(match.booking_email)
-          if (match.booking_phone) setBookingPhone(match.booking_phone)
+    const loadArtistPage = async () => {
+      // 1. Fetch public profile by username
+      const profile = await getPublicProfile(username)
+      if (profile) {
+        if (profile.artist_name) setArtistName(profile.artist_name)
+        setPwaName(profile.pwa_name || profile.artist_name)
+        if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
+        if (profile.bio !== undefined) setBio(profile.bio)
+        if (profile.country) setCountry(profile.country)
+        if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
+        if (profile.banner_url !== undefined) setBannerUrl(profile.banner_url)
+        if (profile.banner_color) setBannerColor(profile.banner_color)
+        if (profile.theme_color) setThemeColor(profile.theme_color)
+        if (profile.theme_mode) setThemeMode(profile.theme_mode)
+        if (profile.genres && Array.isArray(profile.genres) && profile.genres.length > 0) {
+          setGenres(profile.genres)
+        } else if (profile.genre) {
+          setGenres([profile.genre])
         }
-      } catch {}
+        if (profile.verified !== undefined) setIsVerified(profile.verified)
+        if (profile.account_status) setAccountStatus(profile.account_status)
+        if (profile.booking_email) {
+          setBookingEmail(profile.booking_email)
+          setBookingEnabled(profile.booking_enabled ?? true)
+        }
+        if (profile.booking_phone) setBookingPhone(profile.booking_phone)
+        if (profile.social_links && Array.isArray(profile.social_links)) {
+          setSocialLinks(profile.social_links)
+        }
+
+        // 2. Load releases specifically for this artist
+        const userReleases = await getArtistReleases(username, profile.id)
+        setReleases(userReleases)
+      } else if (username === 'ksbloom') {
+        // Fallback for default showcase artist
+        setArtistName('KS Bloom')
+        setPwaName('KS Bloom')
+        setBio("Artiste chanteur gospel & afrobeats ivoirien. Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés.")
+        setGenres(['Afrobeats', 'Gospel', 'Afro-Trap'])
+        setIsVerified(true)
+        setBookingEmail('booking@ksbloom.com')
+        setBookingEnabled(true)
+        setSocialLinks([
+          { id: '1', user_id: 'u1', platform: 'facebook', url: 'https://facebook.com/ksbloom' },
+          { id: '2', user_id: 'u1', platform: 'instagram', url: 'https://instagram.com/ksbloom_music' },
+          { id: '3', user_id: 'u1', platform: 'tiktok', url: 'https://tiktok.com/@ksbloom' },
+          { id: '4', user_id: 'u1', platform: 'youtube', url: 'https://youtube.com/@ksbloom' },
+        ])
+        const userReleases = await getArtistReleases('ksbloom')
+        setReleases(userReleases)
+      } else {
+        // Unknown or freshly created username
+        setArtistName(username.charAt(0).toUpperCase() + username.slice(1))
+        setPwaName(username.charAt(0).toUpperCase() + username.slice(1))
+        setReleases([])
+      }
     }
 
-    // 2. Check local demo user
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.username === username || (!username && parsed.username === 'ksbloom')) {
-          if (parsed.artist_name) setArtistName(parsed.artist_name)
-          if (parsed.pwa_name) setPwaName(parsed.pwa_name)
-          else if (parsed.artist_name) setPwaName(parsed.artist_name)
-          if (parsed.pwa_icon_url) setPwaIconUrl(parsed.pwa_icon_url)
-          if (parsed.bio) setBio(parsed.bio)
-          if (parsed.country) setCountry(parsed.country)
-          if (parsed.avatar_url) setAvatarUrl(parsed.avatar_url)
-          if (parsed.banner_url !== undefined) setBannerUrl(parsed.banner_url)
-          if (parsed.banner_color) setBannerColor(parsed.banner_color)
-          if (parsed.theme_color) setThemeColor(parsed.theme_color)
-          if (parsed.theme_mode) setThemeMode(parsed.theme_mode)
-          if (parsed.booking_enabled !== undefined) setBookingEnabled(parsed.booking_enabled)
-          if (parsed.booking_email) setBookingEmail(parsed.booking_email)
-          if (parsed.booking_phone) setBookingPhone(parsed.booking_phone)
-          if (parsed.pwa_enabled !== undefined) setPwaEnabled(parsed.pwa_enabled)
-          if (parsed.verified !== undefined) setIsVerified(parsed.verified)
-          if (parsed.account_status) setAccountStatus(parsed.account_status)
-          if (parsed.genres && Array.isArray(parsed.genres)) {
-            setGenres(parsed.genres)
-          } else if (parsed.genre) {
-            setGenres([parsed.genre])
-          }
-          if (parsed.social_links && Array.isArray(parsed.social_links)) {
-            setSocialLinks(parsed.social_links)
-          }
-        }
-      } catch {}
-    }
-
-    const localReleases = localStorage.getItem('monpodium_releases')
-    if (localReleases) {
-      try {
-        const parsed = JSON.parse(localReleases)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setReleases(parsed)
-        }
-      } catch {}
-    }
+    loadArtistPage()
 
     document.title = `${artistName} — Hub Officiel & Discographie`
     let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
@@ -305,10 +251,13 @@ function ArtistHubContent() {
             {/* Avatar with glowing ring */}
             <div className={`relative mx-auto w-32 h-32 rounded-3xl overflow-hidden p-1 shadow-2xl border-2 ${isLight ? 'bg-white border-slate-200 ring-4 ring-slate-100' : 'bg-zinc-950 border-white/20'}`}>
               <div className="w-full h-full rounded-[20px] overflow-hidden bg-zinc-900">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <SafeImage
                   src={avatarUrl}
                   alt={artistName}
+                  fallbackType="avatar"
+                  fallbackText={artistName}
+                  themeColor={themeColor}
+                  isLight={isLight}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 />
               </div>

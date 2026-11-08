@@ -226,6 +226,7 @@ function ReleaseDetailContent() {
               url={link.url}
               artistUsername={username}
               trackSlug={slug}
+              themeMode={themeMode}
             />
           ))}
         </div>

@@ -20,6 +20,9 @@ import {
   BarChart3,
   Flame,
   CheckCircle2,
+  XCircle,
+  X,
+  Check,
 } from 'lucide-react'
 
 export default function HomePage() {
@@ -349,6 +352,147 @@ export default function HomePage() {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION PROBLÈME vs SOLUTION - Le contraste choc pour convaincre */}
+      <section className="py-12 sm:py-20 px-3.5 sm:px-4 border-t border-zinc-800/80 bg-zinc-950/70 w-full max-w-full overflow-hidden">
+        <div className="max-w-5xl mx-auto space-y-8 sm:space-y-12">
+          <div className="text-center space-y-2.5 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+              <Flame className="w-3.5 h-3.5" />
+              <span>La réalité des artistes indépendants</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              Pourquoi perds-tu jusqu&apos;à 70% de tes auditeurs aujourd&apos;hui ?
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Partager un simple lien YouTube ou un linktree générique sans extrait audio détruit l&apos;impact de tes sorties. Voici la différence.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 items-stretch">
+            {/* Colonne 1 : LE PROBLÈME (Sans MonPodium) */}
+            <div className="rounded-3xl bg-zinc-900/60 border border-red-500/25 p-5 sm:p-7 space-y-5 relative overflow-hidden flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
+                  <div className="flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center font-black">
+                      <X className="w-4 h-4 stroke-[3]" />
+                    </span>
+                    <div>
+                      <h3 className="font-black text-base text-white">Sans MonPodium</h3>
+                      <span className="text-[11px] text-red-400 font-bold">La galère habituelle</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                    Pertes d&apos;écoutes
+                  </span>
+                </div>
+
+                <ul className="space-y-3.5 text-xs text-zinc-300">
+                  <li className="flex items-start gap-3">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Trafic dispersé & fans perdus</strong>
+                      <span className="text-zinc-400 text-[11px]">Tu partages un lien YouTube : les fans sur Spotify ou Boomplay abandonnent sans écouter.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Linktrees froids & sans extrait audio</strong>
+                      <span className="text-zinc-400 text-[11px]">Une liste de boutons sans âme. Aucune musique ne démarre, aucun frisson.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Arnaques & faux comptes de booking</strong>
+                      <span className="text-zinc-400 text-[11px]">Des faux managers encaissent des avances de concerts à ta place sans canal certifié.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Zéro rétention ni présence durable</strong>
+                      <span className="text-zinc-400 text-[11px]">Le fan quitte ta page et t&apos;oublie. Tu n&apos;es nulle part sur son téléphone.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-red-950/20 border border-red-500/20 text-[11px] text-red-300 flex items-center gap-2 mt-4">
+                <span className="font-black text-sm">📉</span>
+                <span>Résultat : Des mois de travail en studio pour des sorties qui tombent dans l&apos;oubli.</span>
+              </div>
+            </div>
+
+            {/* Colonne 2 : LA SOLUTION (Avec MonPodium) */}
+            <div className="rounded-3xl bg-gradient-to-b from-zinc-900 via-zinc-900 to-zinc-950 border-2 border-emerald-500/60 p-5 sm:p-7 space-y-5 relative overflow-hidden shadow-xl shadow-emerald-950/40 flex flex-col justify-between">
+              {/* Soft glow corner */}
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
+                  <div className="flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-xl bg-emerald-500 text-zinc-950 flex items-center justify-center font-black shadow-md">
+                      <Check className="w-4 h-4 stroke-[3]" />
+                    </span>
+                    <div>
+                      <h3 className="font-black text-base text-white">Avec MonPodium</h3>
+                      <span className="text-[11px] text-emerald-400 font-bold">La vitrine officielle</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    100% Optimisé
+                  </span>
+                </div>
+
+                <ul className="space-y-3.5 text-xs text-zinc-300">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">1 seul lien vers tous les stores</strong>
+                      <span className="text-zinc-400 text-[11px]">Spotify, YouTube, Boomplay, Apple Music... Chacun écoute sur son appli favorite en 1 tap.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Extrait 15s instantané sur le refrain</strong>
+                      <span className="text-zinc-400 text-[11px]">Ton son démarre direct dès le clic. L&apos;auditeur est captivé en 3 secondes.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Booking direct & anti-arnaque</strong>
+                      <span className="text-zinc-400 text-[11px]">Bouton officiel sécurisé relié à ton management pour signer de vraies dates de concert.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-white block font-bold">Ton application PWA sur leur écran</strong>
+                      <span className="text-zinc-400 text-[11px]">Tes fans installent ton icône comme WhatsApp. Tu restes sur leur smartphone à vie.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 flex items-center gap-2 mt-4">
+                <span className="font-black text-sm">🚀</span>
+                <span>Résultat : Chaque visiteur devient un auditeur, et chaque auditeur installe ton application.</span>
               </div>
             </div>
           </div>

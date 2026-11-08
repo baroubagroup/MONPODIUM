@@ -20,8 +20,12 @@ import {
   Music2,
   Sun,
   Moon,
+  Star,
+  ArrowUp,
+  ArrowDown,
+  ExternalLink,
 } from 'lucide-react'
-import { SocialPlatform } from '@/types'
+import { SocialPlatform, AccountType } from '@/types'
 import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
 import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
@@ -96,17 +100,23 @@ const GRADIENT_PRESETS = [
 ]
 
 const AVAILABLE_NETWORKS: { id: SocialPlatform; label: string; placeholder: string }[] = [
-  { id: 'facebook', label: 'Page Facebook Officielle', placeholder: 'https://facebook.com/monnom' },
+  { id: 'whatsapp', label: 'WhatsApp Officiel (Direct / Pro)', placeholder: 'https://wa.me/22501020304 ou +225...' },
   { id: 'instagram', label: 'Compte Instagram Officiel', placeholder: 'https://instagram.com/monnom' },
   { id: 'tiktok', label: 'Compte TikTok Officiel', placeholder: 'https://tiktok.com/@monnom' },
+  { id: 'facebook', label: 'Page Facebook Officielle', placeholder: 'https://facebook.com/monnom' },
   { id: 'youtube', label: 'Chaîne YouTube Officielle', placeholder: 'https://youtube.com/@monnom' },
   { id: 'twitter', label: 'Compte X / Twitter', placeholder: 'https://x.com/monnom' },
+  { id: 'website', label: 'Site Web Officiel / Boutique', placeholder: 'https://monsite.com' },
+  { id: 'linkedin', label: 'Profil LinkedIn Professionnel', placeholder: 'https://linkedin.com/in/monnom' },
+  { id: 'telegram', label: 'Canal Telegram Officiel', placeholder: 'https://t.me/moncanal' },
   { id: 'snapchat', label: 'Compte Snapchat', placeholder: 'https://snapchat.com/add/monnom' },
+  { id: 'threads', label: 'Compte Threads', placeholder: 'https://threads.net/@monnom' },
 ]
 
 export default function ProfilePage() {
   const { isLight } = useDashboardTheme()
   const [userId, setUserId] = useState<string | null>(null)
+  const [accountType, setAccountType] = useState<AccountType>('musician')
   const [fullName, setFullName] = useState('')
   const [artistName, setArtistName] = useState('')
   const [username, setUsername] = useState('')
@@ -128,12 +138,13 @@ export default function ProfilePage() {
   const [bookingEmail, setBookingEmail] = useState('')
   const [bookingPhone, setBookingPhone] = useState('')
 
-  // Social Links
-  const [socialLinks, setSocialLinks] = useState<{ platform: SocialPlatform; url: string }[]>([
-    { platform: 'facebook', url: '' },
-    { platform: 'instagram', url: '' },
-    { platform: 'tiktok', url: '' },
-    { platform: 'youtube', url: '' },
+  // Social Links with position order
+  const [socialLinks, setSocialLinks] = useState<{ platform: SocialPlatform; url: string; display_order?: number }[]>([
+    { platform: 'whatsapp', url: '', display_order: 0 },
+    { platform: 'instagram', url: '', display_order: 1 },
+    { platform: 'tiktok', url: '', display_order: 2 },
+    { platform: 'facebook', url: '', display_order: 3 },
+    { platform: 'youtube', url: '', display_order: 4 },
   ])
 
   const [saved, setSaved] = useState(false)
@@ -143,6 +154,7 @@ export default function ProfilePage() {
       const profile = await getActiveUserProfile()
       if (profile) {
         if (profile.id) setUserId(profile.id)
+        if (profile.account_type) setAccountType(profile.account_type)
         if (profile.full_name) setFullName(profile.full_name)
         if (profile.artist_name) setArtistName(profile.artist_name)
         if (profile.username) setUsername(profile.username)
@@ -169,7 +181,8 @@ export default function ProfilePage() {
         if (profile.booking_email) setBookingEmail(profile.booking_email)
         if (profile.booking_phone) setBookingPhone(profile.booking_phone)
         if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
-          setSocialLinks(profile.social_links)
+          const sorted = [...profile.social_links].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+          setSocialLinks(sorted.map((item, idx) => ({ ...item, display_order: item.display_order ?? idx })))
         }
       }
     }
@@ -241,9 +254,42 @@ export default function ProfilePage() {
       if (exists) {
         return prev.map(l => (l.platform === platform ? { ...l, url } : l))
       } else {
-        return [...prev, { platform, url }]
+        return [...prev, { platform, url, display_order: prev.length }]
       }
     })
+  }
+
+  const moveSocialUp = (index: number) => {
+    if (index <= 0) return
+    setSocialLinks(prev => {
+      const next = [...prev]
+      const temp = next[index - 1]
+      next[index - 1] = next[index]
+      next[index] = temp
+      return next.map((item, idx) => ({ ...item, display_order: idx }))
+    })
+  }
+
+  const moveSocialDown = (index: number) => {
+    setSocialLinks(prev => {
+      if (index >= prev.length - 1) return prev
+      const next = [...prev]
+      const temp = next[index + 1]
+      next[index + 1] = next[index]
+      next[index] = temp
+      return next.map((item, idx) => ({ ...item, display_order: idx }))
+    })
+  }
+
+  const addPlatform = (platform: SocialPlatform) => {
+    setSocialLinks(prev => {
+      if (prev.some(l => l.platform === platform)) return prev
+      return [...prev, { platform, url: '', display_order: prev.length }]
+    })
+  }
+
+  const removePlatform = (platform: SocialPlatform) => {
+    setSocialLinks(prev => prev.filter(l => l.platform !== platform).map((item, idx) => ({ ...item, display_order: idx })))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -257,6 +303,7 @@ export default function ProfilePage() {
       full_name: fullName,
       artist_name: artistName,
       username,
+      account_type: accountType,
       bio,
       country,
       genres: selectedGenres,
@@ -268,7 +315,9 @@ export default function ProfilePage() {
       booking_enabled: bookingEnabled,
       booking_email: bookingEmail,
       booking_phone: bookingPhone,
-      social_links: socialLinks.filter(l => l.url.trim() !== ''),
+      social_links: socialLinks
+        .filter(l => l.url.trim() !== '')
+        .map((l, idx) => ({ ...l, display_order: l.display_order ?? idx })),
     }
 
     // 1. Sync to Supabase if available
@@ -278,6 +327,7 @@ export default function ProfilePage() {
         await supabase.from('profiles').update({
           full_name: fullName,
           artist_name: artistName,
+          account_type: accountType,
           bio,
           country,
           genres: selectedGenres,
@@ -330,6 +380,61 @@ export default function ProfilePage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* SELECTEUR DU TYPE DE COMPTE / AVATAR */}
+        <div className={`rounded-3xl border p-5 sm:p-6 space-y-3 transition-all shadow-sm ${
+          isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/90 border-zinc-800 text-white'
+        }`}>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-sm font-black flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-500" />
+                <span>Type de Vitrine MonPodium</span>
+              </h2>
+              <p className={`text-xs mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                Choisis la structure adaptée à ton activité pour ta page officielle.
+              </p>
+            </div>
+            <div className={`grid grid-cols-2 gap-2 p-1 rounded-2xl border ${
+              isLight ? 'bg-slate-100 border-slate-200' : 'bg-zinc-950 border-zinc-800'
+            }`}>
+              <button
+                type="button"
+                onClick={() => setAccountType('musician')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  accountType === 'musician'
+                    ? 'bg-emerald-500 text-zinc-950 shadow-md font-black'
+                    : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Music2 className="w-4 h-4" />
+                <span>Artiste Musicien</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccountType('public_figure')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  accountType === 'public_figure'
+                    ? 'bg-emerald-500 text-zinc-950 shadow-md font-black'
+                    : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Star className="w-4 h-4" />
+                <span>Personnalité / Créateur</span>
+              </button>
+            </div>
+          </div>
+          <div className={`text-[11px] p-3 rounded-xl border flex items-center gap-2 ${
+            isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-zinc-950/70 border-zinc-800 text-zinc-400'
+          }`}>
+            <span>💡</span>
+            <span>
+              {accountType === 'musician'
+                ? 'Mode Musique actif : vitrine avec lecteur audio 15s instantané, streaming stores (Spotify, Boomplay, Apple...) et discographie.'
+                : 'Mode Personnalité & Créateur actif : vitrine officielle épurée avec réseaux vérifiés, WhatsApp officiel, partenariats et PWA.'}
+            </span>
+          </div>
+        </div>
+
         {/* SECTION 1: BANNIÈRE DE COUVERTURE & PHOTO DE PROFIL */}
         <div className={`rounded-3xl border overflow-hidden space-y-5 transition-all shadow-sm ${
           isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/90 border-zinc-800 text-white'
@@ -824,52 +929,145 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* SECTION 3: RÉSEAUX SOCIAUX CERTIFIÉS (ANTI-FAUX COMPTES) */}
+        {/* SECTION 3: RÉSEAUX SOCIAUX CERTIFIÉS & LIENS (AVEC ORDRE PERSONNALISÉ) */}
         <div className={`rounded-3xl border p-6 sm:p-7 space-y-4 transition-all shadow-sm ${
           isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/90 border-zinc-800 text-white'
         }`}>
           <div>
-            <h2 className={`text-sm font-bold flex items-center gap-2 ${
-              isLight ? 'text-slate-900' : 'text-white'
-            }`}>
-              <ShieldCheck className="w-4 h-4 text-purple-600" />
-              <span>Réseaux Sociaux Officiels & Certifiés</span>
-            </h2>
-            <p className={`text-xs mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-              Ces comptes seront affichés sur ta bio avec le badge vérifié anti-usurpation (sans afficher les URL brutes).
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className={`text-sm font-black flex items-center gap-2 ${
+                isLight ? 'text-slate-900' : 'text-white'
+              }`}>
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Réseaux Sociaux Officiels & Liens Certifiés</span>
+              </h2>
+              <span className="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                Ordre Réorganisable (⬆️ ⬇️)
+              </span>
+            </div>
+            <p className={`text-xs mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+              Ces liens s&apos;affichent sur ta page publique avec protection anti-usurpation. Modifie l&apos;ordre pour mettre en avant ce que tu veux (ex: WhatsApp en #1, puis Instagram et ton Site Web).
             </p>
           </div>
 
-          <div className="space-y-3 pt-1">
-            {AVAILABLE_NETWORKS.map((net) => {
-              const currentVal = socialLinks.find(l => l.platform === net.id)?.url || ''
+          {/* LISTE DES LIENS AVEC RÉORGANISATION */}
+          <div className="space-y-3 pt-2">
+            {socialLinks.map((item, idx) => {
+              const netInfo = AVAILABLE_NETWORKS.find(n => n.id === item.platform) || {
+                id: item.platform,
+                label: item.platform,
+                placeholder: 'https://...',
+              }
+              const isFirst = idx === 0
+
               return (
-                <div key={net.id} className={`p-3.5 rounded-2xl border space-y-1.5 ${
-                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950 border-zinc-800'
-                }`}>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className={`font-bold ${isLight ? 'text-slate-800' : 'text-zinc-300'}`}>{net.label}</span>
-                    {currentVal && (
-                      <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>Vérifié</span>
+                <div
+                  key={`${item.platform}-${idx}`}
+                  className={`p-3.5 sm:p-4 rounded-2xl border transition-all space-y-2 ${
+                    isLight
+                      ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                      : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {/* Position Badge */}
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1 flex-shrink-0 ${
+                        isFirst
+                          ? 'bg-emerald-500 text-zinc-950 shadow-xs'
+                          : isLight ? 'bg-slate-200 text-slate-700' : 'bg-zinc-800 text-zinc-300'
+                      }`}>
+                        {isFirst && <Star className="w-2.5 h-2.5 fill-current" />}
+                        <span>#{idx + 1} {isFirst ? 'Premier lien' : ''}</span>
                       </span>
-                    )}
+                      <span className={`text-xs font-bold truncate ${isLight ? 'text-slate-800' : 'text-zinc-200'}`}>
+                        {netInfo.label}
+                      </span>
+                    </div>
+
+                    {/* Up / Down Controls & Remove */}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => moveSocialUp(idx)}
+                        disabled={idx === 0}
+                        title="Monter la position"
+                        className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                          isLight
+                            ? 'bg-white border-slate-300 hover:bg-slate-100 text-slate-700'
+                            : 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300'
+                        }`}
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveSocialDown(idx)}
+                        disabled={idx === socialLinks.length - 1}
+                        title="Descendre la position"
+                        className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                          isLight
+                            ? 'bg-white border-slate-300 hover:bg-slate-100 text-slate-700'
+                            : 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300'
+                        }`}
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removePlatform(item.platform)}
+                        title="Supprimer ce réseau"
+                        className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ml-1 ${
+                          isLight
+                            ? 'bg-red-50 border-red-200 hover:bg-red-100 text-red-600'
+                            : 'bg-red-950/40 border-red-900/60 hover:bg-red-900/40 text-red-400'
+                        }`}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
+
                   <input
                     type="url"
-                    value={currentVal}
-                    onChange={(e) => handleSocialChange(net.id, e.target.value)}
-                    placeholder={net.placeholder}
+                    value={item.url}
+                    onChange={(e) => handleSocialChange(item.platform, e.target.value)}
+                    placeholder={netInfo.placeholder}
                     className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none transition-colors ${
                       isLight
-                        ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-purple-600'
-                        : 'bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600 focus:border-purple-500'
+                        ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-emerald-600'
+                        : 'bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600 focus:border-emerald-500'
                     }`}
                   />
                 </div>
               )
             })}
+          </div>
+
+          {/* AJOUTER D'AUTRES RÉSEAUX DISPONIBLES */}
+          <div className={`p-4 rounded-2xl border space-y-2 mt-3 ${
+            isLight ? 'bg-slate-50/70 border-slate-200' : 'bg-zinc-950/60 border-zinc-850'
+          }`}>
+            <span className={`text-[11px] font-bold block ${isLight ? 'text-slate-600' : 'text-zinc-400'}`}>
+              + Ajouter un autre lien ou réseau officiel :
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {AVAILABLE_NETWORKS.filter(n => !socialLinks.some(l => l.platform === n.id)).map(net => (
+                <button
+                  key={net.id}
+                  type="button"
+                  onClick={() => addPlatform(net.id)}
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isLight
+                      ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-800 shadow-xs'
+                      : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
+                  }`}
+                >
+                  <Plus className="w-3 h-3 text-emerald-500" />
+                  <span>{net.label.split(' ')[0]}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

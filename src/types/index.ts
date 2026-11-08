@@ -1,5 +1,7 @@
 export type Plan = 'free' | 'starter' | 'pro'
 
+export type AccountType = 'musician' | 'public_figure'
+
 export type ReleaseType = 'single' | 'ep' | 'album'
 
 export type Platform =
@@ -20,6 +22,7 @@ export type Platform =
   | 'iheartradio'
 
 export type SocialPlatform =
+  | 'whatsapp'
   | 'instagram'
   | 'tiktok'
   | 'facebook'
@@ -28,6 +31,7 @@ export type SocialPlatform =
   | 'snapchat'
   | 'threads'
   | 'telegram'
+  | 'linkedin'
   | 'website'
 
 export interface User {
@@ -36,6 +40,7 @@ export interface User {
   full_name: string
   artist_name: string
   username: string
+  account_type?: AccountType
   avatar_url: string | null
   banner_url: string | null
   banner_color: string | null
@@ -105,6 +110,8 @@ export interface SocialLink {
   user_id: string
   platform: SocialPlatform
   url: string
+  title?: string
+  display_order?: number
 }
 
 export interface PlatformConfig {

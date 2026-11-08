@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
-import { Disc3, Sparkles, ArrowRight, Music2, User, Mail, Lock, AlertCircle } from 'lucide-react'
+import { Disc3, Sparkles, ArrowRight, Music2, User, Star, Mail, Lock, AlertCircle } from 'lucide-react'
 import { registerInAdminUsers, UserProfileData, isSupabaseConfigured } from '@/lib/authSync'
+import { AccountType } from '@/types'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const [accountType, setAccountType] = useState<AccountType>('musician')
   const [fullName, setFullName] = useState('')
   const [artistName, setArtistName] = useState('')
   const [username, setUsername] = useState('')
@@ -19,7 +21,9 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Auto-generate username from artist name if empty
+  const isPublicFigure = accountType === 'public_figure'
+
+  // Auto-generate username from artist/public name if empty
   const handleArtistNameChange = (val: string) => {
     setArtistName(val)
     if (!username || username === slugify(artistName)) {
@@ -32,8 +36,8 @@ export default function RegisterPage() {
     setError(null)
     setLoading(true)
 
-    const cleanUsername = slugify(username || artistName || 'artiste')
-    const finalArtistName = artistName.trim() || 'Artiste'
+    const cleanUsername = slugify(username || artistName || (isPublicFigure ? 'personnalite' : 'artiste'))
+    const finalArtistName = artistName.trim() || (isPublicFigure ? 'Profil Officiel' : 'Artiste')
 
     // Build the initial dedicated profile
     const profileData: UserProfileData = {
@@ -42,11 +46,12 @@ export default function RegisterPage() {
       full_name: fullName.trim(),
       artist_name: finalArtistName,
       username: cleanUsername,
+      account_type: accountType,
       genre: genre,
       genres: [genre],
       country: "Côte d'Ivoire",
       booking_email: email.trim(),
-      theme_color: '#9333ea',
+      theme_color: '#10b981',
       theme_mode: 'dark',
       plan: 'free',
       verified: false,
@@ -68,13 +73,13 @@ export default function RegisterPage() {
                 full_name: fullName,
                 artist_name: finalArtistName,
                 username: cleanUsername,
+                account_type: accountType,
                 genre,
               },
             },
           })
 
           if (signUpError) {
-            // If user already registered, display clear message
             if (signUpError.message.includes('already registered')) {
               throw new Error('Un compte avec cette adresse email existe déjà. Veuillez vous connecter.')
             }
@@ -89,11 +94,12 @@ export default function RegisterPage() {
               full_name: fullName.trim(),
               artist_name: finalArtistName,
               username: cleanUsername,
+              account_type: accountType,
               genre,
               genres: [genre],
               country: "Côte d'Ivoire",
               booking_email: email.trim(),
-              theme_color: '#9333ea',
+              theme_color: '#10b981',
               theme_mode: 'dark',
               plan: 'free',
               is_verified: false,
@@ -112,7 +118,7 @@ export default function RegisterPage() {
       localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
       registerInAdminUsers(profileData)
 
-      // Start new artist with their own fresh releases list (empty array)
+      // Start new user with their own fresh releases list
       localStorage.setItem('monpodium_releases', JSON.stringify([]))
       localStorage.setItem(`monpodium_releases_${cleanUsername}`, JSON.stringify([]))
 
@@ -131,20 +137,65 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-12 bg-[#08080a] text-white">
       {/* Brand Header */}
-      <Link href="/" className="flex items-center gap-2 mb-8 group">
-        <div className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-600/30 group-hover:scale-105 transition-transform">
+      <Link href="/" className="flex items-center gap-2 mb-6 group">
+        <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
           <Disc3 className="w-6 h-6 animate-[spin_8s_linear_infinite]" />
         </div>
-        <span className="font-black text-2xl tracking-tight bg-gradient-to-r from-white via-zinc-200 to-purple-300 bg-clip-text text-transparent">
+        <span className="font-black text-2xl tracking-tight text-white">
           MonPodium
         </span>
       </Link>
 
-      <div className="w-full max-w-md rounded-3xl bg-zinc-900/90 border border-zinc-800 p-8 shadow-2xl backdrop-blur-xl space-y-6">
+      <div className="w-full max-w-md rounded-3xl bg-zinc-900/90 border border-zinc-800 p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
         <div>
-          <h1 className="text-2xl font-black text-white">Créer ton compte artiste</h1>
+          <h1 className="text-2xl font-black text-white">Créer ton Hub Officiel</h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Rejoins MonPodium et crée ta vitrine musicale en 2 minutes.
+            Rejoins MonPodium et crée ta vitrine certifiée en 2 minutes chrono.
+          </p>
+        </div>
+
+        {/* SELECTEUR DU TYPE DE COMPTE (AVATAR) */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+            Quel type de vitrine souhaitez-vous créer ?
+          </label>
+          <div className="grid grid-cols-2 gap-2.5 p-1 bg-zinc-950 border border-zinc-800 rounded-2xl">
+            <button
+              type="button"
+              onClick={() => {
+                setAccountType('musician')
+                if (genre === 'Créateur de contenu') setGenre('Afrobeats')
+              }}
+              className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                accountType === 'musician'
+                  ? 'bg-emerald-500 text-zinc-950 shadow-md font-black'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+              }`}
+            >
+              <Music2 className="w-4 h-4" />
+              <span>Artiste Musicien</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setAccountType('public_figure')
+                setGenre('Créateur de contenu')
+              }}
+              className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                accountType === 'public_figure'
+                  ? 'bg-emerald-500 text-zinc-950 shadow-md font-black'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+              }`}
+            >
+              <Star className="w-4 h-4" />
+              <span>Personnalité / Créateur</span>
+            </button>
+          </div>
+          <p className="text-[10px] text-zinc-500 px-1">
+            {accountType === 'musician'
+              ? '🎵 Vitrine avec lecteur audio 15s, liens de streaming (Spotify, Boomplay...) et discographie.'
+              : '⭐ Vitrine officielle anti-usurpation avec réseaux vérifiés (WhatsApp, Insta...), partenariats et PWA.'}
           </p>
         </div>
 
@@ -156,7 +207,7 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nom officiel vs Nom d'artiste */}
+          {/* Nom officiel vs Nom de scène / d'influenceur */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-[11px] font-semibold text-zinc-400">
@@ -169,15 +220,15 @@ export default function RegisterPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Ex: Jean Kouassi"
-                  className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-purple-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
+                  className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-emerald-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-purple-400 flex items-center gap-1">
+              <label className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                <span>Nom d'artiste (public)</span>
+                <span>{isPublicFigure ? 'Nom public / Marque' : "Nom d'artiste (scène)"}</span>
               </label>
               <div className="relative">
                 <input
@@ -185,8 +236,8 @@ export default function RegisterPage() {
                   required
                   value={artistName}
                   onChange={(e) => handleArtistNameChange(e.target.value)}
-                  placeholder="Ex: KS Bloom"
-                  className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-purple-500/60 focus:border-purple-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
+                  placeholder={isPublicFigure ? 'Ex: Apoutchou National' : 'Ex: HIMRA'}
+                  className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-emerald-500/60 focus:border-emerald-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
                 />
               </div>
             </div>
@@ -195,52 +246,68 @@ export default function RegisterPage() {
           {/* Username / URL */}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-zinc-400">
-              Ton lien personnalisé
+              Ton lien certifié MonPodium
             </label>
-            <div className="flex items-center px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus-within:border-purple-500 text-sm text-zinc-400">
+            <div className="flex items-center px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus-within:border-emerald-500 text-sm text-zinc-400">
               <span className="text-zinc-500 text-xs mr-1">monpodium.com/</span>
               <input
                 type="text"
                 required
                 value={username}
                 onChange={(e) => setUsername(slugify(e.target.value))}
-                placeholder="ksbloom"
+                placeholder={isPublicFigure ? 'apoutchou' : 'himra'}
                 className="w-full bg-transparent text-white font-semibold focus:outline-none text-sm placeholder-zinc-600"
               />
             </div>
           </div>
 
-          {/* Genre musical */}
+          {/* Catégorie / Style / Domaine */}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-zinc-400">
-              Genre musical principal
+              {isPublicFigure ? "Domaine d'activité principal" : "Genre musical principal"}
             </label>
-            <select
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-purple-500 text-sm text-white focus:outline-none"
-            >
-              <option value="Afrobeats">Afrobeats</option>
-              <option value="Rap / Hip-Hop">Rap / Hip-Hop</option>
-              <option value="Gospel">Gospel</option>
-              <option value="Coupé Décalé">Coupé Décalé</option>
-              <option value="Amapiano">Amapiano</option>
-              <option value="R&B / Soul">R&B / Soul</option>
-              <option value="Reggae / Dancehall">Reggae / Dancehall</option>
-              <option value="Autre">Autre style musical</option>
-            </select>
+            {isPublicFigure ? (
+              <select
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-emerald-500 text-sm text-white focus:outline-none"
+              >
+                <option value="Créateur de contenu">Créateur de contenu / Influenceur</option>
+                <option value="Humour & Comédie">Humoriste & Comédien</option>
+                <option value="Sport & Athlète">Sportif / Athlète / Fitness</option>
+                <option value="Mode & Beauté">Mode & Beauté</option>
+                <option value="Entrepreneuriat & Conférence">Entrepreneuriat & Conférence</option>
+                <option value="Médias & TV/Radio">Animateur / Média TV/Radio</option>
+                <option value="Autre">Autre domaine public</option>
+              </select>
+            ) : (
+              <select
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-emerald-500 text-sm text-white focus:outline-none"
+              >
+                <option value="Afrobeats">Afrobeats</option>
+                <option value="Rap / Hip-Hop">Rap / Hip-Hop</option>
+                <option value="Gospel">Gospel</option>
+                <option value="Coupé Décalé">Coupé Décalé</option>
+                <option value="Amapiano">Amapiano</option>
+                <option value="R&B / Soul">R&B / Soul</option>
+                <option value="Reggae / Dancehall">Reggae / Dancehall</option>
+                <option value="Autre">Autre style musical</option>
+              </select>
+            )}
           </div>
 
           {/* Email */}
           <div className="space-y-1">
-            <label className="text-[11px] font-semibold text-zinc-400">Email</label>
+            <label className="text-[11px] font-semibold text-zinc-400">Email professionnel</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="artiste@email.com"
-              className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-purple-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
+              placeholder="contact@domaine.com"
+              className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-emerald-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
             />
           </div>
 
@@ -254,20 +321,20 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-purple-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
+              className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-emerald-500 text-sm text-white placeholder-zinc-600 focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold text-sm shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] mt-2"
+            className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-zinc-950 font-black text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] mt-2 cursor-pointer"
           >
             {loading ? (
               <span>Création en cours...</span>
             ) : (
               <>
-                <span>Créer mon podium gratuit</span>
+                <span>Créer ma vitrine officielle gratuite (0 FCFA)</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -276,7 +343,7 @@ export default function RegisterPage() {
 
         <div className="pt-4 border-t border-zinc-800 text-center text-xs text-zinc-400">
           <span>Déjà un compte ? </span>
-          <Link href="/auth/login" className="text-purple-400 hover:underline font-semibold">
+          <Link href="/auth/login" className="text-emerald-400 hover:underline font-bold">
             Se connecter
           </Link>
         </div>

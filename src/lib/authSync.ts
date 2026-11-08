@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import { Release, SocialLink, Plan } from '@/types'
+import { Release, SocialLink, Plan, AccountType } from '@/types'
 import { INITIAL_ADMIN_USERS, AdminArtistUser } from '@/lib/adminData'
 
 export interface UserProfileData {
@@ -8,6 +8,7 @@ export interface UserProfileData {
   full_name: string
   artist_name: string
   username: string
+  account_type?: AccountType
   bio?: string
   genre?: string
   genres?: string[]
@@ -71,6 +72,7 @@ export async function getActiveUserProfile(): Promise<UserProfileData | null> {
             full_name: profile.full_name || '',
             artist_name: profile.artist_name || 'Artiste',
             username: profile.username || 'artiste',
+            account_type: profile.account_type || 'musician',
             bio: profile.bio || '',
             genre: profile.genre || 'Afrobeats',
             genres: profile.genres || (profile.genre ? [profile.genre] : ['Afrobeats']),
@@ -236,6 +238,7 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
             full_name: match.full_name || '',
             artist_name: match.artist_name,
             username: match.username,
+            account_type: (match as any).account_type || 'musician',
             bio: match.bio || '',
             genre: match.genres?.[0] || 'Afrobeats',
             genres: match.genres || ['Afrobeats'],

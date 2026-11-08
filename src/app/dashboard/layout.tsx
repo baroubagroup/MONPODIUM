@@ -39,6 +39,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   // Local state for artist info (fetched or mock fallback)
   const [artistName, setArtistName] = useState('Mon Espace')
   const [username, setUsername] = useState('')
+  const [accountType, setAccountType] = useState<'musician' | 'public_figure'>('musician')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [themeColor, setThemeColor] = useState('#9333ea')
   const [plan, setPlan] = useState<'free' | 'starter' | 'pro'>('free')
@@ -49,6 +50,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       if (profile) {
         setArtistName(profile.artist_name || 'Mon Espace')
         setUsername(profile.username || 'artiste')
+        if (profile.account_type) setAccountType(profile.account_type)
         if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
         if (profile.theme_color) setThemeColor(profile.theme_color)
         if (profile.plan) setPlan(profile.plan)
@@ -84,16 +86,20 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   const desktopNavItems = [
     { label: "Vue d'ensemble", href: '/dashboard', icon: Disc3 },
-    { label: 'Mes Sorties', href: '/dashboard/releases', icon: Music },
+    { label: accountType === 'public_figure' ? 'Sorties (Musique)' : 'Mes Sorties', href: '/dashboard/releases', icon: Music },
     { label: 'Statistiques & Audiences', href: '/dashboard/analytics', icon: BarChart3 },
-    { label: 'Mon Profil', href: '/dashboard/profile', icon: User },
+    { label: 'Mon Profil & Liens', href: '/dashboard/profile', icon: User },
     { label: 'Paramètres & PWA', href: '/dashboard/settings', icon: Settings },
     { label: 'Mon Plan', href: '/dashboard/upgrade', icon: Sparkles },
   ]
 
   const mobileDockItems = [
     { label: 'Accueil', href: '/dashboard', icon: Disc3 },
-    { label: 'Sorties', href: '/dashboard/releases', icon: Music },
+    {
+      label: accountType === 'public_figure' ? 'Profil/Liens' : 'Sorties',
+      href: accountType === 'public_figure' ? '/dashboard/profile' : '/dashboard/releases',
+      icon: accountType === 'public_figure' ? User : Music,
+    },
     { label: 'Ajouter', href: '/dashboard/releases/new', icon: PlusCircle, isAction: true },
     { label: 'Stats', href: '/dashboard/analytics', icon: BarChart3 },
   ]

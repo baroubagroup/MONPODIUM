@@ -9,7 +9,7 @@ import { BookingModal } from '@/components/artist/BookingModal'
 import { SocialLinks } from '@/components/artist/SocialLinks'
 import { ReleasesCarousel } from '@/components/artist/ReleasesCarousel'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
-import { Release, SocialLink, PLATFORMS } from '@/types'
+import { Release, SocialLink, PLATFORMS, AccountType } from '@/types'
 import { recordPageView } from '@/lib/tracker'
 import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
 import { SafeImage } from '@/components/common/SafeImage'
@@ -34,6 +34,7 @@ function ArtistHubContent() {
   const rawUsername = (params?.username as string) || 'ksbloom'
   const username = rawUsername.toLowerCase().trim()
 
+  const [accountType, setAccountType] = useState<AccountType>('musician')
   const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
@@ -73,6 +74,7 @@ function ArtistHubContent() {
       // 1. Fetch public profile by username
       const profile = await getPublicProfile(username)
       if (profile) {
+        if (profile.account_type) setAccountType(profile.account_type)
         if (profile.artist_name) setArtistName(profile.artist_name)
         setPwaName(profile.pwa_name || profile.artist_name)
         if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
@@ -356,7 +358,7 @@ function ArtistHubContent() {
               </div>
             )}
 
-            {/* Menu de navigation sous le profil de l'artiste */}
+            {/* Menu de navigation sous le profil */}
             <nav className={`flex items-center justify-center gap-1.5 pt-3 pb-0.5 border-t mt-4 flex-wrap ${
               isLight ? 'border-slate-200' : 'border-white/10'
             }`}>
@@ -367,29 +369,33 @@ function ArtistHubContent() {
                   boxShadow: `0 3px 12px ${themeColor}55`,
                 }}
               >
-                Bio & Sorties
+                {accountType === 'public_figure' ? 'Profil & Liens' : 'Bio & Sorties'}
               </span>
-              <Link
-                href={`/${username}/discographie`}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  isLight
-                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                    : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
-                }`}
-              >
-                <Disc3 className="w-3.5 h-3.5" style={{ color: themeColor }} />
-                <span>Discographie</span>
-                <span
-                  className="text-[10px] font-black px-1.5 py-0.2 rounded-full border"
-                  style={{
-                    backgroundColor: `${themeColor}20`,
-                    borderColor: `${themeColor}40`,
-                    color: themeColor,
-                  }}
+
+              {accountType !== 'public_figure' && releases.length > 0 && (
+                <Link
+                  href={`/${username}/discographie`}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                    isLight
+                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                  }`}
                 >
-                  {releases.length}
-                </span>
-              </Link>
+                  <Disc3 className="w-3.5 h-3.5" style={{ color: themeColor }} />
+                  <span>Discographie</span>
+                  <span
+                    className="text-[10px] font-black px-1.5 py-0.2 rounded-full border"
+                    style={{
+                      backgroundColor: `${themeColor}20`,
+                      borderColor: `${themeColor}40`,
+                      color: themeColor,
+                    }}
+                  >
+                    {releases.length}
+                  </span>
+                </Link>
+              )}
+
               {socialLinks.length > 0 && (
                 <a
                   href="#reseaux-sociaux"
@@ -407,15 +413,17 @@ function ArtistHubContent() {
           </div>
         </div>
 
-        {/* SECTION 1: SORTIES MUSICALES EN CARROUSEL DÉFILANT SUR UNE SEULE LIGNE */}
-        <div className="pt-1">
-          <ReleasesCarousel
-            releases={releases}
-            username={username}
-            themeColor={themeColor}
-            themeMode={themeMode}
-          />
-        </div>
+        {/* SECTION 1: SORTIES MUSICALES (Uniquement si compte musique et morceaux disponibles) */}
+        {accountType !== 'public_figure' && releases.length > 0 && (
+          <div className="pt-1">
+            <ReleasesCarousel
+              releases={releases}
+              username={username}
+              themeColor={themeColor}
+              themeMode={themeMode}
+            />
+          </div>
+        )}
 
         {/* SECTION 2: RÉSEAUX SOCIAUX OFFICIELS (PROTÈGE CONTRE LES FAUX COMPTES) */}
         {socialLinks.length > 0 && (

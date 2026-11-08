@@ -102,22 +102,28 @@ function ArtistHubContent() {
         // 2. Load releases specifically for this artist
         const userReleases = await getArtistReleases(username, profile.id)
         setReleases(userReleases)
-      } else if (username === 'ksbloom') {
+      } else if (username === 'himra' || username === 'ksbloom') {
         // Fallback for default showcase artist
-        setArtistName('KS Bloom')
-        setPwaName('KS Bloom')
-        setBio("Artiste chanteur gospel & afrobeats ivoirien. Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés.")
-        setGenres(['Afrobeats', 'Gospel', 'Afro-Trap'])
+        const isHimra = username === 'himra'
+        const demoName = isHimra ? 'HIMRA' : 'KS Bloom'
+        setArtistName(demoName)
+        setPwaName(demoName)
+        setBio(
+          isHimra
+            ? "Artiste rappeur & performer ivoirien. Retrouvez ici toutes mes sorties officielles, mes exclusivités et mes liens de streaming certifiés."
+            : "Artiste chanteur gospel & afrobeats ivoirien. Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés."
+        )
+        setGenres(isHimra ? ['Rap Ivoire', 'Drill', 'Afrobeats'] : ['Afrobeats', 'Gospel', 'Afro-Trap'])
         setIsVerified(true)
-        setBookingEmail('booking@ksbloom.com')
+        setBookingEmail(isHimra ? 'booking@himra.ci' : 'booking@ksbloom.com')
         setBookingEnabled(true)
         setSocialLinks([
-          { id: '1', user_id: 'u1', platform: 'facebook', url: 'https://facebook.com/ksbloom' },
-          { id: '2', user_id: 'u1', platform: 'instagram', url: 'https://instagram.com/ksbloom_music' },
-          { id: '3', user_id: 'u1', platform: 'tiktok', url: 'https://tiktok.com/@ksbloom' },
-          { id: '4', user_id: 'u1', platform: 'youtube', url: 'https://youtube.com/@ksbloom' },
+          { id: '1', user_id: 'u1', platform: 'facebook', url: `https://facebook.com/${username}` },
+          { id: '2', user_id: 'u1', platform: 'instagram', url: `https://instagram.com/${username}` },
+          { id: '3', user_id: 'u1', platform: 'tiktok', url: `https://tiktok.com/@${username}` },
+          { id: '4', user_id: 'u1', platform: 'youtube', url: `https://youtube.com/@${username}` },
         ])
-        const userReleases = await getArtistReleases('ksbloom')
+        const userReleases = await getArtistReleases(username)
         setReleases(userReleases)
       } else {
         // Unknown or freshly created username

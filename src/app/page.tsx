@@ -30,37 +30,6 @@ export default function HomePage() {
     setOpenFaq(openFaq === idx ? null : idx)
   }
 
-  const featuredArtists = [
-    {
-      name: 'KS Bloom',
-      username: 'ksbloom',
-      genre: 'Gospel / Afrobeats',
-      avatar: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
-      color: '#9333ea',
-    },
-    {
-      name: 'Roseline Layo',
-      username: 'roselinelayo',
-      genre: 'Variété / Zoblazo',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-      color: '#ec4899',
-    },
-    {
-      name: 'LAMELO',
-      username: 'lamelo',
-      genre: 'Rap / Afrobeats',
-      avatar: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
-      color: '#ea580c',
-    },
-    {
-      name: 'Didi B',
-      username: 'didib',
-      genre: 'Rap Ivoire',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-      color: '#2563eb',
-    },
-  ]
-
   const faqs = [
     {
       q: 'Est-ce que je peux démarrer 100% gratuitement ?',
@@ -119,7 +88,7 @@ export default function HomePage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/ksbloom"
+                href="/himra"
                 target="_blank"
                 className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-sm flex items-center justify-center gap-2 transition-all hover:border-purple-500/50 press-scale"
               >
@@ -208,7 +177,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-between text-[11px] text-zinc-400 border-b border-zinc-800/80 pb-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                        <span className="font-mono font-bold text-white text-[11px] truncate">monpodium.com/ksbloom</span>
+                        <span className="font-mono font-bold text-white text-[11px] truncate">monpodium.com/himra</span>
                       </div>
                       <span className="text-[10px] bg-purple-600/20 text-purple-300 px-2 py-0.5 rounded-full font-bold border border-purple-500/30 flex-shrink-0">
                         Certifié
@@ -218,20 +187,20 @@ export default function HomePage() {
                     <div className="text-center space-y-2 pt-1">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden mx-auto border-2 border-purple-500/50 shadow-xl bg-zinc-900">
                         <SafeImage
-                          src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80"
-                          alt="KS Bloom"
+                          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80"
+                          alt="HIMRA"
                           fallbackType="avatar"
-                          fallbackText="KS"
+                          fallbackText="HIMRA"
                           themeColor="#9333ea"
                         />
                       </div>
                       <div>
                         <div className="flex items-center justify-center gap-1">
-                          <h4 className="font-black text-base sm:text-lg text-white">KS Bloom</h4>
+                          <h4 className="font-black text-base sm:text-lg text-white">HIMRA</h4>
                           <ShieldCheck className="w-4 h-4 text-blue-400" />
                         </div>
                         <p className="text-[11px] text-zinc-400 font-medium line-clamp-2 px-1">
-                          Artiste chanteur gospel & afrobeats. Retrouvez ici toutes mes sorties officielles.
+                          Artiste rappeur & performer. Retrouvez ici toutes mes sorties officielles et liens de streaming.
                         </p>
                       </div>
                     </div>
@@ -247,14 +216,14 @@ export default function HomePage() {
                       <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden bg-zinc-950 flex-shrink-0 shadow-md">
                         <SafeImage
                           src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80"
-                          alt="C'est Dieu"
+                          alt="LEGENDE"
                           fallbackType="cover"
-                          fallbackText="CD"
+                          fallbackText="LGD"
                         />
                       </div>
                       <div className="min-w-0 flex-1">
                         <span className="text-[9px] font-black uppercase tracking-wider text-purple-400 block">Single Actuel</span>
-                        <h5 className="font-bold text-xs text-white truncate">C&apos;est Dieu</h5>
+                        <h5 className="font-bold text-xs text-white truncate">LEGENDE</h5>
                         <p className="text-[10px] text-zinc-400 truncate">4 plateformes actives</p>
                       </div>
                       <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-md flex-shrink-0">
@@ -350,9 +319,9 @@ export default function HomePage() {
                         {/* The Artist PWA Icon */}
                         <div className="flex flex-col items-center gap-1 relative">
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 border border-purple-400 font-black text-xs animate-pulse">
-                            KS
+                            H
                           </div>
-                          <span className="text-[8px] text-purple-300 font-black">KS Bloom</span>
+                          <span className="text-[8px] text-purple-300 font-black">HIMRA</span>
                           <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-black" />
                         </div>
 
@@ -384,43 +353,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FEATURED ARTISTS ROSTER - Social Proof */}
-      <section className="py-8 sm:py-10 border-y border-zinc-800/80 bg-zinc-950/60 w-full max-w-full overflow-hidden">
-        <div className="max-w-6xl mx-auto px-3.5 sm:px-4 space-y-3.5">
-          <div className="text-center">
-            <span className="text-[11px] sm:text-xs uppercase font-extrabold tracking-widest text-zinc-400">
-              Déjà adopté par les artistes en Côte d&apos;Ivoire et en Afrique
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-            {featuredArtists.map((artist) => (
-              <Link
-                key={artist.username}
-                href={`/${artist.username}`}
-                target="_blank"
-                className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-zinc-900/70 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 transition-all flex items-center gap-2.5 group press-scale"
-              >
-                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-md flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform">
-                  <SafeImage
-                    src={artist.avatar}
-                    alt={artist.name}
-                    fallbackType="avatar"
-                    fallbackText={artist.name}
-                    themeColor={artist.color}
-                  />
-                </div>
-                <div className="min-w-0 text-left">
-                  <h4 className="font-black text-xs sm:text-sm text-white group-hover:text-purple-400 transition-colors truncate">
-                    {artist.name}
-                  </h4>
-                  <p className="text-[10px] text-zinc-400 truncate">{artist.genre}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 6 SUPERPOWERS FEATURES - Responsive Grid */}
       <section id="features" className="py-12 sm:py-20 px-3.5 sm:px-4 bg-zinc-950/40 w-full max-w-full overflow-hidden">
@@ -663,14 +595,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Transparent & smart marketing note */}
-            <div className="p-3.5 sm:p-4 rounded-2xl bg-purple-950/30 border border-purple-500/20 text-xs text-zinc-300 leading-relaxed flex items-start gap-2.5">
-              <span className="text-sm sm:text-base flex-shrink-0">💡</span>
-              <div>
-                <strong className="text-white block mb-0.5">Tu as déjà plusieurs morceaux ou un album ?</strong>
-                Commence d&apos;abord par tester la plateforme gratuitement avec ton titre phare. Si tu aimes l&apos;expérience et que tu souhaites promouvoir l&apos;ensemble de ta discographie, tu pourras faire évoluer ton compte vers une formule multi-titres à tout moment depuis ton tableau de bord.
-              </div>
-            </div>
+
           </div>
         </div>
       </section>

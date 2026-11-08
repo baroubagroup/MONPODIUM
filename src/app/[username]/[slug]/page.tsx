@@ -19,8 +19,8 @@ function ReleaseDetailContent() {
   const username = rawUsername.toLowerCase().trim()
   const slug = (params?.slug as string) || ''
 
-  const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
-  const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
+  const [artistName, setArtistName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
+  const [pwaName, setPwaName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
   const [themeColor, setThemeColor] = useState('#9333ea')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
@@ -63,8 +63,8 @@ function ReleaseDetailContent() {
         if (match) {
           setRelease(match)
         }
-      } else if (username === 'ksbloom') {
-        const userReleases = await getArtistReleases('ksbloom')
+      } else if (username === 'himra' || username === 'ksbloom') {
+        const userReleases = await getArtistReleases(username)
         const match = userReleases.find(
           r => r.slug === slug || r.title.toLowerCase().replace(/\s+/g, '-') === slug
         )

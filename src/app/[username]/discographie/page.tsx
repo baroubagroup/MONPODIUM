@@ -28,8 +28,8 @@ function DiscographyContent() {
   const rawUsername = (params?.username as string) || 'ksbloom'
   const username = rawUsername.toLowerCase().trim()
 
-  const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
-  const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
+  const [artistName, setArtistName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
+  const [pwaName, setPwaName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(
     'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80'
@@ -62,8 +62,8 @@ function DiscographyContent() {
 
         const userReleases = await getArtistReleases(username, profile.id)
         setReleases(userReleases)
-      } else if (username === 'ksbloom') {
-        const userReleases = await getArtistReleases('ksbloom')
+      } else if (username === 'himra' || username === 'ksbloom') {
+        const userReleases = await getArtistReleases(username)
         setReleases(userReleases)
       } else {
         setReleases([])

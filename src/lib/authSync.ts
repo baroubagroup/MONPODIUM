@@ -335,14 +335,15 @@ export async function getArtistReleases(
     }
   }
 
-  // If this is KS Bloom (default showcase demo), return his default songs
-  if (cleanUsername === 'ksbloom') {
+  // If this is HIMRA or KS Bloom (default showcase demo), return demo songs
+  if (cleanUsername === 'himra' || cleanUsername === 'ksbloom') {
+    const isHimra = cleanUsername === 'himra'
     return [
       {
         id: 'rel-1',
-        user_id: 'u1',
-        title: "C'est Dieu",
-        slug: 'cest-dieu',
+        user_id: 'usr-himra',
+        title: isHimra ? 'LEGENDE' : "C'est Dieu",
+        slug: isHimra ? 'legende' : 'cest-dieu',
         cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
         preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
         preview_start_ms: 0,
@@ -361,9 +362,9 @@ export async function getArtistReleases(
       },
       {
         id: 'rel-2',
-        user_id: 'u1',
-        title: 'Enfant de Dieu',
-        slug: 'enfant-de-dieu',
+        user_id: 'usr-himra',
+        title: isHimra ? 'DRILL ACT' : 'Enfant de Dieu',
+        slug: isHimra ? 'drill-act' : 'enfant-de-dieu',
         cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80',
         preview_audio_url: 'https://actions.google.com/sounds/v1/musical_tracks/breeze.ogg',
         preview_start_ms: 0,

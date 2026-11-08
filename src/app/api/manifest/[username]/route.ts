@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateManifest } from '@/lib/pwa'
+import { INITIAL_ADMIN_USERS } from '@/lib/adminData'
 import { User } from '@/types'
 
 export async function GET(
@@ -8,33 +9,44 @@ export async function GET(
   { params }: { params: Promise<{ username: string }> }
 ) {
   const { username } = await params
-  const supabase = await createClient()
+  const cleanUsername = (username || '').toLowerCase().trim()
+  let profile: any = null
 
-  // Fetch artist profile by username
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('username', username)
-    .single()
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('username', cleanUsername)
+      .single()
+    if (data) profile = data
+  } catch {}
 
-  // Fallback default artist user if in demo mode or not found
-  const artist: User = profile || {
-    id: 'demo',
-    email: `${username}@monpodium.com`,
-    full_name: username,
-    artist_name: username.charAt(0).toUpperCase() + username.slice(1),
-    username: username,
+  const adminMatch = INITIAL_ADMIN_USERS.find(
+    (u) => u.username.toLowerCase() === cleanUsername
+  )
+
+  const artist: User = profile || adminMatch || {
+    id: `demo-${cleanUsername}`,
+    email: `${cleanUsername}@monpodium.com`,
+    full_name: cleanUsername,
+    artist_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
+    username: cleanUsername,
     avatar_url: null,
-    bio: `Page officielle de ${username}`,
-    genre: 'Musique',
-    country: 'International',
-    custom_domain: null,
+    banner_url: null,
+    banner_color: null,
+    bio: `Page officielle de ${cleanUsername}`,
+    genres: ['Musique'],
+    country: "Côte d'Ivoire",
     booking_email: null,
     booking_phone: null,
+    booking_enabled: false,
     plan: 'free',
     plan_expires_at: null,
     theme_color: '#9333ea',
     pwa_enabled: true,
+    pwa_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
+    pwa_icon_url: null,
     pwa_splash_url: null,
     created_at: new Date().toISOString(),
   }

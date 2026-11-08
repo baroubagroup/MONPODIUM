@@ -439,14 +439,14 @@ export default function ReleasesListPage() {
                 </div>
               </div>
 
-              {/* Right: Modern Actions Bar */}
-              <div className={`flex items-center gap-2 pt-3 md:pt-0 border-t md:border-t-0 flex-shrink-0 ${
+              {/* Right: Modern Actions Bar - Full width strip on mobile */}
+              <div className={`w-full md:w-auto flex items-center justify-between gap-1.5 sm:gap-2 pt-3 md:pt-0 border-t md:border-t-0 flex-shrink-0 ${
                 isLight ? 'border-slate-100' : 'border-zinc-800/80'
               }`}>
                 {/* Audio Snippet Play Toggle Button */}
                 <button
                   onClick={() => togglePlaySnippet(release)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer press-scale ${
+                  className={`flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer press-scale ${
                     isPlaying
                       ? 'bg-purple-600 text-white shadow-purple-600/30'
                       : isLight
@@ -461,7 +461,7 @@ export default function ReleasesListPage() {
                 {/* Direct Link Copy Button */}
                 <button
                   onClick={() => copyReleaseLink(release.slug, release.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-colors shadow-xs cursor-pointer press-scale ${
+                  className={`flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-colors shadow-xs cursor-pointer press-scale ${
                     isLight
                       ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                       : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white'
@@ -480,7 +480,7 @@ export default function ReleasesListPage() {
                 <Link
                   href={`/${username}/${release.slug}`}
                   target="_blank"
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-xs press-scale ${
+                  className={`flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all shadow-xs press-scale ${
                     isLight
                       ? 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200'
                       : 'bg-purple-600/20 hover:bg-purple-600 border border-purple-500/40 text-purple-300 hover:text-white'
@@ -493,7 +493,7 @@ export default function ReleasesListPage() {
                 {/* Delete Button */}
                 <button
                   onClick={() => deleteRelease(release.id)}
-                  className={`p-2 rounded-xl transition-colors cursor-pointer press-scale ${
+                  className={`p-2.5 sm:p-2 rounded-xl transition-colors cursor-pointer press-scale flex-shrink-0 ${
                     isLight
                       ? 'text-slate-400 hover:text-red-600 hover:bg-red-50'
                       : 'text-zinc-500 hover:text-red-400 hover:bg-red-500/10'

@@ -76,6 +76,30 @@ function ReleaseDetailContent() {
 
     document.title = `${release.title} — ${artistName} (Liens Officiels)`
 
+    let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
+    if (!manifestLink) {
+      manifestLink = document.createElement('link')
+      manifestLink.rel = 'manifest'
+      document.head.appendChild(manifestLink)
+    }
+    manifestLink.href = `/api/manifest/${username}`
+
+    let appleIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement
+    if (!appleIcon) {
+      appleIcon = document.createElement('link')
+      appleIcon.rel = 'apple-touch-icon'
+      document.head.appendChild(appleIcon)
+    }
+    appleIcon.href = `/api/icon/${username}`
+
+    let favIcon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (!favIcon) {
+      favIcon = document.createElement('link')
+      favIcon.rel = 'icon'
+      document.head.appendChild(favIcon)
+    }
+    favIcon.href = `/api/icon/${username}`
+
     // Track public single track page view
     recordPageView({
       artistUsername: username,

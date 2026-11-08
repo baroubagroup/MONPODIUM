@@ -5,7 +5,7 @@ export function generateManifest(user: User) {
   const startUrl = `${baseUrl}/${user.username}`
 
   const appName = user.pwa_name || user.artist_name
-  const appIcon = user.pwa_icon_url || user.avatar_url
+  const iconEndpoint = `${baseUrl}/api/icon/${user.username}`
 
   return {
     name: appName,
@@ -21,15 +21,15 @@ export function generateManifest(user: User) {
     background_color: '#08080a',
     icons: [
       {
-        src: appIcon ? appIcon : `${baseUrl}/icons/default-192.png`,
+        src: iconEndpoint,
         sizes: '192x192',
-        type: 'image/png',
+        type: 'image/svg+xml',
         purpose: 'any maskable',
       },
       {
-        src: appIcon ? appIcon : `${baseUrl}/icons/default-512.png`,
+        src: iconEndpoint,
         sizes: '512x512',
-        type: 'image/png',
+        type: 'image/svg+xml',
         purpose: 'any maskable',
       },
     ],

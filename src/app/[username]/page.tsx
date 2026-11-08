@@ -130,6 +130,8 @@ function ArtistHubContent() {
     loadArtistPage()
 
     document.title = `${artistName} — Hub Officiel & Discographie`
+
+    // Inject artist specific PWA Manifest & Icons
     let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
     if (!manifestLink) {
       manifestLink = document.createElement('link')
@@ -137,6 +139,24 @@ function ArtistHubContent() {
       document.head.appendChild(manifestLink)
     }
     manifestLink.href = `/api/manifest/${username}`
+
+    // Inject artist specific Apple Touch Icon (iOS home screen icon)
+    let appleIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement
+    if (!appleIcon) {
+      appleIcon = document.createElement('link')
+      appleIcon.rel = 'apple-touch-icon'
+      document.head.appendChild(appleIcon)
+    }
+    appleIcon.href = `/api/icon/${username}`
+
+    // Inject artist specific Favicon (replaces Next.js default N logo)
+    let favIcon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (!favIcon) {
+      favIcon = document.createElement('link')
+      favIcon.rel = 'icon'
+      document.head.appendChild(favIcon)
+    }
+    favIcon.href = `/api/icon/${username}`
 
     // Track public profile page view
     recordPageView({

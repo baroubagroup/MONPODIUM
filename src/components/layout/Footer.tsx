@@ -18,8 +18,8 @@ export function Footer() {
           <Link href="/#features" className="hover:text-white transition-colors">
             Fonctionnalités
           </Link>
-          <Link href="/#pricing" className="hover:text-white transition-colors">
-            Tarifs
+          <Link href="/#offerte" className="hover:text-white transition-colors">
+            Offre Gratuite
           </Link>
           <Link href="/auth/register" className="hover:text-white transition-colors">
             Pour les artistes

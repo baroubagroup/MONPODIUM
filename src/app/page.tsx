@@ -10,12 +10,9 @@ import {
   Smartphone,
   Globe2,
   Music,
-  Check,
   ArrowRight,
   ShieldCheck,
-  Zap,
   Play,
-  Share2,
   Calendar,
   Disc3,
   ExternalLink,
@@ -23,13 +20,10 @@ import {
   BarChart3,
   Flame,
   CheckCircle2,
-  Star,
-  Users,
 } from 'lucide-react'
 
 export default function HomePage() {
   const [activePreviewTab, setActivePreviewTab] = useState<'profile' | 'release' | 'pwa'>('profile')
-  const [pricingPlan, setPricingPlan] = useState<'all' | 'free' | 'starter' | 'pro'>('all')
   const [openFaq, setOpenFaq] = useState<number | null>(0)
 
   const toggleFaq = (idx: number) => {
@@ -70,56 +64,56 @@ export default function HomePage() {
   const faqs = [
     {
       q: 'Est-ce que je peux démarrer 100% gratuitement ?',
-      a: 'Oui ! Le plan Gratuit à vie vous permet de créer votre vitrine officielle, de téléverser votre premier morceau avec un extrait audio 15 secondes, de lier toutes vos plateformes de streaming et de permettre à vos fans d\'installer votre application mobile PWA.',
+      a: 'Oui, à 100% ! Notre plan Gratuit à vie vous permet de créer votre vitrine officielle, de téléverser votre première sortie musicale avec son extrait audio 15 secondes découpé, de regrouper toutes vos plateformes de streaming et de permettre à vos fans d\'installer votre application mobile PWA sur leur téléphone. Aucune carte bancaire n\'est demandée.',
+    },
+    {
+      q: 'Et si j\'ai plusieurs morceaux ou tout un album à ajouter ?',
+      a: 'Vous testez d\'abord la plateforme en toute liberté avec votre single phare. Si vous êtes conquis et que votre discographie s\'agrandit, vous pourrez à tout moment débloquer un pack multi-titres ou le catalogue complet directement depuis votre tableau de bord, à tarif très accessible.',
     },
     {
       q: 'Comment mes fans installent-ils mon application sur leur téléphone ?',
-      a: 'Dès qu\'un auditeur ouvre votre lien (ex: monpodium.com/votre-nom) sur Safari (iPhone) ou Chrome (Android), une bannière stylisée lui propose d\'installer l\'application sur son écran d\'accueil. En 1 clic, votre icône et votre nom apparaissent à côté de ses applications habituelles, sans passer par l\'App Store ni le Play Store !',
+      a: 'Dès qu\'un auditeur clique sur votre lien officiel (ex: monpodium.com/votre-nom) sur Safari (iPhone) ou Chrome (Android), une bannière stylisée lui propose d\'ajouter votre application sur son écran d\'accueil. En 1 clic, votre icône officielle et votre nom s\'installent à côté de ses applications habituelles, sans passer par l\'App Store ni le Play Store !',
     },
     {
-      q: 'Que se passe-t-il si un clip YouTube est supprimé ou bloqué ?',
-      a: 'C\'est toute la force de MonPodium : vous gardez le même lien dans votre bio Instagram et TikTok. Il vous suffit de remplacer le lien du clip dans votre tableau de bord en 5 secondes, sans jamais perdre le trafic de vos fans ni devoir changer vos publications.',
-    },
-    {
-      q: 'Puis-je suivre le nombre de visites par pays ?',
-      a: 'Absolument. Votre tableau de bord intègre des statistiques détaillées qui vous révèlent en direct d\'où proviennent vos auditeurs (Côte d\'Ivoire, Burkina Faso, France, Sénégal, Mali, etc.) et sur quelles plateformes ils cliquent le plus.',
+      q: 'Puis-je suivre le nombre de visites par pays et les clics par plateforme ?',
+      a: 'Absolument ! Votre tableau de bord intègre un module d\'audiences en temps réel qui vous montre exactement d\'où viennent vos fans (Côte d\'Ivoire, Burkina Faso, France, Sénégal, Mali, etc.) et sur quelles plateformes ils cliquent le plus (Spotify, YouTube, Boomplay, Apple Music...).',
     },
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#070709] text-white selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#070709] text-white selection:bg-purple-600 selection:text-white">
       <Navbar />
 
-      {/* HERO SECTION - 100% Mobile First & Ultra Impact */}
-      <section className="relative pt-8 sm:pt-16 pb-16 sm:pb-24 px-4 overflow-hidden">
-        {/* Ambient atmospheric glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[650px] h-[350px] sm:h-[650px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] bg-indigo-600/15 rounded-full blur-[100px] pointer-events-none" />
+      {/* HERO SECTION - 100% Mobile-First & Anti-Overflow */}
+      <section className="relative w-full max-w-full overflow-hidden pt-6 sm:pt-14 pb-12 sm:pb-20 px-3.5 sm:px-4">
+        {/* Ambient atmospheric glows strictly contained */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/3 left-1/4 w-[200px] sm:w-[350px] h-[200px] sm:h-[350px] bg-indigo-600/15 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-14 relative z-10">
-          {/* Left Column: Mobile First Pitch */}
-          <div className="flex-1 text-center lg:text-left space-y-5 sm:space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold shadow-xs">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12 relative z-10 w-full">
+          {/* Left Column: Mobile-First Pitch */}
+          <div className="flex-1 text-center lg:text-left space-y-4 sm:space-y-6 w-full">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[11px] sm:text-xs font-bold shadow-xs">
               <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
               <span>La vitrine n°1 des artistes indépendants</span>
             </div>
 
-            <h1 className="text-3xl xs:text-4xl sm:text-6xl font-black tracking-tight leading-[1.08]">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
               Toute ta musique. <br />
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
                 Un seul lien officiel.
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base md:text-lg text-zinc-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-              Spotify, YouTube, Boomplay, Apple Music, Deezer... Partage un seul lien avec un <strong>extrait audio 15s percutant</strong>, et offre à tes fans une <strong>application mobile installable</strong> directement sur leur écran d&apos;accueil.
+            <p className="text-xs sm:text-base md:text-lg text-zinc-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+              Spotify, YouTube, Boomplay, Apple Music... Partage un seul lien avec un <strong>extrait audio 15s percutant</strong>, et offre à tes fans une <strong>application mobile installable</strong> directement sur leur écran d&apos;accueil.
             </p>
 
             {/* Mobile CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-1 w-full">
               <Link
                 href="/auth/register"
-                className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/35 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 press-scale"
+                className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/35 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 press-scale"
               >
                 <span>Créer mon podium gratuit</span>
                 <ArrowRight className="w-4 h-4" />
@@ -127,68 +121,68 @@ export default function HomePage() {
               <Link
                 href="/ksbloom"
                 target="_blank"
-                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-sm flex items-center justify-center gap-2 transition-all hover:border-purple-500/50 press-scale"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-sm flex items-center justify-center gap-2 transition-all hover:border-purple-500/50 press-scale"
               >
                 <span>Voir un exemple live</span>
                 <ExternalLink className="w-3.5 h-3.5 opacity-60" />
               </Link>
             </div>
 
-            {/* Trust points - Responsive Grid on Mobile */}
-            <div className="pt-4 sm:pt-6 border-t border-zinc-800/80 grid grid-cols-3 gap-2 sm:gap-4 text-center lg:text-left">
-              <div className="p-2 sm:p-0">
-                <div className="flex items-center justify-center lg:justify-start gap-1.5 text-xs sm:text-sm font-black text-white">
-                  <ShieldCheck className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <span>Gratuit</span>
+            {/* Trust points - Responsive Grid */}
+            <div className="pt-4 sm:pt-6 border-t border-zinc-800/80 grid grid-cols-3 gap-1.5 sm:gap-3 text-center lg:text-left">
+              <div className="p-1 sm:p-0">
+                <div className="flex items-center justify-center lg:justify-start gap-1 text-[11px] sm:text-xs font-black text-white">
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+                  <span>100% Gratuit</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-zinc-400 mt-0.5">1 son à vie sans CB</p>
+                <p className="text-[10px] text-zinc-400 mt-0.5">1 son à vie • Sans CB</p>
               </div>
 
-              <div className="p-2 sm:p-0">
-                <div className="flex items-center justify-center lg:justify-start gap-1.5 text-xs sm:text-sm font-black text-white">
-                  <Smartphone className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <span>App PWA</span>
+              <div className="p-1 sm:p-0">
+                <div className="flex items-center justify-center lg:justify-start gap-1 text-[11px] sm:text-xs font-black text-white">
+                  <Smartphone className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+                  <span>App Mobile</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-zinc-400 mt-0.5">Installable par tes fans</p>
+                <p className="text-[10px] text-zinc-400 mt-0.5">Pour tous tes fans</p>
               </div>
 
-              <div className="p-2 sm:p-0">
-                <div className="flex items-center justify-center lg:justify-start gap-1.5 text-xs sm:text-sm font-black text-white">
-                  <Globe2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <div className="p-1 sm:p-0">
+                <div className="flex items-center justify-center lg:justify-start gap-1 text-[11px] sm:text-xs font-black text-white">
+                  <Globe2 className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
                   <span>Stats Pays</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-zinc-400 mt-0.5">Suivi de tes audiences</p>
+                <p className="text-[10px] text-zinc-400 mt-0.5">Suivi de tes clics</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column: INTERACTIVE SMARTPHONE SHOWCASE */}
-          <div className="w-full max-w-sm sm:max-w-md mx-auto">
+          {/* Right Column: INTERACTIVE SMARTPHONE SHOWCASE (Strictly Sized) */}
+          <div className="w-full max-w-[330px] xs:max-w-[360px] sm:max-w-[390px] mx-auto">
             {/* Interactive Preview Switcher Tabs */}
-            <div className="flex items-center justify-center p-1 bg-zinc-900/90 border border-zinc-800 rounded-2xl mb-4 text-xs font-bold shadow-md">
+            <div className="flex items-center justify-between p-1 bg-zinc-900/95 border border-zinc-800 rounded-xl sm:rounded-2xl mb-3 text-[11px] sm:text-xs font-bold shadow-md">
               <button
                 onClick={() => setActivePreviewTab('profile')}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer press-scale ${
+                className={`flex-1 py-1.5 sm:py-2 px-1 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer press-scale text-center ${
                   activePreviewTab === 'profile'
                     ? 'bg-purple-600 text-white shadow-md'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                <span>📱 Profil Artiste</span>
+                <span>📱 Profil</span>
               </button>
               <button
                 onClick={() => setActivePreviewTab('release')}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer press-scale ${
+                className={`flex-1 py-1.5 sm:py-2 px-1 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer press-scale text-center ${
                   activePreviewTab === 'release'
                     ? 'bg-purple-600 text-white shadow-md'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                <span>🎧 Extrait & Stores</span>
+                <span>🎧 Extrait</span>
               </button>
               <button
                 onClick={() => setActivePreviewTab('pwa')}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer press-scale ${
+                className={`flex-1 py-1.5 sm:py-2 px-1 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer press-scale text-center ${
                   activePreviewTab === 'pwa'
                     ? 'bg-purple-600 text-white shadow-md'
                     : 'text-zinc-400 hover:text-white'
@@ -199,30 +193,30 @@ export default function HomePage() {
             </div>
 
             {/* Smartphone Outer Bezel Frame */}
-            <div className="relative rounded-[38px] p-2 sm:p-2.5 bg-gradient-to-b from-zinc-700 via-zinc-850 to-zinc-950 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(147,51,234,0.25)] border-2 border-white/10">
+            <div className="relative rounded-[32px] sm:rounded-[38px] p-2 sm:p-2.5 bg-gradient-to-b from-zinc-700 via-zinc-850 to-zinc-950 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(147,51,234,0.25)] border-2 border-white/10">
               {/* Dynamic Island Speaker Notch */}
-              <div className="w-24 h-4 bg-black rounded-full mx-auto mb-2 flex items-center justify-center gap-1.5 shadow-inner">
-                <span className="w-2 h-2 rounded-full bg-zinc-800" />
-                <span className="w-2.5 h-2.5 rounded-full bg-zinc-900 border border-zinc-800" />
+              <div className="w-20 sm:w-24 h-3.5 sm:h-4 bg-black rounded-full mx-auto mb-2 flex items-center justify-center gap-1.5 shadow-inner">
+                <span className="w-1.5 h-1.5 rounded-full bg-zinc-800" />
+                <span className="w-2 h-2 rounded-full bg-zinc-900 border border-zinc-800" />
               </div>
 
               {/* Screen Body */}
-              <div className="rounded-[30px] bg-zinc-950 overflow-hidden border border-zinc-800/80 p-4 sm:p-5 text-left space-y-4">
+              <div className="rounded-[24px] sm:rounded-[30px] bg-zinc-950 overflow-hidden border border-zinc-800/80 p-3.5 sm:p-5 text-left space-y-3.5">
                 {/* 1. TAB: PROFIL ARTISTE */}
                 {activePreviewTab === 'profile' && (
-                  <div className="space-y-4 animate-in fade-in duration-300">
-                    <div className="flex items-center justify-between text-[11px] text-zinc-400 border-b border-zinc-800/80 pb-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="font-mono font-bold text-white">monpodium.com/ksbloom</span>
+                  <div className="space-y-3.5 animate-in fade-in duration-300">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 border-b border-zinc-800/80 pb-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                        <span className="font-mono font-bold text-white text-[11px] truncate">monpodium.com/ksbloom</span>
                       </div>
-                      <span className="text-[10px] bg-purple-600/20 text-purple-300 px-2 py-0.5 rounded-full font-bold border border-purple-500/30">
+                      <span className="text-[10px] bg-purple-600/20 text-purple-300 px-2 py-0.5 rounded-full font-bold border border-purple-500/30 flex-shrink-0">
                         Certifié
                       </span>
                     </div>
 
                     <div className="text-center space-y-2 pt-1">
-                      <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto border-2 border-purple-500/50 shadow-xl bg-zinc-900">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden mx-auto border-2 border-purple-500/50 shadow-xl bg-zinc-900">
                         <SafeImage
                           src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80"
                           alt="KS Bloom"
@@ -233,10 +227,10 @@ export default function HomePage() {
                       </div>
                       <div>
                         <div className="flex items-center justify-center gap-1">
-                          <h4 className="font-black text-lg text-white">KS Bloom</h4>
+                          <h4 className="font-black text-base sm:text-lg text-white">KS Bloom</h4>
                           <ShieldCheck className="w-4 h-4 text-blue-400" />
                         </div>
-                        <p className="text-[11px] text-zinc-400 font-medium line-clamp-2 px-2">
+                        <p className="text-[11px] text-zinc-400 font-medium line-clamp-2 px-1">
                           Artiste chanteur gospel & afrobeats. Retrouvez ici toutes mes sorties officielles.
                         </p>
                       </div>
@@ -249,8 +243,8 @@ export default function HomePage() {
                     </div>
 
                     {/* Latest Release Card inside Mock */}
-                    <div className="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-950 flex-shrink-0 shadow-md">
+                    <div className="p-2.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center gap-2.5">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden bg-zinc-950 flex-shrink-0 shadow-md">
                         <SafeImage
                           src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80"
                           alt="C'est Dieu"
@@ -263,8 +257,8 @@ export default function HomePage() {
                         <h5 className="font-bold text-xs text-white truncate">C&apos;est Dieu</h5>
                         <p className="text-[10px] text-zinc-400 truncate">4 plateformes actives</p>
                       </div>
-                      <div className="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-md">
-                        <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                      <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-md flex-shrink-0">
+                        <Play className="w-3 h-3 fill-white ml-0.5" />
                       </div>
                     </div>
                   </div>
@@ -272,8 +266,8 @@ export default function HomePage() {
 
                 {/* 2. TAB: EXTRAIT & STORES */}
                 {activePreviewTab === 'release' && (
-                  <div className="space-y-3.5 animate-in fade-in duration-300">
-                    <div className="aspect-video w-full rounded-2xl overflow-hidden relative shadow-lg bg-zinc-900">
+                  <div className="space-y-3 animate-in fade-in duration-300">
+                    <div className="aspect-video w-full rounded-xl overflow-hidden relative shadow-lg bg-zinc-900">
                       <SafeImage
                         src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80"
                         alt="Morceau"
@@ -281,50 +275,50 @@ export default function HomePage() {
                         fallbackText="Son"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-                      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
-                        <div>
+                      <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between">
+                        <div className="min-w-0">
                           <span className="text-[9px] font-black uppercase text-purple-400 block">Nouveau Son</span>
-                          <span className="text-sm font-black text-white">Élu de Dieu</span>
+                          <span className="text-xs sm:text-sm font-black text-white truncate block">Élu de Dieu</span>
                         </div>
-                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold flex-shrink-0">
                           Extrait 15s
                         </span>
                       </div>
                     </div>
 
                     {/* Simulated Waveform Bar */}
-                    <div className="p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-zinc-400">Extrait de démo</span>
+                    <div className="p-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800 space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px] font-bold">
+                        <span className="text-zinc-400">Extrait 15 secondes</span>
                         <span className="text-purple-400">0:08 / 0:15</span>
                       </div>
-                      <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
                         <div className="w-1/2 h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
                       </div>
                     </div>
 
                     {/* Stores Links buttons */}
                     <div className="space-y-1.5">
-                      <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs font-bold">
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs font-bold">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-[#1DB954] text-black flex items-center justify-center font-black text-[10px]">S</span>
+                          <span className="w-5 h-5 rounded-md bg-[#1DB954] text-black flex items-center justify-center font-black text-[9px]">S</span>
                           <span>Spotify</span>
                         </div>
-                        <span className="text-[10px] text-zinc-400 bg-zinc-800 px-2 py-1 rounded-md">Écouter</span>
+                        <span className="text-[9px] text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">Écouter</span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs font-bold">
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs font-bold">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-[#FF0000] text-white flex items-center justify-center font-black text-[10px]">▶</span>
+                          <span className="w-5 h-5 rounded-md bg-[#FF0000] text-white flex items-center justify-center font-black text-[9px]">▶</span>
                           <span>YouTube</span>
                         </div>
-                        <span className="text-[10px] text-zinc-400 bg-zinc-800 px-2 py-1 rounded-md">Regarder</span>
+                        <span className="text-[9px] text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">Regarder</span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs font-bold">
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs font-bold">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-[#00D2FF] text-black flex items-center justify-center font-black text-[10px]">B</span>
+                          <span className="w-5 h-5 rounded-md bg-[#00D2FF] text-black flex items-center justify-center font-black text-[9px]">B</span>
                           <span>Boomplay</span>
                         </div>
-                        <span className="text-[10px] text-zinc-400 bg-zinc-800 px-2 py-1 rounded-md">Écouter</span>
+                        <span className="text-[9px] text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">Écouter</span>
                       </div>
                     </div>
                   </div>
@@ -332,55 +326,55 @@ export default function HomePage() {
 
                 {/* 3. TAB: APP PWA SUR ECRAN D'ACCUEIL */}
                 {activePreviewTab === 'pwa' && (
-                  <div className="space-y-4 animate-in fade-in duration-300 text-center py-2">
-                    <div className="p-3 rounded-2xl bg-gradient-to-b from-purple-950/40 to-zinc-900 border border-purple-500/30 text-left space-y-1">
-                      <span className="text-[10px] font-black uppercase text-purple-400 tracking-wider">
-                        Sans App Store ni Play Store
+                  <div className="space-y-3 animate-in fade-in duration-300 text-center py-1">
+                    <div className="p-2.5 rounded-xl bg-gradient-to-b from-purple-950/40 to-zinc-900 border border-purple-500/30 text-left space-y-1">
+                      <span className="text-[9px] font-black uppercase text-purple-400 tracking-wider">
+                        Sans passer par l&apos;App Store
                       </span>
-                      <h4 className="font-black text-sm text-white">Ton application sur l&apos;écran d&apos;accueil</h4>
-                      <p className="text-[11px] text-zinc-400">
-                        Tes fans installent directement ton icône officielle en 1 tap.
+                      <h4 className="font-black text-xs sm:text-sm text-white">Ton icône sur leur écran</h4>
+                      <p className="text-[10px] text-zinc-400">
+                        Tes fans installent directement ton application en 1 clic.
                       </p>
                     </div>
 
                     {/* Simulated Phone Home Screen Icons Grid */}
-                    <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-                      <div className="grid grid-cols-4 gap-3 text-center">
+                    <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+                      <div className="grid grid-cols-4 gap-2 text-center">
                         <div className="flex flex-col items-center gap-1">
-                          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md font-bold text-xs">
-                            WhatsApp
+                          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md font-bold text-[10px]">
+                            WA
                           </div>
-                          <span className="text-[9px] text-zinc-400">WhatsApp</span>
+                          <span className="text-[8px] text-zinc-400">WhatsApp</span>
                         </div>
 
                         {/* The Artist PWA Icon */}
                         <div className="flex flex-col items-center gap-1 relative">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 border-2 border-purple-400 font-black text-sm animate-pulse">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 border border-purple-400 font-black text-xs animate-pulse">
                             KS
                           </div>
-                          <span className="text-[9px] text-purple-300 font-black">KS Bloom</span>
-                          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-black" />
+                          <span className="text-[8px] text-purple-300 font-black">KS Bloom</span>
+                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-black" />
                         </div>
 
                         <div className="flex flex-col items-center gap-1">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shadow-md font-bold text-xs">
-                            Insta
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shadow-md font-bold text-[10px]">
+                            IG
                           </div>
-                          <span className="text-[9px] text-zinc-400">Instagram</span>
+                          <span className="text-[8px] text-zinc-400">Insta</span>
                         </div>
 
                         <div className="flex flex-col items-center gap-1">
-                          <div className="w-12 h-12 rounded-2xl bg-black text-white border border-white/20 flex items-center justify-center shadow-md font-bold text-xs">
-                            TikTok
+                          <div className="w-10 h-10 rounded-xl bg-black text-white border border-white/20 flex items-center justify-center shadow-md font-bold text-[10px]">
+                            TT
                           </div>
-                          <span className="text-[9px] text-zinc-400">TikTok</span>
+                          <span className="text-[8px] text-zinc-400">TikTok</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                      <span>Accessible hors-connexion & fluide</span>
+                    <div className="p-2 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-200 text-[11px] font-bold flex items-center justify-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Accessible hors-connexion</span>
                     </div>
                   </div>
                 )}
@@ -391,23 +385,23 @@ export default function HomePage() {
       </section>
 
       {/* FEATURED ARTISTS ROSTER - Social Proof */}
-      <section className="py-10 border-y border-zinc-800/80 bg-zinc-950/60">
-        <div className="max-w-6xl mx-auto px-4 space-y-4">
+      <section className="py-8 sm:py-10 border-y border-zinc-800/80 bg-zinc-950/60 w-full max-w-full overflow-hidden">
+        <div className="max-w-6xl mx-auto px-3.5 sm:px-4 space-y-3.5">
           <div className="text-center">
-            <span className="text-xs uppercase font-extrabold tracking-widest text-zinc-400">
+            <span className="text-[11px] sm:text-xs uppercase font-extrabold tracking-widest text-zinc-400">
               Déjà adopté par les artistes en Côte d&apos;Ivoire et en Afrique
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {featuredArtists.map((artist) => (
               <Link
                 key={artist.username}
                 href={`/${artist.username}`}
                 target="_blank"
-                className="p-3 sm:p-4 rounded-2xl bg-zinc-900/70 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 transition-all flex items-center gap-3 group press-scale"
+                className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-zinc-900/70 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 transition-all flex items-center gap-2.5 group press-scale"
               >
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-md flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-md flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform">
                   <SafeImage
                     src={artist.avatar}
                     alt={artist.name}
@@ -428,10 +422,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6 SUPERPOWERS FEATURES - Responsive Cards */}
-      <section id="features" className="py-16 sm:py-24 px-4 bg-zinc-950/40">
-        <div className="max-w-6xl mx-auto space-y-12">
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
+      {/* 6 SUPERPOWERS FEATURES - Responsive Grid */}
+      <section id="features" className="py-12 sm:py-20 px-3.5 sm:px-4 bg-zinc-950/40 w-full max-w-full overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-8 sm:space-y-12">
+          <div className="text-center space-y-2.5 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 text-xs font-bold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Conçu sur mesure pour la musique</span>
@@ -444,73 +438,73 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
             {/* Feature 1 */}
-            <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-3">
-              <div className="w-11 h-11 rounded-2xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-2.5 sm:space-y-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold">
                 <Music className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-base text-white">Un Seul Lien Universel</h3>
+              <h3 className="font-black text-sm sm:text-base text-white">Un Seul Lien Universel</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Spotify, YouTube, Boomplay, Deezer, Apple Music, Audiomack... Tes fans choisissent leur plateforme favorite en 1 clic sans friction.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="p-6 rounded-3xl bg-zinc-900/60 border border-purple-500/30 hover:border-purple-500 transition-all space-y-3 relative overflow-hidden">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-zinc-900/60 border border-purple-500/30 hover:border-purple-500 transition-all space-y-2.5 sm:space-y-3 relative overflow-hidden">
               <span className="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-purple-600 text-white">
                 Exclusivité
               </span>
-              <div className="w-11 h-11 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
                 <Smartphone className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-base text-white">Application PWA Dédiée</h3>
+              <h3 className="font-black text-sm sm:text-base text-white">Application PWA Dédiée</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Chaque artiste dispose de sa propre application installable avec son logo et son nom, directement sur l&apos;écran d&apos;accueil de ses fans.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-3">
-              <div className="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center font-bold">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-2.5 sm:space-y-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center font-bold">
                 <Play className="w-5 h-5 fill-indigo-400 ml-0.5" />
               </div>
-              <h3 className="font-black text-base text-white">Extrait Audio 15s Direct</h3>
+              <h3 className="font-black text-sm sm:text-base text-white">Extrait Audio 15s Direct</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Fais vibrer tes auditeurs dès l&apos;ouverture de ton lien grâce à l&apos;aperçu audio découpé sur ton refrain, sans quitter la page.
               </p>
             </div>
 
             {/* Feature 4 */}
-            <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-2.5 sm:space-y-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold">
                 <BarChart3 className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-base text-white">Statistiques par Pays</h3>
+              <h3 className="font-black text-sm sm:text-base text-white">Statistiques par Pays</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Suis exactement d&apos;où viennent tes visiteurs (Côte d&apos;Ivoire, Burkina, France, Mali...) et prépare tes tournées ou campagnes ciblées.
               </p>
             </div>
 
             {/* Feature 5 */}
-            <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-3">
-              <div className="w-11 h-11 rounded-2xl bg-pink-500/15 text-pink-400 flex items-center justify-center font-bold">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-2.5 sm:space-y-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-pink-500/15 text-pink-400 flex items-center justify-center font-bold">
                 <Calendar className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-base text-white">Bouton Booking & Concerts</h3>
+              <h3 className="font-black text-sm sm:text-base text-white">Bouton Booking & Concerts</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Reçois des propositions professionnelles d&apos;organisateurs de festivals et d&apos;événements directement sur ton email officiel de booking.
               </p>
             </div>
 
             {/* Feature 6 */}
-            <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-3">
-              <div className="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-purple-500/50 transition-all space-y-2.5 sm:space-y-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold">
                 <Globe2 className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-base text-white">Adresse Officielle Dédiée</h3>
+              <h3 className="font-black text-sm sm:text-base text-white">Adresse Officielle Dédiée</h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Profite d&apos;une URL courte et prestigieuse (ex: <strong>monpodium.com/tonnom</strong> ou sous-domaine officiel) qui renforce ton image de marque.
+                Profite d&apos;une URL courte et prestigieuse (ex: <strong>monpodium.com/tonnom</strong>) qui renforce immédiatement ton image de marque.
               </p>
             </div>
           </div>
@@ -518,16 +512,16 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS - 3 Simple Steps */}
-      <section className="py-14 sm:py-20 px-4 border-t border-zinc-800/80 bg-zinc-950/70">
-        <div className="max-w-4xl mx-auto text-center space-y-10">
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">En 3 minutes chrono</span>
+      <section className="py-12 sm:py-16 px-3.5 sm:px-4 border-t border-zinc-800/80 bg-zinc-950/70 w-full max-w-full overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center space-y-8 sm:space-y-10">
+          <div className="space-y-1.5">
+            <span className="text-[11px] sm:text-xs font-bold text-purple-400 uppercase tracking-widest">En 3 minutes chrono</span>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Comment ça marche ?</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-            <div className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-2.5">
-              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white font-black text-sm flex items-center justify-center shadow-md">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-left">
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-md">
                 1
               </div>
               <h4 className="font-black text-sm text-white">Crée ton profil</h4>
@@ -536,200 +530,160 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-2.5">
-              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white font-black text-sm flex items-center justify-center shadow-md">
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-md">
                 2
               </div>
-              <h4 className="font-black text-sm text-white">Ajoute tes sons</h4>
+              <h4 className="font-black text-sm text-white">Ajoute ton morceau</h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Téléverse ta pochette, ton extrait 15s et colle tes liens Spotify, YouTube, Boomplay...
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-2.5">
-              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white font-black text-sm flex items-center justify-center shadow-md">
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-md">
                 3
               </div>
               <h4 className="font-black text-sm text-white">Partage partout</h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Mets ton lien officiel en bio Instagram, TikTok et sous tes vidéos YouTube.
+                Mets ton lien en bio Instagram, TikTok et sous tes clips YouTube. Tes fans t&apos;installent !
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* PRICING SECTION - Accessible & Mobile Friendly */}
-      <section id="pricing" className="py-16 sm:py-24 px-4 relative">
-        <div className="max-w-6xl mx-auto space-y-12">
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 text-xs font-bold">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Tarifs transparents</span>
+      {/* OFFRE DE DÉMARRAGE 100% GRATUITE - Conversion Optimale & Zéro Barrière */}
+      <section id="offerte" className="py-14 sm:py-20 px-3.5 sm:px-4 relative w-full max-w-full overflow-hidden">
+        {/* Soft centered ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[550px] h-[300px] sm:h-[550px] bg-purple-600/15 rounded-full blur-[130px] pointer-events-none" />
+
+        <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8 relative z-10 text-center">
+          <div className="space-y-2.5">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] sm:text-xs font-extrabold tracking-wide uppercase shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Offre Spéciale Démarrage • 100% Offerte</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white">
-              Choisis le plan adapté à ta carrière
+            <h2 className="text-2xl xs:text-3xl sm:text-4xl font-black text-white tracking-tight">
+              Lance ta vitrine officielle gratuitement
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-400">
-              Démarre gratuitement aujourd&apos;hui et évolue quand ta discographie grandit.
+            <p className="text-xs sm:text-sm text-zinc-300 max-w-xl mx-auto leading-relaxed">
+              Zéro carte bancaire requise. Zéro engagement. Rejoins les artistes qui valorisent leur musique avec un lien unique et leur propre application mobile.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-            {/* Plan Gratuit */}
-            <div className="rounded-3xl bg-zinc-900/80 border border-zinc-800 p-6 sm:p-7 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="inline-block px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 text-[11px] font-black uppercase tracking-wider">
-                  Gratuit
-                </span>
-                <div>
-                  <div className="text-3xl font-black text-white">0 FCFA</div>
-                  <span className="text-xs text-zinc-400">À vie • Sans engagement</span>
+          {/* Main Free Offer Box */}
+          <div className="rounded-3xl bg-gradient-to-b from-zinc-900/95 via-zinc-900/90 to-zinc-950 border-2 border-purple-500/50 p-5 sm:p-8 shadow-2xl shadow-purple-950/40 text-left space-y-5 sm:space-y-6 relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-black text-[10px] sm:text-[11px] uppercase tracking-wider border border-emerald-500/30">
+                    Plan Gratuit Inclus
+                  </span>
+                  <span className="text-[11px] sm:text-xs text-zinc-400 font-bold">Sans condition de durée</span>
                 </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Idéal pour tester la plateforme ou promouvoir ton tout dernier single.
+                <h3 className="text-lg sm:text-2xl font-black text-white mt-1.5">
+                  Ta 1ère sortie musicale offerte à vie
+                </h3>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Tout ce qu&apos;il te faut pour propulser ton single actuel auprès de tes fans.
                 </p>
-
-                <ul className="space-y-2.5 pt-3 border-t border-zinc-800 text-xs text-zinc-300">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span><strong>1 musique</strong> active</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Pochette + extrait audio 15s</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Tous les liens de streaming</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Bouton Booking officiel</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Application PWA incluse</span>
-                  </li>
-                </ul>
               </div>
 
-              <Link
-                href="/auth/register"
-                className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs text-center transition-colors block press-scale"
-              >
-                Démarrer gratuitement
-              </Link>
+              <div className="sm:text-right pt-2 sm:pt-0">
+                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
+                  0 FCFA
+                </div>
+                <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold block">À vie • Sans carte bancaire</span>
+              </div>
             </div>
 
-            {/* Plan Starter */}
-            <div className="rounded-3xl bg-zinc-900/90 border-2 border-purple-500 p-6 sm:p-7 flex flex-col justify-between space-y-6 relative shadow-xl shadow-purple-600/25">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[11px] font-black uppercase tracking-wider shadow-md">
-                Recommandé
-              </div>
-
-              <div className="space-y-4">
-                <span className="inline-block px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-[11px] font-black uppercase tracking-wider">
-                  Starter
-                </span>
+            {/* Feature Checkpoints Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs">
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-3xl font-black text-white">10 000 FCFA</div>
-                  <span className="text-xs text-zinc-400">Par an (~830 FCFA / mois)</span>
+                  <span className="font-black text-white block">1 chanson complète active</span>
+                  <span className="text-[11px] text-zinc-400">Pochette HD, titre et métadonnées.</span>
                 </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Pour les artistes en développement qui ont plusieurs sons à mettre en avant.
-                </p>
-
-                <ul className="space-y-2.5 pt-3 border-t border-zinc-800 text-xs text-zinc-300">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span><strong>Jusqu&apos;à 5 musiques</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Vitrine artiste complète</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Statistiques géographiques</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Support prioritaire WhatsApp</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Toutes les options du plan Gratuit</span>
-                  </li>
-                </ul>
               </div>
 
-              <Link
-                href="/auth/register"
-                className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs text-center transition-all hover:scale-105 block shadow-lg shadow-purple-600/30 press-scale"
-              >
-                Prendre le Starter (10 000 FCFA)
-              </Link>
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-black text-white block">Application PWA installable</span>
+                  <span className="text-[11px] text-zinc-400">Ton icône et ton nom sur l&apos;écran de tes fans.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-black text-white block">Extrait audio 15s découpé</span>
+                  <span className="text-[11px] text-zinc-400">Écoute instantanée sans quitter la page.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-black text-white block">Toutes tes plateformes liées</span>
+                  <span className="text-[11px] text-zinc-400">Spotify, YouTube, Boomplay, Apple Music...</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-black text-white block">Bouton Booking & Concerts</span>
+                  <span className="text-[11px] text-zinc-400">Reçois des opportunités d&apos;organisateurs.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-black text-white block">Statistiques en direct</span>
+                  <span className="text-[11px] text-zinc-400">Suivi des visites, clics et pays.</span>
+                </div>
+              </div>
             </div>
 
-            {/* Plan Pro */}
-            <div className="rounded-3xl bg-zinc-900/80 border border-zinc-800 p-6 sm:p-7 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="inline-block px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 text-[11px] font-black uppercase tracking-wider">
-                  Pro Illimité
-                </span>
-                <div>
-                  <div className="text-3xl font-black text-white">15 000 FCFA</div>
-                  <span className="text-xs text-zinc-400">Par an (~1 250 FCFA / mois)</span>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Pour les professionnels qui veulent valoriser toute leur discographie officielle.
-                </p>
-
-                <ul className="space-y-2.5 pt-3 border-t border-zinc-800 text-xs text-zinc-300">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span><strong>Jusqu&apos;à 20 musiques</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span><strong>Sous-domaine exclusif</strong> (nom.monpodium.com)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Badge vérifié officiel MonPodium</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Analytique complète des clics</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span>Accès à toutes les futures options</span>
-                  </li>
-                </ul>
-              </div>
-
+            {/* Big Action Button */}
+            <div className="pt-2">
               <Link
                 href="/auth/register"
-                className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs text-center transition-colors block press-scale"
+                className="w-full py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base text-center shadow-xl shadow-purple-600/35 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] press-scale"
               >
-                Prendre le Pro (15 000 FCFA)
+                <span>Créer ma page artiste 100% gratuite</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
+              <p className="text-[10px] sm:text-[11px] text-center text-zinc-400 mt-2">
+                Inscription en 2 minutes chrono • Zéro engagement • Aucun moyen de paiement demandé
+              </p>
+            </div>
+
+            {/* Transparent & smart marketing note */}
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-purple-950/30 border border-purple-500/20 text-xs text-zinc-300 leading-relaxed flex items-start gap-2.5">
+              <span className="text-sm sm:text-base flex-shrink-0">💡</span>
+              <div>
+                <strong className="text-white block mb-0.5">Tu as déjà plusieurs morceaux ou un album ?</strong>
+                Commence d&apos;abord par tester la plateforme gratuitement avec ton titre phare. Si tu aimes l&apos;expérience et que tu souhaites promouvoir l&apos;ensemble de ta discographie, tu pourras faire évoluer ton compte vers une formule multi-titres à tout moment depuis ton tableau de bord.
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ SECTION - Interactive Accordion */}
-      <section className="py-14 sm:py-20 px-4 border-t border-zinc-800/80 bg-zinc-950/60">
-        <div className="max-w-3xl mx-auto space-y-8">
-          <div className="text-center space-y-2">
-            <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Questions fréquentes</span>
+      <section className="py-12 sm:py-16 px-3.5 sm:px-4 border-t border-zinc-800/80 bg-zinc-950/60 w-full max-w-full overflow-hidden">
+        <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+          <div className="text-center space-y-1.5">
+            <span className="text-[11px] sm:text-xs font-bold text-purple-400 uppercase tracking-widest">Questions fréquentes</span>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Tout ce que tu dois savoir</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {faqs.map((faq, idx) => {
               const isOpen = openFaq === idx
               return (
@@ -739,7 +693,7 @@ export default function HomePage() {
                 >
                   <button
                     onClick={() => toggleFaq(idx)}
-                    className="w-full p-4 sm:p-5 flex items-center justify-between gap-3 text-left font-bold text-sm text-white cursor-pointer press-scale"
+                    className="w-full p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left font-bold text-xs sm:text-sm text-white cursor-pointer press-scale"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown className={`w-4 h-4 text-purple-400 transition-transform duration-200 flex-shrink-0 ${
@@ -747,7 +701,7 @@ export default function HomePage() {
                     }`} />
                   </button>
                   {isOpen && (
-                    <div className="px-4 sm:px-5 pb-5 text-xs text-zinc-300 leading-relaxed border-t border-zinc-800/60 pt-3 animate-in fade-in duration-200">
+                    <div className="px-3.5 sm:px-4 pb-4 text-xs text-zinc-300 leading-relaxed border-t border-zinc-800/60 pt-2.5 animate-in fade-in duration-200">
                       {faq.a}
                     </div>
                   )}
@@ -759,31 +713,31 @@ export default function HomePage() {
       </section>
 
       {/* FINAL CALL TO ACTION */}
-      <section className="py-16 sm:py-20 px-4 relative overflow-hidden bg-gradient-to-b from-transparent to-purple-950/30">
-        <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center mx-auto shadow-inner">
-            <Disc3 className="w-8 h-8 animate-spin-slow" />
+      <section className="py-14 sm:py-20 px-3.5 sm:px-4 relative overflow-hidden bg-gradient-to-b from-transparent to-purple-950/30 w-full max-w-full">
+        <div className="max-w-4xl mx-auto text-center space-y-5 relative z-10">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center mx-auto shadow-inner">
+            <Disc3 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin-slow" />
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
             Donne à ta musique la vitrine qu&apos;elle mérite
           </h2>
 
-          <p className="text-xs sm:text-base text-zinc-400 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm md:text-base text-zinc-400 max-w-lg mx-auto leading-relaxed">
             Crée ta page en 30 secondes, partage un seul lien officiel et permets à tes fans de t&apos;installer sur leur téléphone.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 pt-2">
             <Link
               href="/auth/register"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/35 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 press-scale"
+              className="w-full sm:w-auto px-7 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/35 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 press-scale"
             >
               <span>Démarrer maintenant</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/auth/login"
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-sm flex items-center justify-center transition-colors hover:text-white press-scale"
+              className="w-full sm:w-auto px-5 py-3.5 sm:py-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-sm flex items-center justify-center transition-colors hover:text-white press-scale"
             >
               Déjà inscrit ? Se connecter
             </Link>

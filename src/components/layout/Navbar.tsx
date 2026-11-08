@@ -22,10 +22,10 @@ export function Navbar() {
         {/* Links & CTA */}
         <div className="flex items-center gap-3 sm:gap-5">
           <Link
-            href="/#pricing"
+            href="/#offerte"
             className="hidden md:inline-block text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
           >
-            Tarifs
+            Offre Gratuite
           </Link>
 
           <Link

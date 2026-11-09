@@ -26,8 +26,8 @@ export function PlatformButton({
   const isLight = themeMode === 'light'
   const config = PLATFORMS.find(p => p.id === platform) || {
     name: platform,
-    color: '#9333ea',
-    bgColor: '#9333ea',
+    color: '#10b981',
+    bgColor: '#10b981',
     textColor: '#ffffff',
   }
 

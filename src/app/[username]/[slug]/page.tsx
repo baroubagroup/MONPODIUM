@@ -22,7 +22,7 @@ function ReleaseDetailContent() {
   const [artistName, setArtistName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaName, setPwaName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
-  const [themeColor, setThemeColor] = useState('#9333ea')
+  const [themeColor, setThemeColor] = useState('#10b981')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
 

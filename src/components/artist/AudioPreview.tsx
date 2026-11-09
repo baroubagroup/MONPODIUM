@@ -20,7 +20,7 @@ export function AudioPreview({
   artistName,
   artistUsername,
   trackSlug,
-  themeColor = '#9333ea',
+  themeColor = '#10b981',
   maxSeconds = 15,
 }: AudioPreviewProps) {
   const [isPlaying, setIsPlaying] = useState(false)

@@ -119,24 +119,29 @@ export async function getActiveUserProfile(): Promise<UserProfileData | null> {
 }
 
 /**
- * Register or update the user inside the admin directory
+ * Register or update the user inside the admin directory and dedicated profile store
  */
 export function registerInAdminUsers(user: UserProfileData) {
   if (typeof window === 'undefined') return
   try {
+    const cleanUsername = user.username.toLowerCase().trim()
+    // Dedicated per-user key for 100% reliable instantaneous lookup
+    localStorage.setItem(`monpodium_profile_${cleanUsername}`, JSON.stringify(user))
+
     const raw = localStorage.getItem(STORAGE_KEY_ADMIN_USERS)
-    const list: AdminArtistUser[] = raw ? JSON.parse(raw) : [...INITIAL_ADMIN_USERS]
+    const list: (AdminArtistUser & { banner_color?: string | null; social_links?: SocialLink[]; account_type?: AccountType })[] = raw ? JSON.parse(raw) : [...INITIAL_ADMIN_USERS]
 
     const existingIdx = list.findIndex(
-      (u) => u.username.toLowerCase() === user.username.toLowerCase()
+      (u) => u.username.toLowerCase() === cleanUsername
     )
 
-    const adminEntry: AdminArtistUser = {
-      id: user.id || `user-${user.username}`,
+    const adminEntry = {
+      id: user.id || `user-${cleanUsername}`,
       email: user.email,
       artist_name: user.artist_name,
-      username: user.username,
+      username: cleanUsername,
       full_name: user.full_name,
+      account_type: user.account_type || 'musician',
       plan: user.plan || 'free',
       plan_expires_at: null,
       verified: user.verified || false,
@@ -153,7 +158,7 @@ export function registerInAdminUsers(user: UserProfileData) {
       booking_email: user.booking_email || null,
       booking_phone: user.booking_phone || null,
       booking_enabled: Boolean(user.booking_email),
-      pwa_enabled: true,
+      pwa_enabled: user.pwa_enabled ?? true,
       pwa_name: user.pwa_name || user.artist_name,
       pwa_icon_url: user.pwa_icon_url || null,
       pwa_splash_url: null,
@@ -162,12 +167,13 @@ export function registerInAdminUsers(user: UserProfileData) {
       is_flagged_impostor: false,
       moderation_report_count: 0,
       admin_notes: '',
+      social_links: user.social_links || [],
     }
 
     if (existingIdx >= 0) {
       list[existingIdx] = { ...list[existingIdx], ...adminEntry }
     } else {
-      list.unshift(adminEntry)
+      list.unshift(adminEntry as any)
     }
 
     localStorage.setItem(STORAGE_KEY_ADMIN_USERS, JSON.stringify(list))
@@ -193,12 +199,20 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
         .single()
 
       if (profile) {
+        // Also fetch social links from Supabase
+        const { data: links } = await supabase
+          .from('social_links')
+          .select('*')
+          .eq('user_id', profile.id)
+          .order('display_order', { ascending: true })
+
         return {
           id: profile.id,
           email: profile.email,
           full_name: profile.full_name || '',
           artist_name: profile.artist_name || cleanUsername,
           username: profile.username,
+          account_type: profile.account_type || 'musician',
           bio: profile.bio || '',
           genre: profile.genre || 'Afrobeats',
           genres: profile.genres || (profile.genre ? [profile.genre] : ['Afrobeats']),
@@ -217,6 +231,7 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
           pwa_enabled: profile.pwa_enabled ?? true,
           pwa_name: profile.pwa_name || profile.artist_name,
           pwa_icon_url: profile.pwa_icon_url,
+          social_links: links || [],
         }
       }
     } catch (err) {
@@ -224,12 +239,29 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
     }
   }
 
-  // 2. Check local admin users registry
+  // 2. Client-side storage priority check
   if (typeof window !== 'undefined') {
     try {
+      // Priority 2A: Dedicated per-profile key (most recent, direct, never overwritten)
+      const dedicatedRaw = localStorage.getItem(`monpodium_profile_${cleanUsername}`)
+      if (dedicatedRaw) {
+        const parsed: UserProfileData = JSON.parse(dedicatedRaw)
+        return parsed
+      }
+
+      // Priority 2B: Active user session if username matches
+      const currentDemo = localStorage.getItem(STORAGE_KEY_USER)
+      if (currentDemo) {
+        const parsed: UserProfileData = JSON.parse(currentDemo)
+        if (parsed.username.toLowerCase() === cleanUsername) {
+          return parsed
+        }
+      }
+
+      // Priority 2C: Local admin users registry
       const raw = localStorage.getItem(STORAGE_KEY_ADMIN_USERS)
       if (raw) {
-        const list: AdminArtistUser[] = JSON.parse(raw)
+        const list: any[] = JSON.parse(raw)
         const match = list.find((u) => u.username.toLowerCase() === cleanUsername)
         if (match) {
           return {
@@ -238,7 +270,7 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
             full_name: match.full_name || '',
             artist_name: match.artist_name,
             username: match.username,
-            account_type: (match as any).account_type || 'musician',
+            account_type: match.account_type || 'musician',
             bio: match.bio || '',
             genre: match.genres?.[0] || 'Afrobeats',
             genres: match.genres || ['Afrobeats'],
@@ -247,6 +279,7 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
             theme_mode: match.theme_mode || 'dark',
             avatar_url: match.avatar_url,
             banner_url: match.banner_url,
+            banner_color: match.banner_color || 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #022c22 100%)',
             booking_email: match.booking_email,
             booking_phone: match.booking_phone,
             booking_enabled: Boolean(match.booking_email),
@@ -256,19 +289,47 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
             pwa_enabled: true,
             pwa_name: match.pwa_name || match.artist_name,
             pwa_icon_url: match.pwa_icon_url,
+            social_links: match.social_links || [],
           }
         }
       }
+    } catch (err) {
+      console.debug('Failed to load local profile', err)
+    }
+  }
 
-      // Check current demo user if matching
-      const currentDemo = localStorage.getItem(STORAGE_KEY_USER)
-      if (currentDemo) {
-        const parsed: UserProfileData = JSON.parse(currentDemo)
-        if (parsed.username.toLowerCase() === cleanUsername) {
-          return parsed
-        }
-      }
-    } catch {}
+  // Priority 3: Fallback seed list from INITIAL_ADMIN_USERS
+  const fallbackMatch = INITIAL_ADMIN_USERS.find(
+    (u) => u.username.toLowerCase() === cleanUsername
+  )
+  if (fallbackMatch) {
+    return {
+      id: fallbackMatch.id,
+      email: fallbackMatch.email,
+      full_name: fallbackMatch.full_name || '',
+      artist_name: fallbackMatch.artist_name,
+      username: fallbackMatch.username,
+      account_type: (fallbackMatch as any).account_type || 'musician',
+      bio: fallbackMatch.bio || '',
+      genre: fallbackMatch.genres?.[0] || 'Afrobeats',
+      genres: fallbackMatch.genres || ['Afrobeats'],
+      country: fallbackMatch.country || "Côte d'Ivoire",
+      theme_color: fallbackMatch.theme_color || '#10b981',
+      theme_mode: fallbackMatch.theme_mode || 'dark',
+      avatar_url: fallbackMatch.avatar_url,
+      banner_url: fallbackMatch.banner_url,
+      banner_color: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #022c22 100%)',
+      booking_email: fallbackMatch.booking_email,
+      booking_phone: fallbackMatch.booking_phone,
+      booking_enabled: Boolean(fallbackMatch.booking_email),
+      plan: fallbackMatch.plan || 'free',
+      verified: fallbackMatch.verified || false,
+      account_status: fallbackMatch.account_status || 'active',
+      pwa_enabled: true,
+      pwa_name: fallbackMatch.pwa_name || fallbackMatch.artist_name,
+      pwa_icon_url: fallbackMatch.pwa_icon_url,
+      social_links: [],
+    }
   }
 
   return null

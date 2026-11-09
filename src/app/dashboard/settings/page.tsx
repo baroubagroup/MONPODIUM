@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { useDashboardTheme } from '@/context/DashboardThemeContext'
 import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
 import { createClient } from '@/lib/supabase/client'
+import { compressImage } from '@/lib/imageCompressor'
 import {
   Smartphone,
   Globe,
@@ -17,6 +18,7 @@ import {
   Upload,
   Moon,
   Sun,
+  Camera,
 } from 'lucide-react'
 
 export default function SettingsPage() {
@@ -27,7 +29,9 @@ export default function SettingsPage() {
   const [username, setUsername] = useState('')
   const [pwaName, setPwaName] = useState('Artiste')
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
-  const [themeColor, setThemeColor] = useState('#9333ea')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null)
+  const [themeColor, setThemeColor] = useState('#10b981')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [copiedSubdomain, setCopiedSubdomain] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -43,6 +47,8 @@ export default function SettingsPage() {
         }
         if (profile.username) setUsername(profile.username)
         if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
+        if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
+        if (profile.banner_url) setBannerUrl(profile.banner_url)
         if (profile.theme_color) setThemeColor(profile.theme_color)
         if (profile.theme_mode) setThemeMode(profile.theme_mode)
         if (profile.pwa_enabled !== undefined) setPwaEnabled(profile.pwa_enabled)
@@ -51,14 +57,47 @@ export default function SettingsPage() {
     initSettings()
   }, [])
 
-  const handleIconFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIconFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPwaIconUrl(reader.result as string)
+      try {
+        const compressed = await compressImage(file, 400, 400, 0.85)
+        setPwaIconUrl(compressed)
+        if (!avatarUrl) setAvatarUrl(compressed)
+        toast.success('Icône PWA sélectionnée !')
+      } catch (err) {
+        console.error('Erreur compression icone:', err)
+        toast.error('Erreur traitement image')
       }
-      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        const compressed = await compressImage(file, 400, 400, 0.85)
+        setAvatarUrl(compressed)
+        if (!pwaIconUrl) setPwaIconUrl(compressed)
+        toast.success('Photo de profil sélectionnée !')
+      } catch (err) {
+        console.error('Erreur compression avatar:', err)
+        toast.error('Erreur traitement photo')
+      }
+    }
+  }
+
+  const handleBannerFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        const compressed = await compressImage(file, 1200, 500, 0.82)
+        setBannerUrl(compressed)
+        toast.success('Photo de couverture prête !')
+      } catch (err) {
+        console.error('Erreur compression bannière:', err)
+        toast.error('Erreur traitement couverture')
+      }
     }
   }
 
@@ -75,15 +114,18 @@ export default function SettingsPage() {
     e.preventDefault()
     const localUser = localStorage.getItem('monpodium_demo_user')
     const current = localUser ? JSON.parse(localUser) : {}
+    const cleanUser = (username || current.username || 'artiste').toLowerCase().trim()
 
     const updated = {
       ...current,
       id: userId || current.id,
       artist_name: artistName,
-      username: username || current.username,
+      username: cleanUser,
       pwa_enabled: pwaEnabled,
       pwa_name: pwaName || artistName,
-      pwa_icon_url: pwaIconUrl,
+      pwa_icon_url: pwaIconUrl || avatarUrl,
+      avatar_url: avatarUrl || pwaIconUrl || current.avatar_url,
+      banner_url: bannerUrl || current.banner_url,
       theme_color: themeColor,
       theme_mode: themeMode,
     }
@@ -94,7 +136,9 @@ export default function SettingsPage() {
         await supabase.from('profiles').update({
           pwa_enabled: pwaEnabled,
           pwa_name: pwaName || artistName,
-          pwa_icon_url: pwaIconUrl,
+          pwa_icon_url: pwaIconUrl || avatarUrl,
+          avatar_url: avatarUrl || pwaIconUrl || current.avatar_url,
+          banner_url: bannerUrl || current.banner_url,
           theme_color: themeColor,
           theme_mode: themeMode,
         }).eq('id', userId || current.id)
@@ -104,11 +148,12 @@ export default function SettingsPage() {
     }
 
     localStorage.setItem('monpodium_demo_user', JSON.stringify(updated))
+    localStorage.setItem(`monpodium_profile_${cleanUser}`, JSON.stringify(updated))
     registerInAdminUsers(updated)
 
     setSaved(true)
     toast.success('Paramètres enregistrés !', {
-      description: 'Tes préférences et ton application PWA sont à jour.',
+      description: 'Tes photos, préférences et ton application PWA sont à jour.',
     })
     setTimeout(() => setSaved(false), 3000)
   }
@@ -187,7 +232,98 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* SECTION 2: APPLICATION PWA (NOM EXACT ET ICÔNE SANS "APP") */}
+        {/* SECTION 2: PHOTOS OFFICIELLES (AVATAR & COUVERTURE) */}
+        <div className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all shadow-sm ${
+          isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/90 border-zinc-800 text-white'
+        }`}>
+          <div>
+            <h2 className={`text-sm font-bold flex items-center gap-2 ${
+              isLight ? 'text-slate-900' : 'text-white'
+            }`}>
+              <Camera className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Photos Officielles de ta Vitrine</span>
+            </h2>
+            <p className={`text-xs leading-relaxed ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+              Gère directement ta photo de profil et ton image de couverture panoramique.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Photo de profil */}
+            <div className={`p-4 rounded-2xl border space-y-3 ${
+              isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950 border-zinc-800'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 flex-shrink-0 shadow-sm ${
+                  isLight ? 'bg-white border-slate-300' : 'bg-zinc-900 border-zinc-700'
+                }`}>
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-500 font-bold text-lg">
+                      {artistName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h3 className={`text-xs font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                    Photo de Profil
+                  </h3>
+                  <p className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                    Cercle central sur ton podium
+                  </p>
+                </div>
+              </div>
+
+              <label className={`cursor-pointer w-full py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors press-scale ${
+                isLight ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+              }`}>
+                <Upload className="w-3.5 h-3.5" />
+                <span>Changer ma photo de profil</span>
+                <input type="file" accept="image/*" onChange={handleAvatarFile} className="hidden" />
+              </label>
+            </div>
+
+            {/* Photo de couverture */}
+            <div className={`p-4 rounded-2xl border space-y-3 ${
+              isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950 border-zinc-800'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-20 h-14 rounded-2xl overflow-hidden border-2 flex-shrink-0 shadow-sm ${
+                  isLight ? 'bg-white border-slate-300' : 'bg-zinc-900 border-zinc-700'
+                }`}>
+                  {bannerUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={bannerUrl} alt="Couverture" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-500 text-[10px] font-bold">
+                      Bannière
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h3 className={`text-xs font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                    Photo de Couverture
+                  </h3>
+                  <p className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                    Bannière panoramique en haut
+                  </p>
+                </div>
+              </div>
+
+              <label className={`cursor-pointer w-full py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors press-scale ${
+                isLight ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+              }`}>
+                <Upload className="w-3.5 h-3.5" />
+                <span>Changer la couverture</span>
+                <input type="file" accept="image/*" onChange={handleBannerFile} className="hidden" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 3: APPLICATION PWA (NOM EXACT ET ICÔNE SANS "APP") */}
         <div className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all shadow-sm ${
           isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/90 border-zinc-800 text-white'
         }`}>

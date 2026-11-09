@@ -34,7 +34,7 @@ function DiscographyContent() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(
     'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80'
   )
-  const [themeColor, setThemeColor] = useState('#9333ea')
+  const [themeColor, setThemeColor] = useState('#10b981')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [pwaEnabled, setPwaEnabled] = useState(true)
 

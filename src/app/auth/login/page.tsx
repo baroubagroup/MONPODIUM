@@ -50,6 +50,7 @@ export default function LoginPage() {
               full_name: profile.full_name || '',
               artist_name: profile.artist_name || 'Artiste',
               username: profile.username,
+              account_type: profile.account_type || 'musician',
               bio: profile.bio || '',
               genre: profile.genre || 'Afrobeats',
               genres: profile.genres || [profile.genre || 'Afrobeats'],
@@ -58,6 +59,7 @@ export default function LoginPage() {
               theme_mode: profile.theme_mode || 'dark',
               avatar_url: profile.avatar_url,
               banner_url: profile.banner_url,
+              banner_color: profile.banner_color,
               booking_email: profile.booking_email,
               booking_phone: profile.booking_phone,
               booking_enabled: Boolean(profile.booking_email),
@@ -68,6 +70,7 @@ export default function LoginPage() {
               pwa_name: profile.pwa_name || profile.artist_name,
             }
             localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
+            localStorage.setItem(`monpodium_profile_${profile.username.toLowerCase()}`, JSON.stringify(profileData))
             registerInAdminUsers(profileData)
 
             // Fetch releases
@@ -90,7 +93,7 @@ export default function LoginPage() {
 
       // 2. Check local accounts registry (fallback or local testing)
       const rawUsers = localStorage.getItem('monpodium_admin_users')
-      const adminUsers: AdminArtistUser[] = rawUsers ? JSON.parse(rawUsers) : [...INITIAL_ADMIN_USERS]
+      const adminUsers: any[] = rawUsers ? JSON.parse(rawUsers) : [...INITIAL_ADMIN_USERS]
       const matchedUser = adminUsers.find((u) => u.email.toLowerCase() === cleanEmail)
 
       if (matchedUser) {
@@ -100,6 +103,7 @@ export default function LoginPage() {
           full_name: matchedUser.full_name || '',
           artist_name: matchedUser.artist_name,
           username: matchedUser.username,
+          account_type: matchedUser.account_type || 'musician',
           bio: matchedUser.bio || '',
           genre: matchedUser.genres?.[0] || 'Afrobeats',
           genres: matchedUser.genres || ['Afrobeats'],
@@ -108,15 +112,19 @@ export default function LoginPage() {
           theme_mode: matchedUser.theme_mode || 'dark',
           avatar_url: matchedUser.avatar_url,
           banner_url: matchedUser.banner_url,
+          banner_color: matchedUser.banner_color,
           booking_email: matchedUser.booking_email,
           booking_phone: matchedUser.booking_phone,
+          booking_enabled: Boolean(matchedUser.booking_email),
           plan: matchedUser.plan || 'free',
           verified: matchedUser.verified || false,
           account_status: matchedUser.account_status || 'active',
           pwa_enabled: true,
           pwa_name: matchedUser.pwa_name || matchedUser.artist_name,
+          social_links: matchedUser.social_links || [],
         }
         localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
+        localStorage.setItem(`monpodium_profile_${matchedUser.username.toLowerCase()}`, JSON.stringify(profileData))
 
         // Retrieve user specific releases or start empty
         const userReleases = localStorage.getItem(`monpodium_releases_${matchedUser.username}`)

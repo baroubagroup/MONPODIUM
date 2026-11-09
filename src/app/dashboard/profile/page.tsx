@@ -29,6 +29,7 @@ import { SocialPlatform, AccountType } from '@/types'
 import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
 import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
+import { compressImage } from '@/lib/imageCompressor'
 
 const PRESET_GENRES = [
   'Afrobeats',
@@ -41,6 +42,19 @@ const PRESET_GENRES = [
   'Zoblazo',
   'Reggae',
   'Zouk / Kompa',
+]
+
+const PUBLIC_FIGURE_DOMAINS = [
+  'Créateur de Contenu',
+  'Influenceur Web',
+  'Humoriste / Comédien',
+  'Entrepreneur',
+  'Personnalité TV / Média',
+  'Coach & Formateur',
+  'Sportif / Athlète',
+  'Artiste Visuel / Mode',
+  'Acteur / Cinéma',
+  'Leader d\'Opinion',
 ]
 
 const DEFAULT_COVER_PRESETS = [
@@ -189,26 +203,32 @@ export default function ProfilePage() {
     loadProfile()
   }, [])
 
-  const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setAvatarUrl(reader.result as string)
+      try {
+        const compressed = await compressImage(file, 400, 400, 0.85)
+        setAvatarUrl(compressed)
+        toast.success('Photo de profil sélectionnée !')
+      } catch (err) {
+        console.error('Erreur compression avatar:', err)
+        toast.error('Erreur lors du traitement de l\'image')
       }
-      reader.readAsDataURL(file)
     }
   }
 
-  const handleBannerFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setBannerUrl(reader.result as string)
+      try {
+        const compressed = await compressImage(file, 1200, 500, 0.82)
+        setBannerUrl(compressed)
         setCoverMode('image')
+        toast.success('Photo de couverture prête !')
+      } catch (err) {
+        console.error('Erreur compression couverture:', err)
+        toast.error('Erreur lors du traitement de la couverture')
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -297,21 +317,25 @@ export default function ProfilePage() {
     const localUser = localStorage.getItem('monpodium_demo_user')
     const current = localUser ? JSON.parse(localUser) : {}
 
+    const cleanUser = (username || current.username || 'artiste').toLowerCase().trim()
+
     const updated = {
       ...current,
       id: userId || current.id,
       full_name: fullName,
       artist_name: artistName,
-      username,
+      username: cleanUser,
       account_type: accountType,
       bio,
       country,
       genres: selectedGenres,
-      banner_url: bannerUrl,
+      banner_url: coverMode === 'image' ? bannerUrl : null,
       banner_color: bannerColor,
       theme_color: customColor,
       theme_mode: themeMode,
       avatar_url: avatarUrl,
+      pwa_icon_url: current.pwa_icon_url || avatarUrl,
+      pwa_name: current.pwa_name || artistName,
       booking_enabled: bookingEnabled,
       booking_email: bookingEmail,
       booking_phone: bookingPhone,
@@ -331,7 +355,7 @@ export default function ProfilePage() {
           bio,
           country,
           genres: selectedGenres,
-          banner_url: bannerUrl,
+          banner_url: coverMode === 'image' ? bannerUrl : null,
           banner_color: bannerColor,
           theme_color: customColor,
           theme_mode: themeMode,
@@ -346,6 +370,7 @@ export default function ProfilePage() {
 
     // 2. Persist locally and update in admin directory
     localStorage.setItem('monpodium_demo_user', JSON.stringify(updated))
+    localStorage.setItem(`monpodium_profile_${cleanUser}`, JSON.stringify(updated))
     registerInAdminUsers(updated)
 
     setSaved(true)
@@ -815,25 +840,31 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* MULTI-GENRES SELECTION & CUSTOM GENRE CREATION */}
+          {/* MULTI-GENRES / DOMAINS SELECTION & CUSTOM TAG CREATION */}
           <div className="space-y-3 pt-2">
             <div>
               <label className={`text-xs font-bold flex items-center justify-between ${
                 isLight ? 'text-slate-900' : 'text-white'
               }`}>
-                <span>Genres & Styles musicaux (Choix multiple)</span>
+                <span>
+                  {accountType === 'public_figure'
+                    ? 'Domaines d\'activité & Titres officiels (Choix multiple)'
+                    : 'Genres & Styles musicaux (Choix multiple)'}
+                </span>
                 <span className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-500'}`}>
                   {selectedGenres.length} sélectionné(s)
                 </span>
               </label>
               <p className={`text-[11px] mt-0.5 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-                Sélectionne tous les styles que tu pratiques, ou saisis ton propre style personnalisé.
+                {accountType === 'public_figure'
+                  ? 'Indique tes rôles (ex: Créateur, Influenceur, Entrepreneur) pour valoriser ton profil officiel.'
+                  : 'Sélectionne tous les styles que tu pratiques, ou saisis ton propre style personnalisé.'}
               </p>
             </div>
 
             {/* Presets Chips */}
             <div className="flex flex-wrap gap-2">
-              {PRESET_GENRES.map((g) => {
+              {(accountType === 'public_figure' ? PUBLIC_FIGURE_DOMAINS : PRESET_GENRES).map((g) => {
                 const isSelected = selectedGenres.includes(g)
                 return (
                   <button
@@ -855,7 +886,7 @@ export default function ProfilePage() {
               })}
             </div>
 
-            {/* Custom Genre Adder */}
+            {/* Custom Genre/Domain Adder */}
             <div className="flex items-center gap-2 pt-1">
               <input
                 type="text"
@@ -867,7 +898,11 @@ export default function ProfilePage() {
                     addCustomGenre()
                   }
                 }}
-                placeholder="Ajouter un autre style (ex: Afro-Gospel, Mandingue...)"
+                placeholder={
+                  accountType === 'public_figure'
+                    ? 'Ajouter un domaine (ex: Podcasteur, Photographe, Modèle...)'
+                    : 'Ajouter un style (ex: Afro-Gospel, Mandingue...)'
+                }
                 className={`flex-1 px-3.5 py-2 rounded-xl border text-xs focus:outline-none transition-colors ${
                   isLight
                     ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-emerald-500'

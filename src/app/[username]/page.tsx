@@ -45,7 +45,7 @@ function ArtistHubContent() {
   )
   const [country, setCountry] = useState("Côte d'Ivoire")
   const [genres, setGenres] = useState<string[]>(['Afrobeats'])
-  const [themeColor, setThemeColor] = useState('#9333ea')
+  const [themeColor, setThemeColor] = useState('#10b981')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [isVerified, setIsVerified] = useState(username === 'ksbloom')
   const [accountStatus, setAccountStatus] = useState<'active' | 'suspended' | 'banned'>('active')
@@ -54,7 +54,7 @@ function ArtistHubContent() {
   )
   const [bannerUrl, setBannerUrl] = useState<string | null>(null)
   const [bannerColor, setBannerColor] = useState<string>(
-    'linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #1e1b4b 100%)'
+    'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #022c22 100%)'
   )
 
   const [bookingEnabled, setBookingEnabled] = useState(false)
@@ -101,9 +101,13 @@ function ArtistHubContent() {
           setSocialLinks(profile.social_links)
         }
 
-        // 2. Load releases specifically for this artist
-        const userReleases = await getArtistReleases(username, profile.id)
-        setReleases(userReleases)
+        // 2. Load releases specifically for musicians only
+        if (profile.account_type !== 'public_figure') {
+          const userReleases = await getArtistReleases(username, profile.id)
+          setReleases(userReleases)
+        } else {
+          setReleases([])
+        }
       } else if (username === 'himra' || username === 'ksbloom') {
         // Fallback for default showcase artist
         const isHimra = username === 'himra'
@@ -276,8 +280,16 @@ function ArtistHubContent() {
 
           {/* Overlapping Avatar & Artist Header */}
           <div className="px-6 pb-6 pt-0 relative -mt-16 text-center space-y-4">
-            {/* Avatar with glowing ring */}
-            <div className={`relative mx-auto w-32 h-32 rounded-3xl overflow-hidden p-1 shadow-2xl border-2 ${isLight ? 'bg-white border-slate-200 ring-4 ring-slate-100' : 'bg-zinc-950 border-white/20'}`}>
+            {/* Avatar with customized glowing ring */}
+            <div
+              className={`relative mx-auto w-32 h-32 rounded-3xl overflow-hidden p-1 shadow-2xl border-2 transition-all duration-300 ${
+                isLight ? 'bg-white ring-4 ring-slate-100' : 'bg-zinc-950'
+              }`}
+              style={{
+                borderColor: themeColor,
+                boxShadow: `0 0 25px ${themeColor}40, 0 10px 25px rgba(0,0,0,0.5)`,
+              }}
+            >
               <div className="w-full h-full rounded-[20px] overflow-hidden bg-zinc-900">
                 <SafeImage
                   src={avatarUrl}

@@ -17,7 +17,7 @@ interface ReleasesCarouselProps {
 export function ReleasesCarousel({
   releases,
   username,
-  themeColor = '#9333ea',
+  themeColor = '#10b981',
   themeMode = 'dark',
 }: ReleasesCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)

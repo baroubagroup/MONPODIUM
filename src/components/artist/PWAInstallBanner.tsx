@@ -20,7 +20,7 @@ interface PWAInstallBannerProps {
 export function PWAInstallBanner({
   appName,
   iconUrl,
-  themeColor = '#9333ea',
+  themeColor = '#10b981',
   username,
   themeMode = 'dark',
 }: PWAInstallBannerProps) {

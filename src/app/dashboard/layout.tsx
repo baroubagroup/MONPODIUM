@@ -84,25 +84,38 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     router.push('/')
   }
 
-  const desktopNavItems = [
-    { label: "Vue d'ensemble", href: '/dashboard', icon: Disc3 },
-    { label: accountType === 'public_figure' ? 'Sorties (Musique)' : 'Mes Sorties', href: '/dashboard/releases', icon: Music },
-    { label: 'Statistiques & Audiences', href: '/dashboard/analytics', icon: BarChart3 },
-    { label: 'Mon Profil & Liens', href: '/dashboard/profile', icon: User },
-    { label: 'Paramètres & PWA', href: '/dashboard/settings', icon: Settings },
-    { label: 'Mon Plan', href: '/dashboard/upgrade', icon: Sparkles },
-  ]
+  const isPublicFigure = accountType === 'public_figure'
 
-  const mobileDockItems = [
-    { label: 'Accueil', href: '/dashboard', icon: Disc3 },
-    {
-      label: accountType === 'public_figure' ? 'Profil/Liens' : 'Sorties',
-      href: accountType === 'public_figure' ? '/dashboard/profile' : '/dashboard/releases',
-      icon: accountType === 'public_figure' ? User : Music,
-    },
-    { label: 'Ajouter', href: '/dashboard/releases/new', icon: PlusCircle, isAction: true },
-    { label: 'Stats', href: '/dashboard/analytics', icon: BarChart3 },
-  ]
+  const desktopNavItems = isPublicFigure
+    ? [
+        { label: "Vue d'ensemble", href: '/dashboard', icon: Disc3 },
+        { label: 'Mon Hub & Réseaux', href: '/dashboard/profile', icon: User },
+        { label: 'Statistiques & Audiences', href: '/dashboard/analytics', icon: BarChart3 },
+        { label: 'Paramètres & PWA', href: '/dashboard/settings', icon: Settings },
+        { label: 'Mon Plan', href: '/dashboard/upgrade', icon: Sparkles },
+      ]
+    : [
+        { label: "Vue d'ensemble", href: '/dashboard', icon: Disc3 },
+        { label: 'Mes Sorties', href: '/dashboard/releases', icon: Music },
+        { label: 'Statistiques & Audiences', href: '/dashboard/analytics', icon: BarChart3 },
+        { label: 'Mon Profil & Liens', href: '/dashboard/profile', icon: User },
+        { label: 'Paramètres & PWA', href: '/dashboard/settings', icon: Settings },
+        { label: 'Mon Plan', href: '/dashboard/upgrade', icon: Sparkles },
+      ]
+
+  const mobileDockItems = isPublicFigure
+    ? [
+        { label: 'Accueil', href: '/dashboard', icon: Disc3 },
+        { label: 'Mon Hub', href: '/dashboard/profile', icon: User },
+        { label: 'Stats', href: '/dashboard/analytics', icon: BarChart3 },
+        { label: 'PWA', href: '/dashboard/settings', icon: Settings },
+      ]
+    : [
+        { label: 'Accueil', href: '/dashboard', icon: Disc3 },
+        { label: 'Sorties', href: '/dashboard/releases', icon: Music },
+        { label: 'Ajouter', href: '/dashboard/releases/new', icon: PlusCircle, isAction: true },
+        { label: 'Stats', href: '/dashboard/analytics', icon: BarChart3 },
+      ]
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-200 ${

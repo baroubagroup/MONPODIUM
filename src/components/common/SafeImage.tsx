@@ -19,7 +19,7 @@ export function SafeImage({
   className = 'w-full h-full object-cover',
   fallbackType = 'cover',
   fallbackText,
-  themeColor = '#9333ea',
+  themeColor = '#10b981',
   isLight = false,
 }: SafeImageProps) {
   const [hasError, setHasError] = useState(false)
@@ -38,7 +38,7 @@ export function SafeImage({
         <div
           className="w-full h-full flex items-center justify-center font-black select-none shadow-inner"
           style={{
-            background: `linear-gradient(135deg, ${themeColor} 0%, #1e1b4b 100%)`,
+            background: `linear-gradient(135deg, ${themeColor} 0%, #064e3b 60%, #09090b 100%)`,
             color: '#ffffff',
           }}
           title={alt}

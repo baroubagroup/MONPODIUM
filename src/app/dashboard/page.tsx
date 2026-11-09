@@ -18,16 +18,22 @@ import {
   Sparkles,
   Disc3,
   Globe,
+  ShieldCheck,
+  Star,
+  ArrowRight,
 } from 'lucide-react'
 
 export default function DashboardOverviewPage() {
   const { isLight } = useDashboardTheme()
   const [artistName, setArtistName] = useState('Artiste')
   const [username, setUsername] = useState('')
+  const [accountType, setAccountType] = useState<'musician' | 'public_figure'>('musician')
   const [plan, setPlan] = useState<Plan>('free')
   const [releasesCount, setReleasesCount] = useState(0)
+  const [socialLinksCount, setSocialLinksCount] = useState(0)
   const [latestRelease, setLatestRelease] = useState<Release | null>(null)
 
+  const isPublicFigure = accountType === 'public_figure'
   const trafficData = getArtistTraffic(username || 'artiste')
 
   useEffect(() => {
@@ -36,12 +42,18 @@ export default function DashboardOverviewPage() {
       if (profile) {
         setArtistName(profile.artist_name || 'Artiste')
         setUsername(profile.username || 'artiste')
+        if (profile.account_type) setAccountType(profile.account_type)
         if (profile.plan) setPlan(profile.plan)
+        if (profile.social_links) {
+          setSocialLinksCount(profile.social_links.filter(l => Boolean(l.url)).length)
+        }
 
-        const userReleases = await getArtistReleases(profile.username, profile.id)
-        setReleasesCount(userReleases.length)
-        if (userReleases.length > 0) {
-          setLatestRelease(userReleases[0])
+        if (profile.account_type !== 'public_figure') {
+          const userReleases = await getArtistReleases(profile.username, profile.id)
+          setReleasesCount(userReleases.length)
+          if (userReleases.length > 0) {
+            setLatestRelease(userReleases[0])
+          }
         }
       }
     }
@@ -60,7 +72,9 @@ export default function DashboardOverviewPage() {
             <span className="text-xl">👋</span>
           </h1>
           <p className={`text-xs sm:text-sm mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-            Voici l'état de ta vitrine musicale MonPodium et de ton application dédiée.
+            {isPublicFigure
+              ? "Voici l'état de ton hub officiel MonPodium et de ton application dédiée."
+              : "Voici l'état de ta vitrine musicale MonPodium et de ton application dédiée."}
           </p>
         </div>
 
@@ -79,28 +93,47 @@ export default function DashboardOverviewPage() {
         </Link>
       </div>
 
-      {/* Plan quota notification */}
-      <PlanBadge plan={plan} currentReleasesCount={releasesCount} />
+      {/* Plan quota notification (only for music releases) */}
+      {!isPublicFigure && <PlanBadge plan={plan} currentReleasesCount={releasesCount} />}
 
       {/* Key Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Card 1: Sorties Actives */}
-        <div className={`p-5 rounded-2xl border transition-all shadow-xs space-y-2 ${
-          isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/80 border-zinc-800 text-white'
-        }`}>
-          <div className={`flex items-center justify-between text-xs font-bold ${
-            isLight ? 'text-slate-500' : 'text-zinc-400'
+        {/* Card 1: Sorties Actives (Musique) OU Liens vérifiés (Personnalité) */}
+        {isPublicFigure ? (
+          <div className={`p-5 rounded-2xl border transition-all shadow-xs space-y-2 ${
+            isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/80 border-zinc-800 text-white'
           }`}>
-            <span>Musiques actives</span>
-            <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className={`flex items-center justify-between text-xs font-bold ${
+              isLight ? 'text-slate-500' : 'text-zinc-400'
+            }`}>
+              <span>Liens vérifiés</span>
+              <ShieldCheck className="w-4 h-4 text-blue-500" />
+            </div>
+            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              {socialLinksCount} lien(s)
+            </div>
+            <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+              WhatsApp Pro, réseaux et liens bio actifs
+            </p>
           </div>
-          <div className="text-2xl font-black">
-            {releasesCount} / {plan === 'free' ? '1' : plan === 'starter' ? '5' : '20'}
+        ) : (
+          <div className={`p-5 rounded-2xl border transition-all shadow-xs space-y-2 ${
+            isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/80 border-zinc-800 text-white'
+          }`}>
+            <div className={`flex items-center justify-between text-xs font-bold ${
+              isLight ? 'text-slate-500' : 'text-zinc-400'
+            }`}>
+              <span>Musiques actives</span>
+              <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="text-2xl font-black">
+              {releasesCount} / {plan === 'free' ? '1' : plan === 'starter' ? '5' : '20'}
+            </div>
+            <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+              {plan === 'free' ? 'Plan gratuit (1 titre inclus)' : 'Sorties publiées sur ta page'}
+            </p>
           </div>
-          <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-            {plan === 'free' ? 'Plan gratuit (1 titre inclus)' : 'Sorties publiées sur ta page'}
-          </p>
-        </div>
+        )}
 
         {/* Card 2: App PWA */}
         <div className={`p-5 rounded-2xl border transition-all shadow-xs space-y-2 ${
@@ -139,13 +172,29 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* Primary Action Card: Quick Release Highlight */}
+      {/* Primary Action Card: Either Quick Release Highlight (Musician) OR Official Hub & Links (Public Figure) */}
       <div className={`p-6 rounded-3xl border transition-all shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 ${
         isLight
           ? 'bg-white border-slate-200 text-slate-900'
           : 'bg-zinc-900/90 border-zinc-800 text-white'
       }`}>
-        {latestRelease ? (
+        {isPublicFigure ? (
+          <div className="flex items-center gap-4">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 border shadow-inner ${
+              isLight ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-blue-950/40 text-blue-400 border-blue-500/30'
+            }`}>
+              <ShieldCheck className="w-8 h-8" />
+            </div>
+            <div className="space-y-1 text-left">
+              <h3 className={`text-base font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                Ton Hub Officiel & Réseaux Ordonnés
+              </h3>
+              <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                Mets WhatsApp Pro en position #1, ajoute ton site web ou ta boutique, et certifie tous tes réseaux officiels.
+              </p>
+            </div>
+          </div>
+        ) : latestRelease ? (
           <div className="flex items-center gap-4 min-w-0">
             <div className={`w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 border shadow-md ${
               isLight ? 'bg-slate-100 border-slate-200' : 'bg-zinc-800 border-zinc-700'
@@ -196,24 +245,35 @@ export default function DashboardOverviewPage() {
         )}
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          {latestRelease && (
+          {isPublicFigure ? (
             <Link
-              href="/dashboard/releases"
-              className={`flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl font-bold text-xs transition-all shadow-xs press-scale ${
-                isLight
-                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                  : 'bg-zinc-800 hover:bg-zinc-700 text-white'
-              }`}
+              href="/dashboard/profile"
+              className="flex-1 md:flex-initial text-center px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105 press-scale"
             >
-              Gérer les plateformes
+              Gérer mes liens & réseaux
             </Link>
+          ) : (
+            <>
+              {latestRelease && (
+                <Link
+                  href="/dashboard/releases"
+                  className={`flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl font-bold text-xs transition-all shadow-xs press-scale ${
+                    isLight
+                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                      : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                  }`}
+                >
+                  Gérer les plateformes
+                </Link>
+              )}
+              <Link
+                href="/dashboard/releases/new"
+                className="flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105 press-scale"
+              >
+                {latestRelease ? 'Ajouter un son' : 'Créer une sortie'}
+              </Link>
+            </>
           )}
-          <Link
-            href="/dashboard/releases/new"
-            className="flex-1 md:flex-initial text-center px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105 press-scale"
-          >
-            {latestRelease ? 'Ajouter un son' : 'Créer une sortie'}
-          </Link>
         </div>
       </div>
 

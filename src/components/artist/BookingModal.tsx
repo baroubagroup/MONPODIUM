@@ -20,7 +20,7 @@ export function BookingModal({
   bookingEmail,
   bookingPhone,
   bookingEnabled = true,
-  themeColor = '#9333ea',
+  themeColor = '#10b981',
   themeMode = 'dark',
 }: BookingModalProps) {
   const [isOpen, setIsOpen] = useState(false)

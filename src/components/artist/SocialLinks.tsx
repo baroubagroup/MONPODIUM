@@ -167,7 +167,7 @@ export function SocialLinks({
   artistName,
   artistUsername,
   themeMode = 'dark',
-  themeColor = '#9333ea',
+  themeColor = '#10b981',
 }: SocialLinksProps) {
   if (!links || links.length === 0) return null
 
@@ -205,6 +205,11 @@ export function SocialLinks({
 
           const label = link.title || cfg.name
 
+          const isWebsite = link.platform === 'website'
+          const iconBg = isWebsite ? themeColor : cfg.bg
+          const btnBg = isWebsite ? themeColor : cfg.btnBg
+          const btnShadow = isWebsite ? `0 2px 12px ${themeColor}50` : cfg.btnShadow
+
           return (
             <a
               key={link.id || `${link.platform}-${link.url}`}
@@ -214,14 +219,14 @@ export function SocialLinks({
               onClick={() => handleLinkClick(link.platform)}
               className={`group flex items-center justify-between w-full px-4 py-3.5 rounded-2xl transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 ${
                 isLight
-                  ? 'bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-900'
-                  : 'bg-zinc-900/80 hover:bg-zinc-800/90 border border-zinc-800/90 hover:border-zinc-700 text-white'
+                  ? 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-900'
+                  : 'bg-zinc-900/80 hover:bg-zinc-800/90 border border-zinc-800/90 text-white'
               }`}
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-inner group-hover:scale-105 transition-transform"
-                  style={{ background: cfg.bg }}
+                  style={{ background: iconBg }}
                 >
                   <SocialIcon platform={link.platform} />
                 </div>
@@ -237,9 +242,9 @@ export function SocialLinks({
               <div
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all duration-200 group-hover:scale-105 group-hover:brightness-110 active:scale-95 shadow-sm"
                 style={{
-                  background: cfg.btnBg,
+                  background: btnBg,
                   color: cfg.btnText,
-                  boxShadow: cfg.btnShadow,
+                  boxShadow: btnShadow,
                 }}
               >
                 <span>{cfg.btnLabel || 'Accéder'}</span>

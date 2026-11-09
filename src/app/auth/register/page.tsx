@@ -116,6 +116,7 @@ export default function RegisterPage() {
 
       // 2. Always persist to localStorage for instant dedicated workspace
       localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
+      localStorage.setItem(`monpodium_profile_${cleanUsername}`, JSON.stringify(profileData))
       registerInAdminUsers(profileData)
 
       // Start new user with their own fresh releases list

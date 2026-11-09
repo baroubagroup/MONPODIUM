@@ -66,19 +66,73 @@ export default function AdminDashboardPage() {
 
   // Initialize and synchronize with localStorage and Supabase
   useEffect(() => {
-    let localList = INITIAL_ADMIN_USERS
+    let localList: AdminArtistUser[] = [...INITIAL_ADMIN_USERS]
     const savedUsers = localStorage.getItem('monpodium_admin_users')
     if (savedUsers) {
       try {
-        localList = JSON.parse(savedUsers)
-        setUsers(localList)
-      } catch {
-        setUsers(INITIAL_ADMIN_USERS)
-      }
-    } else {
-      setUsers(INITIAL_ADMIN_USERS)
-      localStorage.setItem('monpodium_admin_users', JSON.stringify(INITIAL_ADMIN_USERS))
+        const parsed = JSON.parse(savedUsers)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          localList = parsed
+        }
+      } catch {}
     }
+
+    // Scan for any monpodium_profile_* keys in localStorage to ensure all real registered profiles appear
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('monpodium_profile_')) {
+          const raw = localStorage.getItem(key)
+          if (raw) {
+            const p = JSON.parse(raw)
+            if (p.username) {
+              const cleanU = p.username.toLowerCase().trim()
+              const idx = localList.findIndex((u) => u.username.toLowerCase() === cleanU)
+              const entry: AdminArtistUser = {
+                id: p.id || `usr-${cleanU}`,
+                email: p.email || `${cleanU}@monpodium.com`,
+                artist_name: p.artist_name || cleanU,
+                username: cleanU,
+                full_name: p.full_name || '',
+                plan: p.plan || 'free',
+                plan_expires_at: null,
+                verified: p.verified || false,
+                account_status: p.account_status || 'active',
+                created_at: p.created_at || new Date().toISOString(),
+                country: p.country || "Côte d'Ivoire",
+                genres: p.genres || (p.genre ? [p.genre] : ['Afrobeats']),
+                bio: p.bio || null,
+                avatar_url: p.avatar_url || null,
+                banner_url: p.banner_url || null,
+                banner_color: p.banner_color || null,
+                theme_color: p.theme_color || '#10b981',
+                theme_mode: p.theme_mode || 'dark',
+                booking_email: p.booking_email || null,
+                booking_phone: p.booking_phone || null,
+                booking_enabled: Boolean(p.booking_email),
+                pwa_enabled: true,
+                pwa_name: p.pwa_name || p.artist_name,
+                pwa_icon_url: p.pwa_icon_url || null,
+                pwa_splash_url: null,
+                releases_count: 0,
+                total_streams_preview: 0,
+                is_flagged_impostor: false,
+                moderation_report_count: 0,
+                admin_notes: 'Profil réel utilisateur inscrit.',
+              }
+              if (idx >= 0) {
+                localList[idx] = { ...localList[idx], ...entry }
+              } else {
+                localList.unshift(entry)
+              }
+            }
+          }
+        }
+      }
+    } catch {}
+
+    setUsers(localList)
+    localStorage.setItem('monpodium_admin_users', JSON.stringify(localList))
 
     // Try fetching online registered users from Supabase if active
     if (isSupabaseConfigured()) {
@@ -108,7 +162,7 @@ export default function AdminDashboardPage() {
                   avatar_url: p.avatar_url || null,
                   banner_url: p.banner_url || null,
                   banner_color: p.banner_color || null,
-                  theme_color: p.theme_color || '#9333ea',
+                  theme_color: p.theme_color || '#10b981',
                   theme_mode: p.theme_mode || 'dark',
                   booking_email: p.booking_email || null,
                   booking_phone: p.booking_phone || null,
@@ -159,6 +213,60 @@ export default function AdminDashboardPage() {
     localStorage.setItem('monpodium_admin_users', JSON.stringify(updated))
   }
 
+  // Helper to sync profile updates to dedicated profile store, demo session, and Supabase
+  const syncProfileStore = async (username: string, updates: Partial<AdminArtistUser>) => {
+    const cleanUsername = (username || '').toLowerCase().trim()
+    if (!cleanUsername) return
+
+    // 1. Dedicated profile storage
+    try {
+      const dedicatedKey = `monpodium_profile_${cleanUsername}`
+      const existing = localStorage.getItem(dedicatedKey)
+      let data: any = {}
+      if (existing) {
+        data = JSON.parse(existing)
+      } else {
+        const found = users.find((u) => u.username.toLowerCase() === cleanUsername)
+        if (found) data = { ...found }
+      }
+      const merged = { ...data, ...updates }
+      localStorage.setItem(dedicatedKey, JSON.stringify(merged))
+    } catch (e) {
+      console.debug('Dedicated profile store update error', e)
+    }
+
+    // 2. Active demo user session if matches
+    try {
+      const currentDemo = localStorage.getItem('monpodium_demo_user')
+      if (currentDemo) {
+        const demo = JSON.parse(currentDemo)
+        if ((demo.username || '').toLowerCase() === cleanUsername) {
+          const mergedDemo = { ...demo, ...updates }
+          localStorage.setItem('monpodium_demo_user', JSON.stringify(mergedDemo))
+        }
+      }
+    } catch (e) {
+      console.debug('Demo user update error', e)
+    }
+
+    // 3. Supabase update if configured
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient()
+        const supaPayload: any = {}
+        if (updates.verified !== undefined) supaPayload.is_verified = updates.verified
+        if (updates.account_status !== undefined) supaPayload.account_status = updates.account_status
+        if (updates.plan !== undefined) supaPayload.plan = updates.plan
+
+        if (Object.keys(supaPayload).length > 0) {
+          await supabase.from('profiles').update(supaPayload).eq('username', cleanUsername)
+        }
+      } catch (err) {
+        console.debug('Supabase admin update error', err)
+      }
+    }
+  }
+
   // Helper to persist reports
   const saveReportsList = (updated: ModerationReport[]) => {
     setReports(updated)
@@ -166,28 +274,17 @@ export default function AdminDashboardPage() {
   }
 
   // 1. Toggle Official Verified Badge
-  const handleToggleVerification = (targetUser: AdminArtistUser) => {
+  const handleToggleVerification = async (targetUser: AdminArtistUser) => {
     const nextVerified = !targetUser.verified
     const updated = users.map((u) =>
       u.id === targetUser.id ? { ...u, verified: nextVerified } : u
     )
     saveUsersList(updated)
-
-    // Sync with demo user if currently editing them
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.username === targetUser.username) {
-          parsed.verified = nextVerified
-          localStorage.setItem('monpodium_demo_user', JSON.stringify(parsed))
-        }
-      } catch {}
-    }
+    await syncProfileStore(targetUser.username, { verified: nextVerified })
 
     if (nextVerified) {
       toast.success(`Badge vérifié attribué à ${targetUser.artist_name} !`, {
-        description: `Le bouclier bleu de certification officielle est désormais visible sur sa vitrine.`,
+        description: `Le bouclier bleu de certification officielle est désormais visible sur sa vitrine /${targetUser.username}.`,
       })
     } else {
       toast.info(`Badge vérifié révoqué pour ${targetUser.artist_name}.`, {
@@ -197,7 +294,7 @@ export default function AdminDashboardPage() {
   }
 
   // 2. Toggle Account Suspension (Active / Suspended)
-  const handleToggleAccountStatus = (targetUser: AdminArtistUser) => {
+  const handleToggleAccountStatus = async (targetUser: AdminArtistUser) => {
     const isCurrentlySuspended = targetUser.account_status === 'suspended'
     const nextStatus: 'active' | 'suspended' = isCurrentlySuspended ? 'active' : 'suspended'
 
@@ -205,32 +302,21 @@ export default function AdminDashboardPage() {
       u.id === targetUser.id ? { ...u, account_status: nextStatus } : u
     )
     saveUsersList(updated)
-
-    // Sync with demo user
-    const localUser = localStorage.getItem('monpodium_demo_user')
-    if (localUser) {
-      try {
-        const parsed = JSON.parse(localUser)
-        if (parsed.username === targetUser.username) {
-          parsed.account_status = nextStatus
-          localStorage.setItem('monpodium_demo_user', JSON.stringify(parsed))
-        }
-      } catch {}
-    }
+    await syncProfileStore(targetUser.username, { account_status: nextStatus })
 
     if (nextStatus === 'suspended') {
       toast.error(`Compte suspendu : ${targetUser.artist_name}`, {
-        description: `La vitrine est bloquée et affiche un avertissement de sécurité MonPodium.`,
+        description: `La vitrine /${targetUser.username} affiche l'avertissement de sécurité de modération.`,
       })
     } else {
       toast.success(`Compte réactivé avec succès : ${targetUser.artist_name}`, {
-        description: `L'accès et la vitrine publique sont de nouveau opérationnels.`,
+        description: `L'accès et la vitrine publique sont de nouveau 100% opérationnels.`,
       })
     }
   }
 
   // 3. Change Plan
-  const handleChangePlan = (userId: string, newPlan: Plan) => {
+  const handleChangePlan = async (userId: string, newPlan: Plan) => {
     const updated = users.map((u) =>
       u.id === userId ? { ...u, plan: newPlan } : u
     )
@@ -238,43 +324,50 @@ export default function AdminDashboardPage() {
 
     const targetUser = users.find((u) => u.id === userId)
     if (targetUser) {
-      // Sync with demo user
-      const localUser = localStorage.getItem('monpodium_demo_user')
-      if (localUser) {
-        try {
-          const parsed = JSON.parse(localUser)
-          if (parsed.username === targetUser.username) {
-            parsed.plan = newPlan
-            localStorage.setItem('monpodium_demo_user', JSON.stringify(parsed))
-          }
-        } catch {}
-      }
-
+      await syncProfileStore(targetUser.username, { plan: newPlan })
       toast.success(`Plan mis à jour : ${targetUser.artist_name}`, {
         description: `Passé sur le plan ${newPlan.toUpperCase()} (quota max : ${PLAN_LIMITS[newPlan]} musiques).`,
       })
     }
   }
 
-  // 4. Delete Fake Account
-  const handleConfirmDelete = () => {
+  // 4. Delete Account
+  const handleConfirmDelete = async () => {
     if (!userToDelete) return
 
     const updated = users.filter((u) => u.id !== userToDelete.id)
     saveUsersList(updated)
 
+    const cleanUsername = userToDelete.username.toLowerCase().trim()
+    try {
+      localStorage.removeItem(`monpodium_profile_${cleanUsername}`)
+      const demo = localStorage.getItem('monpodium_demo_user')
+      if (demo) {
+        const parsed = JSON.parse(demo)
+        if ((parsed.username || '').toLowerCase() === cleanUsername) {
+          localStorage.removeItem('monpodium_demo_user')
+        }
+      }
+      if (isSupabaseConfigured()) {
+        const supabase = createClient()
+        await supabase.from('profiles').delete().eq('username', cleanUsername)
+      }
+    } catch {}
+
     toast.success(`Compte définitivement supprimé : ${userToDelete.artist_name}`, {
-      description: `Le profil, ses sous-domaines et ses données ont été purgés de la plateforme.`,
+      description: `Le profil, ses données et ses liens ont été purgés de la plateforme.`,
     })
 
     setUserToDelete(null)
   }
 
   // 5. Moderation: Ban Fake Impostor directly from a Report
-  const handleBanReportedUser = (report: ModerationReport) => {
-    const target = users.find((u) => u.id === report.reported_user_id || u.username === report.reported_username)
+  const handleBanReportedUser = async (report: ModerationReport) => {
+    const target = users.find(
+      (u) => u.id === report.reported_user_id || u.username.toLowerCase() === report.reported_username.toLowerCase()
+    )
     if (target) {
-      handleToggleAccountStatus(target)
+      await handleToggleAccountStatus(target)
     }
 
     const updatedReports = reports.map((r) =>

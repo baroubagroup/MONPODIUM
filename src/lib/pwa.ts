@@ -12,23 +12,41 @@ export function generateManifest(user: User) {
     short_name: appName,
     description: user.bio
       ? `${user.bio.slice(0, 100)}...`
-      : `Toute la musique officielle de ${appName}`,
+      : `Application officielle de ${appName}`,
     start_url: startUrl,
-    scope: startUrl,
+    scope: `/${user.username}`,
     display: 'standalone',
     orientation: 'portrait',
-    theme_color: user.theme_color || '#7C3AED',
-    background_color: '#08080a',
+    theme_color: user.theme_color || '#10b981',
+    background_color: '#09090b',
     icons: [
       {
         src: iconEndpoint,
         sizes: '192x192',
-        type: 'image/svg+xml',
-        purpose: 'any maskable',
+        type: 'image/png',
+        purpose: 'any',
       },
       {
         src: iconEndpoint,
         sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any maskable',
+      },
+      {
+        src: '/icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any maskable',
+      },
+      {
+        src: iconEndpoint,
+        sizes: 'any',
         type: 'image/svg+xml',
         purpose: 'any maskable',
       },

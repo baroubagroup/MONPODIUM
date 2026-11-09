@@ -12,6 +12,7 @@ import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { Release, SocialLink, PLATFORMS, AccountType } from '@/types'
 import { recordPageView } from '@/lib/tracker'
 import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { INITIAL_ADMIN_USERS } from '@/lib/adminData'
 import { SafeImage } from '@/components/common/SafeImage'
 import {
   Disc3,
@@ -29,42 +30,81 @@ import {
   Moon,
 } from 'lucide-react'
 
+function getInitialProfileSync(cleanUsername: string) {
+  if (typeof window !== 'undefined') {
+    try {
+      const dedicatedRaw = localStorage.getItem(`monpodium_profile_${cleanUsername}`)
+      if (dedicatedRaw) {
+        const parsed = JSON.parse(dedicatedRaw)
+        if (parsed) return parsed
+      }
+      const demoRaw = localStorage.getItem('monpodium_demo_user')
+      if (demoRaw) {
+        const demo = JSON.parse(demoRaw)
+        if ((demo.username || '').toLowerCase() === cleanUsername) {
+          return demo
+        }
+      }
+      const adminUsersRaw = localStorage.getItem('monpodium_admin_users')
+      if (adminUsersRaw) {
+        const adminUsers = JSON.parse(adminUsersRaw)
+        if (Array.isArray(adminUsers)) {
+          const match = adminUsers.find((u: any) => (u.username || '').toLowerCase() === cleanUsername)
+          if (match) return match
+        }
+      }
+    } catch {}
+  }
+
+  const seed = INITIAL_ADMIN_USERS.find((u) => u.username.toLowerCase() === cleanUsername)
+  if (seed) return seed
+
+  return {
+    artist_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
+    theme_color: '#10b981',
+    theme_mode: 'dark',
+    account_type: 'musician',
+    avatar_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
+    banner_url: null,
+    banner_color: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #022c22 100%)',
+    bio: "Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés.",
+    country: "Côte d'Ivoire",
+    genres: ['Afrobeats'],
+    verified: cleanUsername === 'himra' || cleanUsername === 'ksbloom',
+    account_status: 'active',
+  }
+}
+
 function ArtistHubContent() {
   const params = useParams()
   const rawUsername = (params?.username as string) || 'ksbloom'
   const username = rawUsername.toLowerCase().trim()
 
-  const [accountType, setAccountType] = useState<AccountType>('musician')
-  const [artistName, setArtistName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
-  const [pwaName, setPwaName] = useState(username === 'ksbloom' ? 'KS Bloom' : username)
-  const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
-  const [bio, setBio] = useState(
-    username === 'ksbloom'
-      ? "Artiste chanteur gospel & afrobeats ivoirien. Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés."
-      : "Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés."
-  )
-  const [country, setCountry] = useState("Côte d'Ivoire")
-  const [genres, setGenres] = useState<string[]>(['Afrobeats'])
-  const [themeColor, setThemeColor] = useState('#10b981')
-  const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
-  const [isVerified, setIsVerified] = useState(username === 'ksbloom')
-  const [accountStatus, setAccountStatus] = useState<'active' | 'suspended' | 'banned'>('active')
-  const [avatarUrl, setAvatarUrl] = useState(
-    'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80'
-  )
-  const [bannerUrl, setBannerUrl] = useState<string | null>(null)
-  const [bannerColor, setBannerColor] = useState<string>(
-    'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #022c22 100%)'
-  )
+  const initial = React.useMemo(() => getInitialProfileSync(username), [username])
 
-  const [bookingEnabled, setBookingEnabled] = useState(false)
-  const [bookingEmail, setBookingEmail] = useState<string | null>(null)
-  const [bookingPhone, setBookingPhone] = useState<string | null>(null)
+  const [accountType, setAccountType] = useState<AccountType>(() => (initial.account_type as AccountType) || 'musician')
+  const [artistName, setArtistName] = useState<string>(() => initial.artist_name || (username === 'ksbloom' ? 'KS Bloom' : username))
+  const [pwaName, setPwaName] = useState<string>(() => initial.pwa_name || initial.artist_name || (username === 'ksbloom' ? 'KS Bloom' : username))
+  const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(() => initial.pwa_icon_url || null)
+  const [bio, setBio] = useState<string>(() => initial.bio || "Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés.")
+  const [country, setCountry] = useState<string>(() => initial.country || "Côte d'Ivoire")
+  const [genres, setGenres] = useState<string[]>(() => initial.genres || (initial.genre ? [initial.genre] : ['Afrobeats']))
+  const [themeColor, setThemeColor] = useState<string>(() => initial.theme_color || '#10b981')
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>(() => (initial.theme_mode as 'dark' | 'light') || 'dark')
+  const [isVerified, setIsVerified] = useState<boolean>(() => initial.verified ?? (username === 'ksbloom' || username === 'himra'))
+  const [accountStatus, setAccountStatus] = useState<'active' | 'suspended' | 'banned'>(() => (initial.account_status as 'active' | 'suspended' | 'banned') || 'active')
+  const [avatarUrl, setAvatarUrl] = useState<string>(() => initial.avatar_url || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80')
+  const [bannerUrl, setBannerUrl] = useState<string | null>(() => initial.banner_url || null)
+  const [bannerColor, setBannerColor] = useState<string>(() => initial.banner_color || 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #022c22 100%)')
+
+  const [bookingEnabled, setBookingEnabled] = useState<boolean>(() => Boolean(initial.booking_email || initial.booking_enabled))
+  const [bookingEmail, setBookingEmail] = useState<string | null>(() => initial.booking_email || null)
+  const [bookingPhone, setBookingPhone] = useState<string | null>(() => initial.booking_phone || null)
   const [pwaEnabled, setPwaEnabled] = useState(true)
   const [copied, setCopied] = useState(false)
 
   // Official verified social links (no raw URLs)
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([])
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => initial.social_links || [])
 
   // Discography (Releases)
   const [releases, setReleases] = useState<Release[]>([])
@@ -269,13 +309,6 @@ function ArtistHubContent() {
           >
             {/* Gradient overlay for ultra sleek transition */}
             <div className={`absolute inset-0 bg-gradient-to-t ${isLight ? 'from-white via-white/35 to-transparent' : 'from-zinc-900 via-zinc-900/40 to-transparent'}`} />
-            <div
-              className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-md text-[10px] font-extrabold uppercase tracking-widest flex items-center gap-1 shadow-sm"
-              style={{ color: themeColor }}
-            >
-              <Sparkles className="w-3 h-3" style={{ color: themeColor }} />
-              <span>Profil Officiel</span>
-            </div>
           </div>
 
           {/* Overlapping Avatar & Artist Header */}

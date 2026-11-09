@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
 import { BookingModal } from '@/components/artist/BookingModal'
+import { ShareProfileModal } from '@/components/artist/ShareProfileModal'
+import { ReportProfileModal } from '@/components/artist/ReportProfileModal'
 import { SocialLinks } from '@/components/artist/SocialLinks'
 import { ReleasesCarousel } from '@/components/artist/ReleasesCarousel'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
@@ -28,6 +30,8 @@ import {
   Layers,
   Sun,
   Moon,
+  Lock,
+  Flag,
 } from 'lucide-react'
 
 function getInitialProfileSync(cleanUsername: string) {
@@ -106,6 +110,10 @@ function ArtistHubContent() {
   // Official verified social links (no raw URLs)
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => initial.social_links || [])
 
+  // Modals state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+
   // Discography (Releases)
   const [releases, setReleases] = useState<Release[]>([])
 
@@ -123,7 +131,12 @@ function ArtistHubContent() {
         if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
         if (profile.banner_url !== undefined) setBannerUrl(profile.banner_url)
         if (profile.banner_color) setBannerColor(profile.banner_color)
-        if (profile.theme_color) setThemeColor(profile.theme_color)
+        if (profile.theme_color) {
+          setThemeColor(profile.theme_color)
+          if (typeof document !== 'undefined') {
+            document.documentElement.style.setProperty('--artist-theme-color', profile.theme_color)
+          }
+        }
         if (profile.theme_mode) setThemeMode(profile.theme_mode)
         if (profile.genres && Array.isArray(profile.genres) && profile.genres.length > 0) {
           setGenres(profile.genres)
@@ -230,11 +243,41 @@ function ArtistHubContent() {
   const isLight = themeMode === 'light'
 
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-between relative overflow-x-hidden transition-colors duration-300 ${isLight ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#070709] text-white'}`}>
+    <div
+      style={{ '--artist-theme-color': themeColor } as React.CSSProperties}
+      className={`min-h-screen flex flex-col items-center justify-between relative overflow-x-hidden transition-colors duration-300 ${isLight ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#070709] text-white'}`}
+    >
+      {/* Early inline script to guarantee zero-flash of unstyled or default colors */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              try {
+                var u = "${username}";
+                var p = localStorage.getItem('monpodium_profile_' + u);
+                if (!p) {
+                  var d = localStorage.getItem('monpodium_demo_user');
+                  if (d) {
+                    var parsed = JSON.parse(d);
+                    if (parsed && (parsed.username || '').toLowerCase() === u) p = d;
+                  }
+                }
+                if (p) {
+                  var obj = JSON.parse(p);
+                  if (obj && obj.theme_color) {
+                    document.documentElement.style.setProperty('--artist-theme-color', obj.theme_color);
+                  }
+                }
+              } catch(e) {}
+            })();
+          `
+        }}
+      />
+
       {/* Dynamic ambient background glow */}
       <div
         className="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[550px] rounded-full opacity-20 blur-[180px] pointer-events-none"
-        style={{ backgroundColor: themeColor }}
+        style={{ backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')' }}
       />
 
       {/* Top Floating Glass Navigation Bar */}
@@ -243,7 +286,7 @@ function ArtistHubContent() {
           <div className="flex items-center gap-2.5">
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-lg"
-              style={{ backgroundColor: themeColor }}
+              style={{ backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')' }}
             >
               <Disc3 className="w-4 h-4 animate-[spin_8s_linear_infinite]" />
             </div>
@@ -259,22 +302,41 @@ function ArtistHubContent() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Report discreet button */}
+            <button
+              onClick={() => setIsReportModalOpen(true)}
+              className={`p-1.5 rounded-full border transition-all cursor-pointer ${
+                isLight
+                  ? 'bg-white border-slate-300 text-slate-400 hover:text-red-500 hover:bg-red-50 shadow-xs'
+                  : 'bg-zinc-900/90 border-zinc-750 text-zinc-400 hover:text-red-400 hover:bg-zinc-800'
+              }`}
+              title="Signaler ce profil ou usurpation"
+              aria-label="Signaler ce profil"
+            >
+              <Flag className="w-3.5 h-3.5" />
+            </button>
+
             {/* Quick theme switcher for visitor */}
             <button
               onClick={() => setThemeMode(prev => prev === 'dark' ? 'light' : 'dark')}
               className={`p-1.5 rounded-full border transition-all ${isLight ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 shadow-xs' : 'bg-zinc-900/90 border-zinc-750 text-zinc-300 hover:text-white'}`}
               title={isLight ? 'Activer le Mode Sombre' : 'Activer le Mode Clair'}
             >
-              {isLight ? <Moon className="w-3.5 h-3.5" style={{ color: themeColor }} /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
+              {isLight ? <Moon className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
             </button>
 
+            {/* Partager modal trigger button */}
             <button
-              onClick={copyPageUrl}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-md ${isLight ? 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700' : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-750 text-zinc-300'}`}
+              onClick={() => setIsShareModalOpen(true)}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer ${
+                isLight
+                  ? 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700'
+                  : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-750 text-zinc-300'
+              }`}
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Share2 className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Lien copié' : 'Partager'}</span>
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Partager</span>
             </button>
           </div>
         </div>
@@ -284,14 +346,16 @@ function ArtistHubContent() {
       <main className="w-full max-w-lg mx-auto px-4 pb-4 space-y-6 relative z-10 animate-in fade-in zoom-in-95 duration-300">
         {/* Moderation Suspension Security Notice */}
         {accountStatus === 'suspended' && (
-          <div className="w-full p-4 rounded-2xl bg-red-950/85 border-2 border-red-600 text-red-200 text-xs flex items-center gap-3.5 shadow-2xl animate-pulse">
-            <ShieldAlert className="w-8 h-8 text-red-500 flex-shrink-0" />
-            <div className="text-left space-y-0.5">
+          <div className="w-full p-4 rounded-3xl bg-red-950/90 border-2 border-red-500 text-red-200 text-xs flex items-start gap-3.5 shadow-2xl animate-pulse">
+            <div className="w-9 h-9 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div className="text-left space-y-1">
               <strong className="block text-sm font-black text-white uppercase tracking-wider">
                 Profil Suspendu par la Modération MonPodium
               </strong>
               <span className="leading-snug block opacity-95">
-                Ce compte a été suspendu pour suspicion d&apos;usurpation d&apos;identité ou non-respect de la charte officielle. Les transactions et les liens sont temporairement désactivés.
+                Ce compte a fait l&apos;objet d&apos;une mesure conservatoire pour suspicion d&apos;usurpation d&apos;identité ou non-respect de la charte. Tous les liens et écoutes sont verrouillés.
               </span>
             </div>
           </div>
@@ -319,7 +383,7 @@ function ArtistHubContent() {
                 isLight ? 'bg-white ring-4 ring-slate-100' : 'bg-zinc-950'
               }`}
               style={{
-                borderColor: themeColor,
+                borderColor: 'var(--artist-theme-color, ' + themeColor + ')',
                 boxShadow: `0 0 25px ${themeColor}40, 0 10px 25px rgba(0,0,0,0.5)`,
               }}
             >
@@ -357,6 +421,19 @@ function ArtistHubContent() {
                 )}
               </div>
 
+              {/* Discrete Verified Sticker */}
+              {isVerified && (
+                <div className="flex justify-center pt-0.5">
+                  <div
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 shadow-xs backdrop-blur-md"
+                    title="Compte officiel vérifié et certifié par l'équipe MonPodium"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Compte Officiel Authentifié</span>
+                  </div>
+                </div>
+              )}
+
               {/* Multi-genres Tags & Country */}
               <div className="flex flex-wrap items-center justify-center gap-1.5 pt-0.5">
                 {genres.map((g, idx) => (
@@ -366,7 +443,7 @@ function ArtistHubContent() {
                     style={{
                       backgroundColor: `${themeColor}1a`,
                       borderColor: `${themeColor}45`,
-                      color: themeColor,
+                      color: 'var(--artist-theme-color, ' + themeColor + ')',
                     }}
                   >
                     {g}
@@ -388,8 +465,8 @@ function ArtistHubContent() {
               </p>
             )}
 
-            {/* Booking Button (Only if enabled, without WhatsApp) */}
-            {bookingEnabled && bookingEmail && (
+            {/* Booking Button (Only if enabled and account is active) */}
+            {accountStatus !== 'suspended' && bookingEnabled && bookingEmail && (
               <div className="pt-1">
                 <BookingModal
                   artistName={artistName}
@@ -410,14 +487,14 @@ function ArtistHubContent() {
               <span
                 className="px-3.5 py-1.5 rounded-full text-xs font-black shadow-sm text-white"
                 style={{
-                  backgroundColor: themeColor,
+                  backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')',
                   boxShadow: `0 3px 12px ${themeColor}55`,
                 }}
               >
                 {accountType === 'public_figure' ? 'Profil & Liens' : 'Bio & Sorties'}
               </span>
 
-              {accountType !== 'public_figure' && releases.length > 0 && (
+              {accountStatus !== 'suspended' && accountType !== 'public_figure' && releases.length > 0 && (
                 <Link
                   href={`/${username}/discographie`}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
@@ -426,14 +503,14 @@ function ArtistHubContent() {
                       : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                   }`}
                 >
-                  <Disc3 className="w-3.5 h-3.5" style={{ color: themeColor }} />
+                  <Disc3 className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} />
                   <span>Discographie</span>
                   <span
                     className="text-[10px] font-black px-1.5 py-0.2 rounded-full border"
                     style={{
                       backgroundColor: `${themeColor}20`,
                       borderColor: `${themeColor}40`,
-                      color: themeColor,
+                      color: 'var(--artist-theme-color, ' + themeColor + ')',
                     }}
                   >
                     {releases.length}
@@ -441,7 +518,7 @@ function ArtistHubContent() {
                 </Link>
               )}
 
-              {socialLinks.length > 0 && (
+              {accountStatus !== 'suspended' && socialLinks.length > 0 && (
                 <a
                   href="#reseaux-sociaux"
                   className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
@@ -458,46 +535,63 @@ function ArtistHubContent() {
           </div>
         </div>
 
-        {/* SECTION 1: SORTIES MUSICALES (Uniquement si compte musique et morceaux disponibles) */}
-        {accountType !== 'public_figure' && releases.length > 0 && (
-          <div className="pt-1">
-            <ReleasesCarousel
-              releases={releases}
-              username={username}
-              themeColor={themeColor}
-              themeMode={themeMode}
-            />
+        {/* INTERACTIVE SECTIONS OR LOCKED MODERATION STATE */}
+        {accountStatus === 'suspended' ? (
+          <div className="relative rounded-3xl overflow-hidden border border-red-500/30 bg-red-950/20 p-6 sm:p-8 text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+              <Lock className="w-7 h-7" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-black text-white">Contenu & Liens Verrouillés</h3>
+              <p className="text-xs text-red-200/90 max-w-sm mx-auto leading-relaxed">
+                Ce profil est actuellement sous mesure de suspension administrative par MonPodium. Les écoutes musicales, les sorties et les liens vers les réseaux externes sont désactivés pour la sécurité des utilisateurs.
+              </p>
+            </div>
           </div>
-        )}
+        ) : (
+          <>
+            {/* SECTION 1: SORTIES MUSICALES (Uniquement si compte musique et morceaux disponibles) */}
+            {accountType !== 'public_figure' && releases.length > 0 && (
+              <div className="pt-1">
+                <ReleasesCarousel
+                  releases={releases}
+                  username={username}
+                  themeColor={themeColor}
+                  themeMode={themeMode}
+                />
+              </div>
+            )}
 
-        {/* SECTION 2: RÉSEAUX SOCIAUX OFFICIELS (PROTÈGE CONTRE LES FAUX COMPTES) */}
-        {socialLinks.length > 0 && (
-          <div id="reseaux-sociaux" className="pt-2">
-            <SocialLinks
-              links={socialLinks}
-              artistName={artistName}
-              artistUsername={username}
-              themeMode={themeMode}
-              themeColor={themeColor}
-            />
-          </div>
-        )}
+            {/* SECTION 2: RÉSEAUX SOCIAUX OFFICIELS (PROTÈGE CONTRE LES FAUX COMPTES) */}
+            {socialLinks.length > 0 && (
+              <div id="reseaux-sociaux" className="pt-2">
+                <SocialLinks
+                  links={socialLinks}
+                  artistName={artistName}
+                  artistUsername={username}
+                  themeMode={themeMode}
+                  themeColor={themeColor}
+                />
+              </div>
+            )}
 
-        {/* SECTION 3: PWA INSTALLATION BANNER (SANS LE MOT 'APP') */}
-        {pwaEnabled && (
-          <div className="pt-2">
-            <PWAInstallBanner
-              appName={effectiveAppName}
-              username={username}
-              themeColor={themeColor}
-              themeMode={themeMode}
-              iconUrl={pwaIconUrl || avatarUrl}
-            />
-          </div>
+            {/* SECTION 3: PWA INSTALLATION BANNER */}
+            {pwaEnabled && (
+              <div className="pt-2">
+                <PWAInstallBanner
+                  appName={effectiveAppName}
+                  username={username}
+                  themeColor={themeColor}
+                  themeMode={themeMode}
+                  iconUrl={pwaIconUrl || avatarUrl}
+                />
+              </div>
+            )}
+          </>
         )}
       </main>
 
-      {/* Footer Branding - Positionné bien au-dessus du sticker PWA pour rester 100% visible */}
+      {/* Footer Branding & Discreet Report Link */}
       <footer className={`w-full max-w-lg pt-6 pb-28 sm:pb-24 text-center relative z-20 border-t mt-6 transition-colors ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
         <a
           href="/"
@@ -513,7 +607,40 @@ function ArtistHubContent() {
           <span>Plateforme officielle propulsée par</span>
           <span className="text-emerald-500 font-extrabold transition-colors">MonPodium</span>
         </a>
+
+        {/* Discreet link to report profile */}
+        <div className="pt-3">
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="inline-flex items-center gap-1.5 text-[11px] text-zinc-400 hover:text-red-400 font-semibold transition-colors cursor-pointer"
+          >
+            <Flag className="w-3 h-3" />
+            <span>Signaler ce compte ou une usurpation</span>
+          </button>
+        </div>
       </footer>
+
+      {/* Share Profile Modal */}
+      <ShareProfileModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        artistName={artistName}
+        username={username}
+        avatarUrl={avatarUrl}
+        themeColor={themeColor}
+        isLight={isLight}
+        accountType={accountType}
+      />
+
+      {/* Report Impostor Profile Modal */}
+      <ReportProfileModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        artistName={artistName}
+        username={username}
+        themeColor={themeColor}
+        isLight={isLight}
+      />
     </div>
   )
 }

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useDashboardTheme } from '@/context/DashboardThemeContext'
-import { Plan, PLAN_LIMITS } from '@/types'
+import { Plan, PLAN_LIMITS, Release } from '@/types'
 import {
   AdminArtistUser,
   INITIAL_ADMIN_USERS,
@@ -40,13 +40,48 @@ import {
   TrendingUp,
   BarChart3,
   Headphones,
+  Clock,
+  Play,
+  Lock,
 } from 'lucide-react'
 import { GLOBAL_PLATFORM_TRAFFIC } from '@/lib/analyticsData'
 import { computeArtistAnalytics, TIME_RANGE_LABELS } from '@/lib/analyticsEngine'
 import { AnalyticsTimeRange } from '@/types/analytics'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { createClient } from '@/lib/supabase/client'
-import { isSupabaseConfigured } from '@/lib/authSync'
+import { isSupabaseConfigured, getArtistReleases } from '@/lib/authSync'
+
+function formatLastActivity(iso?: string) {
+  if (!iso) return 'Récemment'
+  try {
+    const d = new Date(iso)
+    const now = new Date()
+    const diffMin = Math.floor((now.getTime() - d.getTime()) / 60000)
+    if (diffMin < 2) return 'En ligne'
+    if (diffMin < 60) return `Il y a ${diffMin} min`
+    const diffHours = Math.floor(diffMin / 60)
+    if (diffHours < 24) return `Il y a ${diffHours}h`
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  } catch {
+    return 'Récemment'
+  }
+}
+
+function formatCreatedDate(iso?: string) {
+  if (!iso) return 'Date non renseignée'
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return iso
+  }
+}
 
 export default function AdminDashboardPage() {
   const { isLight } = useDashboardTheme()
@@ -56,13 +91,31 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'reports' | 'analytics'>('users')
   const [searchQuery, setSearchQuery] = useState('')
   const [filterMode, setFilterMode] = useState<
-    'all' | 'verified' | 'unverified' | 'suspended' | 'flagged' | 'paid'
+    'all' | 'musician' | 'public_figure' | 'verified' | 'unverified' | 'suspended' | 'flagged' | 'paid'
   >('all')
 
   // Modals
   const [userToDelete, setUserToDelete] = useState<AdminArtistUser | null>(null)
   const [userToInspect, setUserToInspect] = useState<AdminArtistUser | null>(null)
   const [inspectTimeRange, setInspectTimeRange] = useState<AnalyticsTimeRange>('30d')
+  const [inspectedReleases, setInspectedReleases] = useState<Release[]>([])
+  const [loadingReleases, setLoadingReleases] = useState(false)
+
+  // Fetch inspected artist releases on inspect
+  useEffect(() => {
+    if (userToInspect) {
+      setLoadingReleases(true)
+      getArtistReleases(userToInspect.username, userToInspect.id)
+        .then((rels) => {
+          setInspectedReleases(rels)
+        })
+        .finally(() => {
+          setLoadingReleases(false)
+        })
+    } else {
+      setInspectedReleases([])
+    }
+  }, [userToInspect])
 
   // Initialize and synchronize with localStorage and Supabase
   useEffect(() => {
@@ -400,6 +453,8 @@ export default function AdminDashboardPage() {
 
     if (!matchesQuery) return false
 
+    if (filterMode === 'musician') return u.account_type !== 'public_figure'
+    if (filterMode === 'public_figure') return u.account_type === 'public_figure'
     if (filterMode === 'verified') return u.verified === true
     if (filterMode === 'unverified') return !u.verified
     if (filterMode === 'suspended') return u.account_status === 'suspended'
@@ -411,6 +466,8 @@ export default function AdminDashboardPage() {
 
   // Real-time KPI Stats
   const totalUsers = users.length
+  const musiciansCount = users.filter((u) => u.account_type !== 'public_figure').length
+  const publicFiguresCount = users.filter((u) => u.account_type === 'public_figure').length
   const verifiedCount = users.filter((u) => u.verified).length
   const suspendedCount = users.filter((u) => u.account_status === 'suspended').length
   const pendingReportsCount = reports.filter((r) => r.status === 'pending').length
@@ -604,6 +661,30 @@ export default function AdminDashboardPage() {
                 Tous ({users.length})
               </button>
               <button
+                onClick={() => setFilterMode('musician')}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer press-scale ${
+                  filterMode === 'musician'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : isLight
+                    ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                    : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
+                }`}
+              >
+                🎵 Musiciens ({musiciansCount})
+              </button>
+              <button
+                onClick={() => setFilterMode('public_figure')}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer press-scale ${
+                  filterMode === 'public_figure'
+                    ? 'bg-cyan-600 text-white shadow-xs'
+                    : isLight
+                    ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                    : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
+                }`}
+              >
+                🌟 Personnalités ({publicFiguresCount})
+              </button>
+              <button
                 onClick={() => setFilterMode('verified')}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer press-scale ${
                   filterMode === 'verified'
@@ -662,8 +743,10 @@ export default function AdminDashboardPage() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className={`border-b ${isLight ? 'border-slate-200 bg-slate-50 text-slate-500' : 'border-zinc-800 bg-zinc-950 text-zinc-400'}`}>
-                    <th className="py-3.5 px-4 font-bold">Artiste & Identité</th>
+                    <th className="py-3.5 px-4 font-bold">Membre & Identité</th>
+                    <th className="py-3.5 px-4 font-bold">Type</th>
                     <th className="py-3.5 px-4 font-bold">Sous-Domaine / URL</th>
+                    <th className="py-3.5 px-4 font-bold">Dernière Activité</th>
                     <th className="py-3.5 px-4 font-bold">Plan & Quota</th>
                     <th className="py-3.5 px-4 font-bold">Badge Officiel</th>
                     <th className="py-3.5 px-4 font-bold">Statut Compte</th>
@@ -673,8 +756,8 @@ export default function AdminDashboardPage() {
                 <tbody className={`divide-y ${isLight ? 'divide-slate-200' : 'divide-zinc-800'}`}>
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-zinc-400">
-                        Aucun artiste ne correspond à ces critères.
+                      <td colSpan={8} className="py-12 text-center text-zinc-400">
+                        Aucun compte ne correspond à ces critères.
                       </td>
                     </tr>
                   ) : (
@@ -733,11 +816,21 @@ export default function AdminDashboardPage() {
                                 <div className={`text-[11px] truncate ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
                                   {user.full_name || 'Nom non précisé'} • {user.email}
                                 </div>
-                                <div className="text-[10px] text-zinc-500 font-mono">
-                                  Inscrit le {new Date(user.created_at).toLocaleDateString('fr-FR')}
-                                </div>
                               </div>
                             </div>
+                          </td>
+
+                          {/* Type de compte */}
+                          <td className="py-3.5 px-4">
+                            {user.account_type === 'public_figure' ? (
+                              <span className="px-2.5 py-1 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 font-bold text-[11px] inline-flex items-center gap-1">
+                                🌟 Personnalité
+                              </span>
+                            ) : (
+                              <span className="px-2.5 py-1 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 font-bold text-[11px] inline-flex items-center gap-1">
+                                🎵 Artiste
+                              </span>
+                            )}
                           </td>
 
                           {/* Sous-domaine */}
@@ -754,6 +847,19 @@ export default function AdminDashboardPage() {
                                 <span>Inspecter la vitrine</span>
                                 <ExternalLink className="w-3 h-3" />
                               </Link>
+                            </div>
+                          </td>
+
+                          {/* Dernière Activité */}
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                                <span>{formatLastActivity(user.last_active_at || user.created_at)}</span>
+                              </div>
+                              <div className="text-[10px] text-zinc-500 font-mono">
+                                Inscrit le {new Date(user.created_at).toLocaleDateString('fr-FR')}
+                              </div>
                             </div>
                           </td>
 
@@ -1230,6 +1336,166 @@ export default function AdminDashboardPage() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Identité 360° & Actions Modérateur */}
+              <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950/60 border-zinc-800'
+              }`}>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold text-zinc-400">Type de Compte :</span>
+                    {userToInspect.account_type === 'public_figure' ? (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 font-bold text-xs inline-flex items-center gap-1">
+                        🌟 Personnalité Publique
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 font-bold text-xs inline-flex items-center gap-1">
+                        🎵 Artiste Musicien
+                      </span>
+                    )}
+                    <span className="text-zinc-500">•</span>
+                    <span className="text-xs font-medium text-zinc-400">
+                      Dernière activité : <strong className="text-emerald-500">{formatLastActivity(userToInspect.last_active_at || userToInspect.created_at)}</strong>
+                    </span>
+                  </div>
+                  <div className="text-xs text-zinc-500">
+                    Contact : <span className="font-semibold text-zinc-300">{userToInspect.email}</span>
+                    {userToInspect.booking_phone && <> • Booking : <span className="font-semibold text-zinc-300">{userToInspect.booking_phone}</span></>}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleVerification(userToInspect)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      userToInspect.verified
+                        ? 'bg-blue-500/20 border-blue-500/40 text-blue-400'
+                        : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:text-white'
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 inline mr-1 text-blue-500" />
+                    <span>{userToInspect.verified ? 'Badge Retirer' : 'Certifier Officiel'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleAccountStatus(userToInspect)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      userToInspect.account_status === 'suspended'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-red-500/15 border-red-500/30 text-red-400 hover:bg-red-500/25'
+                    }`}
+                  >
+                    {userToInspect.account_status === 'suspended' ? 'Réactiver Compte' : 'Suspendre Compte'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserToDelete(userToInspect)
+                      setUserToInspect(null)
+                    }}
+                    className="p-1.5 rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    title="Supprimer ce compte"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* VUE 360° : MORCEAUX & DATES D'AJOUT POUR LES ARTISTES */}
+              {userToInspect.account_type !== 'public_figure' ? (
+                <div className={`p-4 sm:p-5 rounded-3xl border space-y-3 ${
+                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950/60 border-zinc-800'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Music className="w-4 h-4 text-emerald-500" />
+                      <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-400">
+                        Morceaux Hébergés sur MonPodium & Dates d&apos;Ajout ({inspectedReleases.length})
+                      </h4>
+                    </div>
+                    {loadingReleases && (
+                      <span className="text-[10px] text-zinc-500 animate-pulse">Chargement des morceaux...</span>
+                    )}
+                  </div>
+
+                  {inspectedReleases.length === 0 ? (
+                    <div className="py-5 text-center text-xs text-zinc-500">
+                      Aucun morceau n&apos;a encore été mis en ligne par cet artiste.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-zinc-800/40">
+                      {inspectedReleases.map((rel) => (
+                        <div key={rel.id} className="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700">
+                              {rel.cover_url ? (
+                                <img src={rel.cover_url} alt={rel.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center font-bold text-xs">
+                                  {rel.title.charAt(0)}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-xs">{rel.title}</span>
+                                <span className="px-1.5 py-0.2 rounded-md bg-zinc-800 text-[9px] uppercase font-bold text-zinc-400">
+                                  {rel.release_type}
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-zinc-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                                <span className="text-emerald-500 font-semibold flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  Ajouté le {formatCreatedDate(rel.created_at)}
+                                </span>
+                                {rel.release_date && (
+                                  <>
+                                    <span>•</span>
+                                    <span>Sortie : {rel.release_date}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Preview Audio player */}
+                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                            {rel.preview_audio_url && (
+                              <audio
+                                controls
+                                src={rel.preview_audio_url}
+                                className="h-7 w-44 rounded-lg"
+                              />
+                            )}
+                            <div className="flex items-center gap-1">
+                              {rel.platform_links?.map((pl) => (
+                                <span key={pl.id} className="w-6 h-6 rounded-md bg-zinc-800 flex items-center justify-center" title={pl.platform}>
+                                  <PlatformIcon platform={pl.platform} className="w-3.5 h-3.5" />
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className={`p-4 rounded-2xl border space-y-1.5 ${
+                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950/60 border-zinc-800'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-cyan-500" />
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-cyan-400">Hub Personnalité Publique</h4>
+                  </div>
+                  <p className="text-xs text-zinc-400">
+                    Ce profil est configuré comme personnalité publique / créateur certifié. Il réunit tous ses réseaux sociaux officiels et ses liens externes sans catalogue musical.
+                  </p>
+                </div>
+              )}
 
               {/* Time Range Selector */}
               <div className="flex items-center justify-between flex-wrap gap-2">

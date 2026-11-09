@@ -7,6 +7,7 @@ export interface AdminArtistUser extends User {
   is_flagged_impostor: boolean
   moderation_report_count: number
   admin_notes: string
+  last_active_at?: string
 }
 
 export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
@@ -16,6 +17,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Himra Officiel',
     artist_name: 'HIMRA',
     username: 'himra',
+    account_type: 'musician',
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
     banner_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop&q=80',
     banner_color: null,
@@ -41,6 +43,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 2,
     total_streams_preview: 28400,
     created_at: '2024-01-15T10:00:00Z',
+    last_active_at: '2026-11-09T11:42:00Z',
   },
   {
     id: 'usr-1',
@@ -48,6 +51,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Sou Sou Sou (Kader Kévin)',
     artist_name: 'KS Bloom',
     username: 'ksbloom',
+    account_type: 'musician',
     avatar_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
     banner_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop&q=80',
     banner_color: null,
@@ -73,6 +77,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 3,
     total_streams_preview: 14850,
     created_at: '2024-01-15T10:00:00Z',
+    last_active_at: '2026-11-09T09:15:00Z',
   },
   {
     id: 'usr-2',
@@ -80,6 +85,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Lamel Yao',
     artist_name: 'LAMELO',
     username: 'lamelo',
+    account_type: 'musician',
     avatar_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
     banner_url: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1200&auto=format&fit=crop&q=80',
     banner_color: null,
@@ -105,6 +111,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 3,
     total_streams_preview: 9320,
     created_at: '2024-02-10T14:30:00Z',
+    last_active_at: '2026-11-08T18:20:00Z',
   },
   {
     id: 'usr-3',
@@ -112,6 +119,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Roseline Layo',
     artist_name: 'Roseline Layo',
     username: 'roselinelayo',
+    account_type: 'musician',
     avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
     banner_url: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=1200&auto=format&fit=crop&q=80',
     banner_color: null,
@@ -137,6 +145,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 6,
     total_streams_preview: 38200,
     created_at: '2024-01-20T09:15:00Z',
+    last_active_at: '2026-11-08T22:10:00Z',
   },
   {
     id: 'usr-4',
@@ -144,6 +153,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Bassa Zéréhoué Diyilem',
     artist_name: 'Didi B',
     username: 'didib',
+    account_type: 'musician',
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
     banner_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&auto=format&fit=crop&q=80',
     banner_color: null,
@@ -169,6 +179,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 8,
     total_streams_preview: 64100,
     created_at: '2024-02-01T11:00:00Z',
+    last_active_at: '2026-11-09T12:05:00Z',
   },
   {
     id: 'usr-5',
@@ -176,11 +187,12 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Faux Booking KS Bloom',
     artist_name: 'KS BLOOM OFFICIEL BOOKING',
     username: 'ksbloom-booking-officiel',
+    account_type: 'public_figure',
     avatar_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
     banner_url: null,
     banner_color: null,
     bio: "Pour tout concert envoyez un acompte via Wave au 07000000. Compte officiel de management.",
-    genres: ['Gospel'],
+    genres: ['Public Figure'],
     country: "Côte d'Ivoire",
     booking_email: 'arnaque-booking@yahoo.fr',
     booking_phone: '+225 01 02 03 04',
@@ -201,6 +213,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 0,
     total_streams_preview: 12,
     created_at: '2024-03-01T18:22:00Z',
+    last_active_at: '2026-11-04T10:11:00Z',
   },
   {
     id: 'usr-6',
@@ -208,6 +221,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     full_name: 'Axel Kader',
     artist_name: 'Axel Kader',
     username: 'axelkader',
+    account_type: 'musician',
     avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
     banner_url: null,
     banner_color: null,
@@ -225,7 +239,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     pwa_name: 'Axel Kader',
     pwa_icon_url: null,
     pwa_splash_url: null,
-    verified: false, // En attente de vérification
+    verified: false,
     account_status: 'active',
     is_flagged_impostor: false,
     moderation_report_count: 0,
@@ -233,6 +247,7 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     releases_count: 1,
     total_streams_preview: 840,
     created_at: '2024-03-04T12:00:00Z',
+    last_active_at: '2026-11-09T08:30:00Z',
   },
 ]
 

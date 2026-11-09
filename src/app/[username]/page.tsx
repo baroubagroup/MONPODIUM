@@ -125,12 +125,12 @@ function ArtistHubContent() {
       if (profile) {
         if (profile.account_type) setAccountType(profile.account_type)
         if (profile.artist_name) setArtistName(profile.artist_name)
-        setPwaName(profile.pwa_name || profile.artist_name)
+        if (profile.pwa_name) setPwaName(profile.pwa_name)
         if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
-        if (profile.bio !== undefined) setBio(profile.bio)
+        if (profile.bio) setBio(profile.bio)
         if (profile.country) setCountry(profile.country)
         if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
-        if (profile.banner_url !== undefined) setBannerUrl(profile.banner_url)
+        if (profile.banner_url) setBannerUrl(profile.banner_url)
         if (profile.banner_color) setBannerColor(profile.banner_color)
         if (profile.theme_color) {
           setThemeColor(profile.theme_color)
@@ -151,7 +151,7 @@ function ArtistHubContent() {
           setBookingEnabled(profile.booking_enabled ?? true)
         }
         if (profile.booking_phone) setBookingPhone(profile.booking_phone)
-        if (profile.social_links && Array.isArray(profile.social_links)) {
+        if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
           setSocialLinks(profile.social_links)
         }
 
@@ -615,19 +615,6 @@ function ArtistHubContent() {
                 />
               </div>
             )}
-
-            {/* SECTION 3: PWA INSTALLATION BANNER */}
-            {pwaEnabled && (
-              <div className="pt-2">
-                <PWAInstallBanner
-                  appName={effectiveAppName}
-                  username={username}
-                  themeColor={themeColor}
-                  themeMode={themeMode}
-                  iconUrl={pwaIconUrl || avatarUrl}
-                />
-              </div>
-            )}
           </>
         )}
       </main>
@@ -645,7 +632,7 @@ function ArtistHubContent() {
           }`}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 group-hover:scale-125 transition-transform" />
-          <span>Plateforme officielle propulsée par</span>
+          <span>Propulsé par</span>
           <span className="text-emerald-500 font-extrabold transition-colors">MonPodium</span>
         </a>
 
@@ -660,6 +647,17 @@ function ArtistHubContent() {
           </button>
         </div>
       </footer>
+
+      {/* Root-Level Floating PWA Installation Banner (Guaranteed Clickable & Never Trapped in CSS Transforms) */}
+      {pwaEnabled && accountStatus !== 'suspended' && (
+        <PWAInstallBanner
+          appName={effectiveAppName}
+          username={username}
+          themeColor={themeColor}
+          themeMode={themeMode}
+          iconUrl={pwaIconUrl || avatarUrl}
+        />
+      )}
 
       {/* Share Profile Modal */}
       <ShareProfileModal

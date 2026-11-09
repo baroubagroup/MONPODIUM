@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Download, Smartphone, X, Share, CheckCircle2, Sparkles } from 'lucide-react'
 import { SafeImage } from '@/components/common/SafeImage'
+import { toast } from 'sonner'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -81,7 +82,12 @@ export function PWAInstallBanner({
     }
   }, [])
 
-  const handleInstallClick = async () => {
+  const handleInstallClick = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
     const promptEvent =
       deferredPrompt ||
       (typeof window !== 'undefined' ? (window as any).__pwaPrompt : null)
@@ -90,11 +96,13 @@ export function PWAInstallBanner({
       try {
         await promptEvent.prompt()
         const choice = await promptEvent.userChoice
-        if (choice.outcome === 'accepted') {
+        if (choice && choice.outcome === 'accepted') {
           setIsInstalled(true)
+          toast.success("Application installée avec succès sur votre écran d'accueil !")
         }
       } catch (err) {
         console.error('PWA prompt error:', err)
+        setShowGuide(true)
       } finally {
         setDeferredPrompt(null)
         if (typeof window !== 'undefined') {
@@ -104,12 +112,7 @@ export function PWAInstallBanner({
       return
     }
 
-    if (isIOS) {
-      setShowGuide(true)
-      return
-    }
-
-    // Fallback if browser prompt event is postponed or already prompted
+    // Direct instructions guide display
     setShowGuide(true)
   }
 
@@ -122,7 +125,7 @@ export function PWAInstallBanner({
       {/* Floating Sticker Pill Dock at the bottom */}
       <aside
         aria-label="Application mobile de l'artiste"
-        className="fixed bottom-3 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[470px] z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 pointer-events-auto"
+        className="fixed bottom-3 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[470px] z-[100] animate-in fade-in slide-in-from-bottom-4 duration-300 pointer-events-auto"
       >
         <div
           className={`relative rounded-2xl border p-2 sm:p-2.5 backdrop-blur-2xl overflow-hidden flex items-center justify-between gap-2.5 transition-colors ${
@@ -193,8 +196,9 @@ export function PWAInstallBanner({
           {/* Right: Install Button & Close */}
           <div className="flex items-center gap-1.5 relative z-10 flex-shrink-0">
             <button
-              onClick={handleInstallClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black text-white shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              type="button"
+              onClick={(e) => handleInstallClick(e)}
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black text-white shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer z-20 pointer-events-auto"
               style={{
                 backgroundColor: themeColor,
                 boxShadow: `0 4px 15px ${themeColor}66`,
@@ -206,6 +210,7 @@ export function PWAInstallBanner({
 
             {/* Dismiss X button */}
             <button
+              type="button"
               onClick={() => setDismissed(true)}
               className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
                 isLight ? 'text-slate-400 hover:text-slate-800 hover:bg-slate-200' : 'text-zinc-400 hover:text-white hover:bg-white/10'
@@ -221,7 +226,7 @@ export function PWAInstallBanner({
 
       {/* Elegant Installation Guide Modal */}
       {showGuide && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+        <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4 pointer-events-auto">
           <div className="w-full max-w-sm rounded-3xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom duration-200">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">

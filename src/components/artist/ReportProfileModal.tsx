@@ -43,13 +43,8 @@ export function ReportProfileModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!reporterEmail || !reporterEmail.includes('@')) {
-      toast.error('Veuillez entrer une adresse email valide pour le suivi.')
-      return
-    }
-
-    if (!description || description.trim().length < 5) {
-      toast.error('Veuillez décrire brièvement le problème constaté.')
+    if (reporterEmail.trim() && !reporterEmail.includes('@')) {
+      toast.error('Veuillez entrer une adresse email valide ou laisser le champ vide.')
       return
     }
 
@@ -57,14 +52,17 @@ export function ReportProfileModal({
 
     try {
       const cleanUsername = username.toLowerCase().trim()
+      const finalEmail = reporterEmail.trim() || 'anonyme@visiteur.monpodium.com'
+      const finalDescription = description.trim() || `Signalement rapide pour motif : ${reason}`
+
       const newReport: ModerationReport = {
         id: `rep-${Date.now()}`,
         reported_user_id: `usr-${cleanUsername}`,
         reported_artist_name: artistName,
         reported_username: cleanUsername,
-        reporter_email: reporterEmail.trim(),
+        reporter_email: finalEmail,
         reason,
-        description: description.trim(),
+        description: finalDescription,
         status: 'pending',
         created_at: new Date().toISOString(),
       }
@@ -104,9 +102,9 @@ export function ReportProfileModal({
           await supabase.from('moderation_reports').insert({
             reported_artist_name: artistName,
             reported_username: cleanUsername,
-            reporter_email: reporterEmail.trim(),
+            reporter_email: finalEmail,
             reason,
-            description: description.trim(),
+            description: finalDescription,
             status: 'pending',
           })
         } catch (supaErr) {
@@ -244,17 +242,17 @@ export function ReportProfileModal({
               </div>
             </div>
 
-            {/* Description */}
+            {/* Description (facultatif) */}
             <div className="space-y-1.5">
-              <label className={`text-xs font-bold block ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
-                Détails ou explications
+              <label className={`text-xs font-bold flex items-center justify-between ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
+                <span>Détails ou explications</span>
+                <span className="text-[10px] font-normal opacity-60">facultatif</span>
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Expliquez ce qui vous fait penser que ce profil est frauduleux..."
+                placeholder="Précisez votre signalement si vous le souhaitez (facultatif)..."
                 rows={3}
-                required
                 className={`w-full p-3 rounded-2xl text-xs outline-none border transition-all resize-none ${
                   isLight
                     ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-red-500'
@@ -263,17 +261,17 @@ export function ReportProfileModal({
               />
             </div>
 
-            {/* Reporter Email */}
+            {/* Reporter Email (facultatif) */}
             <div className="space-y-1.5">
-              <label className={`text-xs font-bold block ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
-                Votre email de contact
+              <label className={`text-xs font-bold flex items-center justify-between ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
+                <span>Votre email de contact</span>
+                <span className="text-[10px] font-normal opacity-60">facultatif</span>
               </label>
               <input
                 type="email"
                 value={reporterEmail}
                 onChange={(e) => setReporterEmail(e.target.value)}
-                placeholder="votre.email@exemple.com"
-                required
+                placeholder="votre.email@exemple.com (laisser vide pour anonyme)"
                 className={`w-full p-2.5 rounded-2xl text-xs outline-none border transition-all ${
                   isLight
                     ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-red-500'

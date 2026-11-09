@@ -346,24 +346,47 @@ export default function ProfilePage() {
     }
 
     // 1. Sync to Supabase if available
-    if (isSupabaseConfigured() && (userId || current.id)) {
+    if (isSupabaseConfigured()) {
       try {
         const supabase = createClient()
-        await supabase.from('profiles').update({
-          full_name: fullName,
-          artist_name: artistName,
-          account_type: accountType,
-          bio,
-          country,
-          genres: selectedGenres,
-          banner_url: coverMode === 'image' ? bannerUrl : null,
-          banner_color: bannerColor,
-          theme_color: customColor,
-          theme_mode: themeMode,
-          avatar_url: avatarUrl,
-          booking_email: bookingEmail,
-          booking_phone: bookingPhone,
-        }).eq('id', userId || current.id)
+        const { data: authData } = await supabase.auth.getUser()
+        const effectiveId = authData?.user?.id || userId || current.id
+
+        if (effectiveId) {
+          await supabase.from('profiles').update({
+            full_name: fullName,
+            artist_name: artistName,
+            account_type: accountType,
+            bio,
+            country,
+            genres: selectedGenres,
+            banner_url: coverMode === 'image' ? bannerUrl : null,
+            banner_color: bannerColor,
+            theme_color: customColor,
+            theme_mode: themeMode,
+            avatar_url: avatarUrl,
+            booking_email: bookingEmail,
+            booking_phone: bookingPhone,
+          }).eq('id', effectiveId)
+
+          // Sync social links in Supabase
+          const validLinks = updated.social_links || []
+          try {
+            await supabase.from('social_links').delete().eq('user_id', effectiveId)
+            if (validLinks.length > 0) {
+              const insertData = validLinks.map((l: any, idx: number) => ({
+                user_id: effectiveId,
+                platform: l.platform,
+                url: l.url.trim(),
+                title: l.platform,
+                display_order: l.display_order ?? idx,
+              }))
+              await supabase.from('social_links').insert(insertData)
+            }
+          } catch (linksErr) {
+            console.debug('Failed to sync social links in Supabase', linksErr)
+          }
+        }
       } catch (err) {
         console.debug('Failed to sync profile update to Supabase', err)
       }

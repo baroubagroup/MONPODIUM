@@ -206,32 +206,58 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
           .eq('user_id', profile.id)
           .order('display_order', { ascending: true })
 
+        // Check local storage for recent client-side edits to avoid wiping data
+        let localOverride: any = null
+        if (typeof window !== 'undefined') {
+          try {
+            const dedicatedRaw = localStorage.getItem(`monpodium_profile_${cleanUsername}`)
+            if (dedicatedRaw) {
+              localOverride = JSON.parse(dedicatedRaw)
+            } else {
+              const demoRaw = localStorage.getItem(STORAGE_KEY_USER)
+              if (demoRaw) {
+                const demo = JSON.parse(demoRaw)
+                if ((demo.username || '').toLowerCase() === cleanUsername) {
+                  localOverride = demo
+                }
+              }
+            }
+          } catch {}
+        }
+
+        const effectiveLinks =
+          links && links.length > 0
+            ? links
+            : localOverride?.social_links && localOverride.social_links.length > 0
+            ? localOverride.social_links
+            : []
+
         return {
           id: profile.id,
           email: profile.email,
-          full_name: profile.full_name || '',
-          artist_name: profile.artist_name || cleanUsername,
+          full_name: localOverride?.full_name || profile.full_name || '',
+          artist_name: localOverride?.artist_name || profile.artist_name || cleanUsername,
           username: profile.username,
-          account_type: profile.account_type || 'musician',
-          bio: profile.bio || '',
-          genre: profile.genre || 'Afrobeats',
-          genres: profile.genres || (profile.genre ? [profile.genre] : ['Afrobeats']),
-          country: profile.country || "Côte d'Ivoire",
-          theme_color: profile.theme_color || '#10b981',
-          theme_mode: profile.theme_mode || 'dark',
-          avatar_url: profile.avatar_url,
-          banner_url: profile.banner_url,
-          banner_color: profile.banner_color,
-          booking_email: profile.booking_email,
-          booking_phone: profile.booking_phone,
-          booking_enabled: Boolean(profile.booking_email),
+          account_type: localOverride?.account_type || profile.account_type || 'musician',
+          bio: localOverride?.bio || profile.bio || '',
+          genre: localOverride?.genre || profile.genre || 'Afrobeats',
+          genres: localOverride?.genres || profile.genres || (profile.genre ? [profile.genre] : ['Afrobeats']),
+          country: localOverride?.country || profile.country || "Côte d'Ivoire",
+          theme_color: localOverride?.theme_color || profile.theme_color || '#10b981',
+          theme_mode: localOverride?.theme_mode || profile.theme_mode || 'dark',
+          avatar_url: localOverride?.avatar_url || profile.avatar_url,
+          banner_url: localOverride?.banner_url !== undefined ? localOverride.banner_url : profile.banner_url,
+          banner_color: localOverride?.banner_color || profile.banner_color,
+          booking_email: localOverride?.booking_email || profile.booking_email,
+          booking_phone: localOverride?.booking_phone || profile.booking_phone,
+          booking_enabled: Boolean(localOverride?.booking_email || profile.booking_email),
           plan: profile.plan || 'free',
           verified: profile.is_verified || false,
           account_status: profile.account_status || 'active',
           pwa_enabled: profile.pwa_enabled ?? true,
-          pwa_name: profile.pwa_name || profile.artist_name,
-          pwa_icon_url: profile.pwa_icon_url,
-          social_links: links || [],
+          pwa_name: localOverride?.pwa_name || profile.pwa_name || profile.artist_name,
+          pwa_icon_url: localOverride?.pwa_icon_url || profile.pwa_icon_url,
+          social_links: effectiveLinks,
         }
       }
     } catch (err) {

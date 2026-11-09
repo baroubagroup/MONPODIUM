@@ -8,6 +8,7 @@ import { slugify } from '@/lib/utils'
 import { Disc3, Sparkles, ArrowRight, Music2, User, Star, Mail, Lock, AlertCircle } from 'lucide-react'
 import { registerInAdminUsers, UserProfileData, isSupabaseConfigured } from '@/lib/authSync'
 import { AccountType } from '@/types'
+import { CountrySelect } from '@/components/common/CountrySelect'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -18,6 +19,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [genre, setGenre] = useState('Afrobeats')
+  const [country, setCountry] = useState("Côte d'Ivoire")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,7 +51,7 @@ export default function RegisterPage() {
       account_type: accountType,
       genre: genre,
       genres: [genre],
-      country: "Côte d'Ivoire",
+      country: country,
       booking_email: email.trim(),
       theme_color: '#10b981',
       theme_mode: 'dark',
@@ -97,7 +99,7 @@ export default function RegisterPage() {
               account_type: accountType,
               genre,
               genres: [genre],
-              country: "Côte d'Ivoire",
+              country: country,
               booking_email: email.trim(),
               theme_color: '#10b981',
               theme_mode: 'dark',
@@ -297,6 +299,17 @@ export default function RegisterPage() {
                 <option value="Autre">Autre style musical</option>
               </select>
             )}
+          </div>
+
+          {/* Pays de résidence */}
+          <div className="space-y-1">
+            <CountrySelect
+              label="Pays de résidence"
+              value={country}
+              onChange={(newCountry) => setCountry(newCountry)}
+              isLight={false}
+              placeholder="Sélectionnez votre pays"
+            />
           </div>
 
           {/* Email */}

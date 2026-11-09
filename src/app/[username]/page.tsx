@@ -16,6 +16,7 @@ import { recordPageView } from '@/lib/tracker'
 import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
 import { INITIAL_ADMIN_USERS } from '@/lib/adminData'
 import { SafeImage } from '@/components/common/SafeImage'
+import { getCountryFlag } from '@/lib/countries'
 import {
   Disc3,
   Share2,
@@ -230,6 +231,22 @@ function ArtistHubContent() {
     })
   }, [artistName, username])
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      let link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null
+      if (!link) {
+        link = document.createElement('link')
+        link.rel = 'manifest'
+        document.head.appendChild(link)
+      }
+      link.href = `/api/manifest/${username}`
+    }
+
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
+  }, [username])
+
   const copyPageUrl = () => {
     navigator.clipboard.writeText(window.location.href)
     setCopied(true)
@@ -425,10 +442,14 @@ function ArtistHubContent() {
               {isVerified && (
                 <div className="flex justify-center pt-0.5">
                   <div
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 shadow-xs backdrop-blur-md"
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-extrabold border shadow-xs backdrop-blur-md transition-colors ${
+                      isLight
+                        ? 'bg-blue-500/10 border-blue-500/30 text-blue-700'
+                        : 'bg-blue-600/25 border-blue-400/50 text-white shadow-blue-500/20'
+                    }`}
                     title="Compte officiel vérifié et certifié par l'équipe MonPodium"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                    <ShieldCheck className={`w-3.5 h-3.5 ${isLight ? 'text-blue-600' : 'text-blue-400'}`} />
                     <span>Compte Officiel Authentifié</span>
                   </div>
                 </div>
@@ -439,19 +460,34 @@ function ArtistHubContent() {
                 {genres.map((g, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 rounded-full text-xs font-extrabold tracking-wide uppercase shadow-xs border transition-colors"
-                    style={{
-                      backgroundColor: `${themeColor}1a`,
-                      borderColor: `${themeColor}45`,
-                      color: 'var(--artist-theme-color, ' + themeColor + ')',
-                    }}
+                    className="px-3.5 py-1 rounded-full text-xs font-black tracking-wide uppercase shadow-xs border transition-all"
+                    style={
+                      isLight
+                        ? {
+                            backgroundColor: `${themeColor}15`,
+                            borderColor: `${themeColor}40`,
+                            color: 'var(--artist-theme-color, ' + themeColor + ')',
+                          }
+                        : {
+                            backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')',
+                            borderColor: 'transparent',
+                            color: '#ffffff',
+                            boxShadow: `0 3px 12px ${themeColor}45`,
+                          }
+                    }
                   >
                     {g}
                   </span>
                 ))}
                 {country && (
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1 ${isLight ? 'bg-slate-100 border-slate-200 text-slate-700' : 'bg-zinc-800 border-zinc-700 text-zinc-300'}`}>
-                    <MapPin className="w-3 h-3 opacity-60" />
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 transition-colors shadow-xs ${
+                      isLight
+                        ? 'bg-slate-100 border-slate-200 text-slate-800'
+                        : 'bg-zinc-800/90 border-zinc-700 text-white'
+                    }`}
+                  >
+                    <span className="text-sm leading-none">{getCountryFlag(country)}</span>
                     <span>{country}</span>
                   </span>
                 )}
@@ -460,7 +496,13 @@ function ArtistHubContent() {
 
             {/* Official Bio */}
             {bio && (
-              <p className={`text-xs sm:text-sm leading-relaxed max-w-md mx-auto whitespace-pre-line text-left p-4 rounded-2xl border ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-zinc-950/70 border-white/5 text-zinc-300'}`}>
+              <p
+                className={`text-xs sm:text-sm leading-relaxed max-w-md mx-auto whitespace-pre-line text-left p-4 rounded-2xl border transition-colors ${
+                  isLight
+                    ? 'bg-slate-50 border-slate-200 text-slate-700'
+                    : 'bg-zinc-950/85 border-zinc-850 text-zinc-100 font-normal shadow-inner'
+                }`}
+              >
                 {bio}
               </p>
             )}
@@ -482,7 +524,7 @@ function ArtistHubContent() {
 
             {/* Menu de navigation sous le profil */}
             <nav className={`flex items-center justify-center gap-1.5 pt-3 pb-0.5 border-t mt-4 flex-wrap ${
-              isLight ? 'border-slate-200' : 'border-white/10'
+              isLight ? 'border-slate-200' : 'border-zinc-800'
             }`}>
               <span
                 className="px-3.5 py-1.5 rounded-full text-xs font-black shadow-sm text-white"
@@ -500,17 +542,16 @@ function ArtistHubContent() {
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                     isLight
                       ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                      : 'bg-zinc-800 hover:bg-zinc-700 text-white'
                   }`}
                 >
                   <Disc3 className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} />
                   <span>Discographie</span>
                   <span
-                    className="text-[10px] font-black px-1.5 py-0.2 rounded-full border"
+                    className="text-[10px] font-black px-1.5 py-0.2 rounded-full border text-white"
                     style={{
-                      backgroundColor: `${themeColor}20`,
-                      borderColor: `${themeColor}40`,
-                      color: 'var(--artist-theme-color, ' + themeColor + ')',
+                      backgroundColor: themeColor,
+                      borderColor: 'transparent',
                     }}
                   >
                     {releases.length}
@@ -524,10 +565,10 @@ function ArtistHubContent() {
                   className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                     isLight
                       ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                      : 'bg-zinc-800 hover:bg-zinc-700 text-white'
                   }`}
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
                   <span>Réseaux Vérifiés</span>
                 </a>
               )}

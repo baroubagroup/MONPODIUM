@@ -30,6 +30,7 @@ import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from
 import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
+import { CountrySelect } from '@/components/common/CountrySelect'
 
 const PRESET_GENRES = [
   'Afrobeats',
@@ -825,18 +826,12 @@ export default function ProfilePage() {
           </div>
 
           <div className="space-y-1">
-            <label className={`text-xs font-bold ${isLight ? 'text-slate-600' : 'text-zinc-400'}`}>
-              Pays de résidence
-            </label>
-            <input
-              type="text"
+            <CountrySelect
+              label="Pays de résidence"
               value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
-                isLight
-                  ? 'bg-slate-50 border-slate-300 focus:border-emerald-500 text-slate-900'
-                  : 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
-              }`}
+              onChange={(newCountry) => setCountry(newCountry)}
+              isLight={isLight}
+              placeholder="Sélectionnez votre pays"
             />
           </div>
 

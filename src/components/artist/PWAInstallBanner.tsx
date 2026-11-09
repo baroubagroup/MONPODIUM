@@ -53,15 +53,27 @@ export function PWAInstallBanner({
     const iosDevice = /iphone|ipad|ipod/.test(userAgent)
     setIsIOS(iosDevice)
 
+    // Check if prompt was already captured globally
+    if (typeof window !== 'undefined' && (window as any).__pwaPrompt) {
+      setDeferredPrompt((window as any).__pwaPrompt)
+    }
+
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
+      const p = e as BeforeInstallPromptEvent
+      setDeferredPrompt(p)
+      if (typeof window !== 'undefined') {
+        ;(window as any).__pwaPrompt = p
+      }
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall)
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true)
       setDeferredPrompt(null)
+      if (typeof window !== 'undefined') {
+        ;(window as any).__pwaPrompt = null
+      }
     })
 
     return () => {
@@ -70,15 +82,14 @@ export function PWAInstallBanner({
   }, [])
 
   const handleInstallClick = async () => {
-    if (isIOS) {
-      setShowGuide(true)
-      return
-    }
+    const promptEvent =
+      deferredPrompt ||
+      (typeof window !== 'undefined' ? (window as any).__pwaPrompt : null)
 
-    if (deferredPrompt) {
+    if (promptEvent) {
       try {
-        await deferredPrompt.prompt()
-        const choice = await deferredPrompt.userChoice
+        await promptEvent.prompt()
+        const choice = await promptEvent.userChoice
         if (choice.outcome === 'accepted') {
           setIsInstalled(true)
         }
@@ -86,11 +97,19 @@ export function PWAInstallBanner({
         console.error('PWA prompt error:', err)
       } finally {
         setDeferredPrompt(null)
+        if (typeof window !== 'undefined') {
+          ;(window as any).__pwaPrompt = null
+        }
       }
       return
     }
 
-    // Fallback if browser prompt event is not yet triggered or blocked
+    if (isIOS) {
+      setShowGuide(true)
+      return
+    }
+
+    // Fallback if browser prompt event is postponed or already prompted
     setShowGuide(true)
   }
 
@@ -233,7 +252,7 @@ export function PWAInstallBanner({
                     1
                   </span>
                   <span>
-                    Appuie sur le bouton <strong>Partager</strong> en bas de Safari (<Share className="w-3.5 h-3.5 inline mx-1 text-emerald-400" />).
+                    Touchez l&apos;icône <strong>Partager</strong> en bas de Safari (<Share className="w-3.5 h-3.5 inline mx-1 text-emerald-400" />).
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -241,7 +260,7 @@ export function PWAInstallBanner({
                     2
                   </span>
                   <span>
-                    Sélectionne <strong>Sur l&apos;écran d&apos;accueil</strong>.
+                    Faites défiler et sélectionnez <strong>Sur l&apos;écran d&apos;accueil</strong>.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -249,29 +268,26 @@ export function PWAInstallBanner({
                     3
                   </span>
                   <span>
-                    Valide en appuyant sur <strong>Ajouter</strong> en haut à droite.
+                    Validez en touchant <strong>Ajouter</strong> en haut à droite.
                   </span>
                 </li>
               </ol>
             ) : (
-              <ol className="space-y-3 text-sm text-zinc-300">
-                <li className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-white flex-shrink-0" style={{ color: themeColor }}>
-                    1
-                  </span>
-                  <span>
-                    Dans le menu de ton navigateur (les <strong>trois points ⋮</strong> en haut), appuie sur <strong>Installer l&apos;application</strong> ou <strong>Ajouter à l&apos;écran d&apos;accueil</strong>.
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-xs font-bold text-white flex-shrink-0" style={{ color: themeColor }}>
-                    2
-                  </span>
-                  <span>
-                    Confirme l&apos;installation. L&apos;icône officielle s&apos;ajoutera instantanément sans passer par le store !
-                  </span>
-                </li>
-              </ol>
+              <div className="space-y-3 text-sm text-zinc-300">
+                <div className="p-3.5 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-white">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <span>Installation Rapide Directe</span>
+                  </div>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Si votre navigateur n&apos;a pas encore affiché la boîte de dialogue native, appuyez sur <strong>Installer l&apos;application</strong> dans la barre d&apos;adresse ou dans le menu de votre navigateur pour créer le raccourci officiel.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-zinc-400 px-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                  <span>Aucun store requis • Chargement instantané • Mode hors-ligne</span>
+                </div>
+              </div>
             )}
 
             <button

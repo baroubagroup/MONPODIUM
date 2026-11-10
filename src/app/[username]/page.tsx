@@ -298,11 +298,11 @@ function ArtistHubContent() {
       />
 
       {/* Top Floating Glass Navigation Bar */}
-      <header className={`sticky top-0 z-40 w-full backdrop-blur-xl border-b py-3 px-4 transition-colors ${isLight ? 'bg-white/80 border-slate-200/90 text-slate-900 shadow-xs' : 'bg-black/40 border-white/5 text-white'}`}>
+      <header className={`sticky top-0 z-40 w-full backdrop-blur-2xl border-b py-3 px-4 transition-colors specular-edge ${isLight ? 'apple-glass-light border-slate-200/90 text-slate-900 shadow-xs' : 'apple-glass border-white/10 text-white'}`}>
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-lg"
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-lg apple-spring"
               style={{ backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')' }}
             >
               <Disc3 className="w-4 h-4 animate-[spin_8s_linear_infinite]" />
@@ -323,7 +323,7 @@ function ArtistHubContent() {
             {/* Report discreet button */}
             <button
               onClick={() => setIsReportModalOpen(true)}
-              className={`p-1.5 rounded-full border transition-all cursor-pointer ${
+              className={`p-1.5 rounded-full border transition-all apple-spring active:scale-90 cursor-pointer ${
                 isLight
                   ? 'bg-white border-slate-300 text-slate-400 hover:text-red-500 hover:bg-red-50 shadow-xs'
                   : 'bg-zinc-900/90 border-zinc-750 text-zinc-400 hover:text-red-400 hover:bg-zinc-800'
@@ -337,7 +337,7 @@ function ArtistHubContent() {
             {/* Quick theme switcher for visitor */}
             <button
               onClick={() => setThemeMode(prev => prev === 'dark' ? 'light' : 'dark')}
-              className={`p-1.5 rounded-full border transition-all ${isLight ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 shadow-xs' : 'bg-zinc-900/90 border-zinc-750 text-zinc-300 hover:text-white'}`}
+              className={`p-1.5 rounded-full border transition-all apple-spring active:scale-90 cursor-pointer ${isLight ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 shadow-xs' : 'bg-zinc-900/90 border-zinc-750 text-zinc-300 hover:text-white'}`}
               title={isLight ? 'Activer le Mode Sombre' : 'Activer le Mode Clair'}
             >
               {isLight ? <Moon className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
@@ -346,7 +346,7 @@ function ArtistHubContent() {
             {/* Partager modal trigger button */}
             <button
               onClick={() => setIsShareModalOpen(true)}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all apple-spring active:scale-95 shadow-md cursor-pointer ${
                 isLight
                   ? 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700'
                   : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-750 text-zinc-300'
@@ -360,7 +360,7 @@ function ArtistHubContent() {
       </header>
 
       {/* Main Hub Container */}
-      <main className="w-full max-w-lg mx-auto px-4 pb-4 space-y-6 relative z-10 animate-in fade-in zoom-in-95 duration-300">
+      <main className="w-full max-w-lg mx-auto px-4 pb-4 space-y-6 relative z-10 animate-in fade-in duration-300">
         {/* Moderation Suspension Security Notice */}
         {accountStatus === 'suspended' && (
           <div className="w-full p-4 rounded-3xl bg-red-950/90 border-2 border-red-500 text-red-200 text-xs flex items-start gap-3.5 shadow-2xl animate-pulse">
@@ -379,7 +379,7 @@ function ArtistHubContent() {
         )}
 
         {/* ULTRA DESIGN HERO: COVER BANNER + OVERLAPPING AVATAR */}
-        <div className={`rounded-[32px] overflow-hidden border shadow-2xl backdrop-blur-2xl transition-all ${isLight ? 'bg-white border-slate-200/90 shadow-slate-200/80 text-slate-900' : 'bg-zinc-900/80 border-white/10 text-white'}`}>
+        <div className={`rounded-[32px] overflow-hidden border shadow-2xl backdrop-blur-2xl transition-all specular-edge ${isLight ? 'apple-glass-light border-slate-200/90 shadow-slate-200/80 text-slate-900' : 'apple-glass border-white/10 text-white'}`}>
           {/* Panoramic Cover Banner */}
           <div
             className="w-full h-48 sm:h-56 relative bg-zinc-950"
@@ -401,7 +401,7 @@ function ArtistHubContent() {
               }`}
               style={{
                 borderColor: 'var(--artist-theme-color, ' + themeColor + ')',
-                boxShadow: `0 0 25px ${themeColor}40, 0 10px 25px rgba(0,0,0,0.5)`,
+                boxShadow: `0 0 30px ${themeColor}45, 0 12px 30px rgba(0,0,0,0.5)`,
               }}
             >
               <div className="w-full h-full rounded-[20px] overflow-hidden bg-zinc-900">
@@ -457,34 +457,40 @@ function ArtistHubContent() {
 
               {/* Multi-genres Tags & Country */}
               <div className="flex flex-wrap items-center justify-center gap-1.5 pt-0.5">
-                {genres.map((g, idx) => (
+                {Array.from(new Set((genres || []).map(g => g.trim()).filter(Boolean))).map((g, idx) => (
                   <span
-                    key={idx}
-                    className="px-3.5 py-1 rounded-full text-xs font-black tracking-wide uppercase shadow-xs border transition-all"
+                    key={`${g}-${idx}`}
+                    className="apple-spring inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-xs border transition-all active:scale-95"
                     style={
                       isLight
                         ? {
-                            backgroundColor: `${themeColor}15`,
-                            borderColor: `${themeColor}40`,
-                            color: 'var(--artist-theme-color, ' + themeColor + ')',
+                            backgroundColor: `${themeColor}14`,
+                            borderColor: `${themeColor}35`,
+                            color: themeColor,
                           }
                         : {
-                            backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')',
-                            borderColor: 'transparent',
+                            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                            borderColor: 'rgba(255, 255, 255, 0.16)',
                             color: '#ffffff',
-                            boxShadow: `0 3px 12px ${themeColor}45`,
+                            boxShadow: `0 2px 12px ${themeColor}25`,
                           }
                     }
                   >
+                    {!isLight && (
+                      <span
+                        className="w-1.5 h-1.5 rounded-full mr-1.5 flex-shrink-0"
+                        style={{ backgroundColor: themeColor, boxShadow: `0 0 6px ${themeColor}` }}
+                      />
+                    )}
                     {g}
                   </span>
                 ))}
                 {country && (
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 transition-colors shadow-xs ${
+                    className={`apple-spring inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors shadow-xs active:scale-95 ${
                       isLight
                         ? 'bg-slate-100 border-slate-200 text-slate-800'
-                        : 'bg-zinc-800/90 border-zinc-700 text-white'
+                        : 'bg-white/10 border-white/15 text-white'
                     }`}
                   >
                     <span className="text-sm leading-none">{getCountryFlag(country)}</span>
@@ -499,8 +505,8 @@ function ArtistHubContent() {
               <p
                 className={`text-xs sm:text-sm leading-relaxed max-w-md mx-auto whitespace-pre-line text-left p-4 rounded-2xl border transition-colors ${
                   isLight
-                    ? 'bg-slate-50 border-slate-200 text-slate-700'
-                    : 'bg-zinc-950/85 border-zinc-850 text-zinc-100 font-normal shadow-inner'
+                    ? 'bg-slate-50/90 border-slate-200/90 text-slate-700 shadow-xs'
+                    : 'bg-white/[0.04] border-white/10 text-zinc-100 font-normal shadow-inner'
                 }`}
               >
                 {bio}
@@ -522,57 +528,60 @@ function ArtistHubContent() {
               </div>
             )}
 
-            {/* Menu de navigation sous le profil */}
-            <nav className={`flex items-center justify-center gap-1.5 pt-3 pb-0.5 border-t mt-4 flex-wrap ${
-              isLight ? 'border-slate-200' : 'border-zinc-800'
-            }`}>
-              <span
-                className="px-3.5 py-1.5 rounded-full text-xs font-black shadow-sm text-white"
+            {/* Apple iOS Segmented Navigation Pill */}
+            <div className="pt-3 pb-0.5 border-t mt-4 border-zinc-200/60 dark:border-white/10 flex justify-center">
+              <nav
+                className="inline-flex items-center justify-center gap-1 p-1 rounded-full border backdrop-blur-md max-w-full flex-wrap"
                 style={{
-                  backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')',
-                  boxShadow: `0 3px 12px ${themeColor}55`,
+                  backgroundColor: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.06)',
+                  borderColor: isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.12)',
                 }}
               >
-                {accountType === 'public_figure' ? 'Profil & Liens' : 'Bio & Sorties'}
-              </span>
-
-              {accountStatus !== 'suspended' && accountType !== 'public_figure' && releases.length > 0 && (
-                <Link
-                  href={`/${username}/discographie`}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    isLight
-                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-white'
-                  }`}
+                <span
+                  className="apple-spring px-4 py-1.5 rounded-full text-xs font-bold shadow-md text-white transition-all cursor-default"
+                  style={{
+                    backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')',
+                    boxShadow: `0 2px 10px ${themeColor}60`,
+                  }}
                 >
-                  <Disc3 className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} />
-                  <span>Discographie</span>
-                  <span
-                    className="text-[10px] font-black px-1.5 py-0.2 rounded-full border text-white"
-                    style={{
-                      backgroundColor: themeColor,
-                      borderColor: 'transparent',
-                    }}
+                  {accountType === 'public_figure' ? 'Profil & Liens' : 'Bio & Sorties'}
+                </span>
+
+                {accountStatus !== 'suspended' && accountType !== 'public_figure' && releases.length > 0 && (
+                  <Link
+                    href={`/${username}/discographie`}
+                    className={`apple-spring flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                      isLight
+                        ? 'text-slate-700 hover:text-slate-900 hover:bg-black/5'
+                        : 'text-zinc-300 hover:text-white hover:bg-white/10'
+                    }`}
                   >
-                    {releases.length}
-                  </span>
-                </Link>
-              )}
+                    <Disc3 className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} />
+                    <span>Discographie</span>
+                    <span
+                      className="text-[10px] font-black px-1.5 py-0.2 rounded-full text-white"
+                      style={{ backgroundColor: themeColor }}
+                    >
+                      {releases.length}
+                    </span>
+                  </Link>
+                )}
 
-              {accountStatus !== 'suspended' && socialLinks.length > 0 && (
-                <a
-                  href="#reseaux-sociaux"
-                  className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    isLight
-                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-white'
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Réseaux Vérifiés</span>
-                </a>
-              )}
-            </nav>
+                {accountStatus !== 'suspended' && socialLinks.length > 0 && (
+                  <a
+                    href="#reseaux-sociaux"
+                    className={`apple-spring flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                      isLight
+                        ? 'text-slate-700 hover:text-slate-900 hover:bg-black/5'
+                        : 'text-zinc-300 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Réseaux Vérifiés</span>
+                  </a>
+                )}
+              </nav>
+            </div>
           </div>
         </div>
 

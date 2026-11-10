@@ -217,30 +217,33 @@ export function SocialLinks({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => handleLinkClick(link.platform)}
-              className={`group flex items-center justify-between w-full px-4 py-3.5 rounded-2xl transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 ${
+              className={`group apple-spring flex items-center justify-between w-full px-4 py-3.5 rounded-3xl transition-all duration-300 shadow-md hover:shadow-2xl hover:-translate-y-0.5 cursor-pointer ${
                 isLight
-                  ? 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-900'
-                  : 'bg-zinc-900/80 hover:bg-zinc-800/90 border border-zinc-800/90 text-white'
+                  ? 'apple-glass-light hover:bg-white text-slate-900'
+                  : 'apple-glass hover:bg-zinc-800/80 text-white'
               }`}
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-inner group-hover:scale-105 transition-transform"
+                  className="w-11 h-11 rounded-2xl flex items-center justify-center text-white flex-shrink-0 shadow-lg ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-300"
                   style={{ background: iconBg }}
                 >
                   <SocialIcon platform={link.platform} />
                 </div>
-                <div className="min-w-0">
-                  <div className={`text-sm font-bold flex items-center gap-1.5 truncate ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                <div className="min-w-0 text-left">
+                  <div className={`text-sm font-black tracking-tight flex items-center gap-1.5 truncate ${isLight ? 'text-slate-900' : 'text-white'}`}>
                     <span>{label}</span>
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500 inline" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500 inline flex-shrink-0" />
                   </div>
+                  <p className={`text-[10px] font-medium truncate ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                    {isWebsite ? 'Site officiel vérifié' : 'Compte officiel certifié'}
+                  </p>
                 </div>
               </div>
 
               {/* Colored Action Button matching platform branding */}
               <div
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all duration-200 group-hover:scale-105 group-hover:brightness-110 active:scale-95 shadow-sm"
+                className="apple-spring flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all duration-200 group-hover:scale-105 group-hover:brightness-110 active:scale-95 shadow-sm"
                 style={{
                   background: btnBg,
                   color: cfg.btnText,

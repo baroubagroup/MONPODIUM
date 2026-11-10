@@ -157,15 +157,15 @@ export function ReleasesCarousel({
           <Link
             key={rel.id}
             href={`/${username}/${rel.slug}`}
-            className={`group flex-shrink-0 w-[185px] sm:w-[205px] snap-start rounded-2xl p-2.5 border transition-all duration-200 shadow-sm hover:shadow-xl hover:-translate-y-1 active:scale-[0.97] press-scale cursor-pointer ${
+            className={`group apple-spring flex-shrink-0 w-[190px] sm:w-[210px] snap-start rounded-3xl p-3 border transition-all duration-300 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer ${
               isLight
-                ? 'bg-white hover:bg-slate-50 border-slate-200 text-slate-900'
-                : 'bg-zinc-900/90 hover:bg-zinc-850 border-white/10 text-white'
+                ? 'apple-glass-light hover:bg-white text-slate-900'
+                : 'apple-glass hover:bg-zinc-800/80 text-white'
             }`}
           >
-            {/* Square Cover */}
-            <div className={`relative aspect-square w-full rounded-xl overflow-hidden shadow-md ${
-              isLight ? 'bg-slate-100' : 'bg-zinc-950'
+            {/* Square Cover with Apple-style rounded corner and specular gloss */}
+            <div className={`relative aspect-square w-full rounded-2xl overflow-hidden shadow-md ring-1 ${
+              isLight ? 'bg-slate-100 ring-black/5' : 'bg-zinc-950 ring-white/10'
             }`}>
               <SafeImage
                 src={rel.cover_url}
@@ -174,23 +174,23 @@ export function ReleasesCarousel({
                 fallbackText={rel.title}
                 themeColor={themeColor}
                 isLight={isLight}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
               />
 
               {/* Release Type Badge */}
-              <div className="absolute top-2 left-2">
+              <div className="absolute top-2.5 left-2.5">
                 <span
-                  className="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[9px] font-black uppercase tracking-wider border border-white/10"
+                  className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-[9px] font-black uppercase tracking-wider border border-white/15 shadow-sm"
                   style={{ color: themeColor }}
                 >
                   {rel.release_type}
                 </span>
               </div>
 
-              {/* Play Overlay */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              {/* Play Overlay with spring animation */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 backdrop-blur-[2px] transition-all duration-300 flex items-center justify-center">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-xl transform scale-90 group-hover:scale-100 transition-transform"
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white shadow-2xl transform scale-75 group-hover:scale-100 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
                   style={{ backgroundColor: themeColor }}
                 >
                   <Play className="w-5 h-5 fill-white ml-0.5" />
@@ -199,14 +199,14 @@ export function ReleasesCarousel({
             </div>
 
             {/* Info */}
-            <div className="pt-2.5 space-y-1 text-left">
-              <h3 className="text-xs sm:text-sm font-bold truncate transition-colors">
+            <div className="pt-3 space-y-1 text-left">
+              <h3 className="text-xs sm:text-sm font-black tracking-tight truncate transition-colors">
                 {rel.title}
               </h3>
 
               {/* Platforms mini dots */}
-              <div className="flex items-center justify-between pt-0.5">
-                <div className="flex items-center gap-1">
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-1.5">
                   {rel.platform_links?.slice(0, 4).map((l) => {
                     const cfg = PLATFORMS.find((p) => p.id === l.platform)
                     return (

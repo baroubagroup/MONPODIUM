@@ -128,17 +128,20 @@ export function ShareProfileModal({
   ]
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div
-        className={`w-full max-w-md rounded-3xl border shadow-2xl p-5 sm:p-6 space-y-5 animate-in slide-in-from-bottom-6 duration-300 ${
-          isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900 border-zinc-800 text-white'
+        className={`w-full max-w-md rounded-[32px] border shadow-2xl p-5 sm:p-6 space-y-5 animate-in slide-in-from-bottom-8 duration-300 ${
+          isLight ? 'apple-glass-light text-slate-900' : 'apple-glass text-white'
         }`}
       >
+        {/* iOS Sheet Grab Indicator */}
+        <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-2 mb-2" />
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-zinc-800 dark:border-zinc-800/80">
+        <div className="flex items-center justify-between pb-2 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-2xl overflow-hidden border flex items-center justify-center shadow-md flex-shrink-0"
+              className="w-11 h-11 rounded-2xl overflow-hidden border-2 flex items-center justify-center shadow-lg flex-shrink-0"
               style={{ borderColor: themeColor }}
             >
               <SafeImage
@@ -151,7 +154,7 @@ export function ShareProfileModal({
               />
             </div>
             <div>
-              <h3 className="font-black text-base flex items-center gap-1.5">
+              <h3 className="font-black text-base tracking-tight flex items-center gap-1.5">
                 <span>Partager ce profil</span>
                 <Sparkles className="w-3.5 h-3.5" style={{ color: themeColor }} />
               </h3>
@@ -162,8 +165,9 @@ export function ShareProfileModal({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+            className={`apple-spring-subtle p-1.5 rounded-full transition-colors cursor-pointer ${
               isLight ? 'text-slate-400 hover:text-slate-700 hover:bg-slate-100' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
             }`}
             aria-label="Fermer"
@@ -179,15 +183,16 @@ export function ShareProfileModal({
           </label>
           <div
             className={`flex items-center justify-between gap-2 p-2.5 rounded-2xl border transition-all ${
-              isLight ? 'bg-slate-50 border-slate-200' : 'bg-zinc-950 border-zinc-800'
+              isLight ? 'bg-slate-50/80 border-slate-200' : 'bg-zinc-950/80 border-white/10'
             }`}
           >
             <span className="text-xs font-mono truncate px-1 text-emerald-600 dark:text-emerald-400 font-semibold">
               {profileUrl}
             </span>
             <button
+              type="button"
               onClick={handleCopyLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-xs transition-all press-scale cursor-pointer flex-shrink-0"
+              className="apple-spring flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white shadow-xs cursor-pointer flex-shrink-0"
               style={{ backgroundColor: themeColor }}
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -210,7 +215,7 @@ export function ShareProfileModal({
                   href={ch.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all press-scale shadow-sm ${ch.bg} ${ch.text}`}
+                  className={`apple-spring flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold shadow-md ${ch.bg} ${ch.text}`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">{ch.action}</span>
@@ -223,8 +228,9 @@ export function ShareProfileModal({
         {/* Native Mobile Share Sheet Button */}
         {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
           <button
+            type="button"
             onClick={handleNativeShare}
-            className={`w-full py-2.5 rounded-2xl text-xs font-bold border transition-colors flex items-center justify-center gap-2 cursor-pointer ${
+            className={`apple-spring w-full py-2.5 rounded-2xl text-xs font-bold border transition-colors flex items-center justify-center gap-2 cursor-pointer ${
               isLight
                 ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
                 : 'bg-zinc-800/80 hover:bg-zinc-800 border-zinc-700 text-zinc-200'

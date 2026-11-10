@@ -122,21 +122,21 @@ export function PWAInstallBanner({
 
   return (
     <>
-      {/* Floating Sticker Pill Dock at the bottom */}
+      {/* Floating Sticker Pill Dock at the bottom - Apple Dynamic Island Style */}
       <aside
         aria-label="Application mobile de l'artiste"
-        className="fixed bottom-3 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[470px] z-[100] animate-in fade-in slide-in-from-bottom-4 duration-300 pointer-events-auto"
+        className="fixed bottom-3 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[480px] z-[100] animate-in fade-in slide-in-from-bottom-4 duration-300 pointer-events-auto"
       >
         <div
-          className={`relative rounded-2xl border p-2 sm:p-2.5 backdrop-blur-2xl overflow-hidden flex items-center justify-between gap-2.5 transition-colors ${
+          className={`relative rounded-3xl p-2.5 sm:p-3 overflow-hidden flex items-center justify-between gap-3 transition-all ${
             isLight
-              ? 'bg-white/95 border-slate-300 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.18),0_0_20px_rgba(16,185,129,0.15)] text-slate-900'
-              : 'bg-zinc-950/90 border-white/15 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.3)] text-white'
+              ? 'apple-dock-light text-slate-900'
+              : 'apple-dock text-white'
           }`}
         >
           {/* Subtle Ambient Color Glow */}
           <div
-            className="absolute -right-8 -top-8 w-28 h-28 rounded-full opacity-25 blur-2xl pointer-events-none"
+            className="absolute -right-8 -top-8 w-28 h-28 rounded-full opacity-30 blur-2xl pointer-events-none"
             style={{ backgroundColor: themeColor }}
           />
           <div
@@ -145,11 +145,11 @@ export function PWAInstallBanner({
           />
 
           {/* Left: App Icon & Name */}
-          <div className="flex items-center gap-2.5 min-w-0 flex-1 relative z-10">
+          <div className="flex items-center gap-3 min-w-0 flex-1 relative z-10">
             {/* App Icon */}
             <div
-              className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center shadow-md ${
-                isLight ? 'bg-slate-100 border border-slate-300' : 'bg-zinc-900 border border-white/20'
+              className={`relative w-11 h-11 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center shadow-lg transition-transform ${
+                isLight ? 'bg-slate-100 ring-2 ring-slate-200/80' : 'bg-zinc-900 ring-2 ring-white/15'
               }`}
             >
               <SafeImage
@@ -161,17 +161,17 @@ export function PWAInstallBanner({
                 isLight={isLight}
               />
               <div
-                className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-tl-md flex items-center justify-center shadow-xs"
+                className="absolute bottom-0 right-0 w-4 h-4 rounded-tl-lg flex items-center justify-center shadow-xs"
                 style={{ backgroundColor: themeColor }}
               >
-                <Smartphone className="w-2 h-2 text-white" />
+                <Smartphone className="w-2.5 h-2.5 text-white" />
               </div>
             </div>
 
             {/* Title & Badge */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className={`text-xs sm:text-sm font-black truncate drop-shadow-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                <span className={`text-xs sm:text-sm font-black truncate tracking-tight drop-shadow-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>
                   {appName}
                 </span>
                 <span
@@ -188,7 +188,7 @@ export function PWAInstallBanner({
               </div>
               <p className={`text-[10px] truncate flex items-center gap-1.5 font-medium ${isLight ? 'text-slate-600' : 'text-zinc-300'}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                <span className="truncate">Application officielle • Accès direct en 1 clic sans store</span>
+                <span className="truncate">Application officielle • Accès direct 1-clic</span>
               </p>
             </div>
           </div>
@@ -198,22 +198,22 @@ export function PWAInstallBanner({
             <button
               type="button"
               onClick={(e) => handleInstallClick(e)}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black text-white shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer z-20 pointer-events-auto"
+              className="apple-spring flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black text-white shadow-xl cursor-pointer z-20 pointer-events-auto"
               style={{
                 backgroundColor: themeColor,
-                boxShadow: `0 4px 15px ${themeColor}66`,
+                boxShadow: `0 4px 18px ${themeColor}60, 0 0 0 1px rgba(255,255,255,0.2) inset`,
               }}
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Installer l&apos;App</span>
+              <span>Installer</span>
             </button>
 
             {/* Dismiss X button */}
             <button
               type="button"
               onClick={() => setDismissed(true)}
-              className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
-                isLight ? 'text-slate-400 hover:text-slate-800 hover:bg-slate-200' : 'text-zinc-400 hover:text-white hover:bg-white/10'
+              className={`apple-spring-subtle w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                isLight ? 'text-slate-400 hover:text-slate-800 hover:bg-slate-200/80' : 'text-zinc-400 hover:text-white hover:bg-white/10'
               }`}
               title="Masquer"
               aria-label="Fermer"
@@ -224,26 +224,30 @@ export function PWAInstallBanner({
         </div>
       </aside>
 
-      {/* Elegant Installation Guide Modal */}
+      {/* Elegant Installation Guide Modal - iOS Sheet Design */}
       {showGuide && (
-        <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4 pointer-events-auto">
-          <div className="w-full max-w-sm rounded-3xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom duration-200">
+        <div className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-xl flex items-end sm:items-center justify-center p-3 sm:p-4 pointer-events-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-[32px] apple-dock border border-white/20 p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom-8 duration-300">
+            {/* iOS Sheet Grab Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-2 mb-3" />
+
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg ring-1 ring-white/20"
                   style={{ backgroundColor: themeColor }}
                 >
-                  <Smartphone className="w-4 h-4" />
+                  <Smartphone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-white">Installer {appName}</h3>
-                  <p className="text-[11px] text-zinc-400">Application PWA certifiée sécurisée</p>
+                  <h3 className="font-black text-base text-white tracking-tight">Installer {appName}</h3>
+                  <p className="text-[11px] text-zinc-400 font-medium">Application PWA officielle certifiée</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setShowGuide(false)}
-                className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+                className="apple-spring-subtle text-zinc-400 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors"
                 aria-label="Fermer"
               >
                 <X className="w-5 h-5" />

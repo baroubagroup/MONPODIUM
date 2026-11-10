@@ -126,16 +126,21 @@ export function ReportProfileModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xl flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div
-        className={`w-full max-w-md rounded-3xl border shadow-2xl p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-6 duration-300 ${
-          isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900 border-zinc-800 text-white'
+        className={`w-full max-w-md rounded-[32px] border shadow-2xl p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-6 duration-300 ${
+          isLight
+            ? 'apple-glass-light border-slate-200/90 text-slate-900 shadow-slate-200/80'
+            : 'apple-glass border-white/10 text-white shadow-2xl'
         }`}
       >
+        {/* iOS sheet grab bar indicator */}
+        <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-white/25 mx-auto -mt-2 mb-3" />
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-800 dark:border-zinc-800/80">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-200/70 dark:border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-red-500/20 text-red-500 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center flex-shrink-0">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
@@ -150,8 +155,8 @@ export function ReportProfileModal({
 
           <button
             onClick={onClose}
-            className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-              isLight ? 'text-slate-400 hover:text-slate-700 hover:bg-slate-100' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+            className={`p-1.5 rounded-full transition-all apple-spring active:scale-90 cursor-pointer ${
+              isLight ? 'text-slate-400 hover:text-slate-700 hover:bg-slate-100' : 'text-zinc-400 hover:text-white hover:bg-white/10'
             }`}
             aria-label="Fermer"
           >

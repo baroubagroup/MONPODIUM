@@ -44,6 +44,13 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     total_streams_preview: 28400,
     created_at: '2024-01-15T10:00:00Z',
     last_active_at: '2026-11-09T11:42:00Z',
+    social_links: [
+      { id: 'sl-h1', user_id: 'usr-himra', platform: 'whatsapp', url: 'https://wa.me/22507102030', title: 'WhatsApp Pro', display_order: 0 },
+      { id: 'sl-h2', user_id: 'usr-himra', platform: 'instagram', url: 'https://instagram.com/himra', title: 'Instagram Officiel', display_order: 1 },
+      { id: 'sl-h3', user_id: 'usr-himra', platform: 'facebook', url: 'https://facebook.com/himra', title: 'Facebook Officiel', display_order: 2 },
+      { id: 'sl-h4', user_id: 'usr-himra', platform: 'tiktok', url: 'https://tiktok.com/@himra', title: 'TikTok Officiel', display_order: 3 },
+      { id: 'sl-h5', user_id: 'usr-himra', platform: 'youtube', url: 'https://youtube.com/@himra', title: 'YouTube Officiel', display_order: 4 },
+    ],
   },
   {
     id: 'usr-1',
@@ -78,6 +85,13 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     total_streams_preview: 14850,
     created_at: '2024-01-15T10:00:00Z',
     last_active_at: '2026-11-09T09:15:00Z',
+    social_links: [
+      { id: 'sl-k1', user_id: 'usr-1', platform: 'whatsapp', url: 'https://wa.me/22507000000', title: 'WhatsApp Pro', display_order: 0 },
+      { id: 'sl-k2', user_id: 'usr-1', platform: 'instagram', url: 'https://instagram.com/ksbloom', title: 'Instagram Officiel', display_order: 1 },
+      { id: 'sl-k3', user_id: 'usr-1', platform: 'facebook', url: 'https://facebook.com/ksbloom', title: 'Facebook Officiel', display_order: 2 },
+      { id: 'sl-k4', user_id: 'usr-1', platform: 'tiktok', url: 'https://tiktok.com/@ksbloom', title: 'TikTok Officiel', display_order: 3 },
+      { id: 'sl-k5', user_id: 'usr-1', platform: 'youtube', url: 'https://youtube.com/@ksbloom', title: 'YouTube Officiel', display_order: 4 },
+    ],
   },
   {
     id: 'usr-2',
@@ -112,6 +126,13 @@ export const INITIAL_ADMIN_USERS: AdminArtistUser[] = [
     total_streams_preview: 9320,
     created_at: '2024-02-10T14:30:00Z',
     last_active_at: '2026-11-08T18:20:00Z',
+    social_links: [
+      { id: 'sl-l1', user_id: 'usr-2', platform: 'whatsapp', url: 'https://wa.me/22505123456', title: 'WhatsApp Pro', display_order: 0 },
+      { id: 'sl-l2', user_id: 'usr-2', platform: 'instagram', url: 'https://instagram.com/lamelo', title: 'Instagram Officiel', display_order: 1 },
+      { id: 'sl-l3', user_id: 'usr-2', platform: 'facebook', url: 'https://facebook.com/lamelo', title: 'Facebook Officiel', display_order: 2 },
+      { id: 'sl-l4', user_id: 'usr-2', platform: 'tiktok', url: 'https://tiktok.com/@lamelo', title: 'TikTok Officiel', display_order: 3 },
+      { id: 'sl-l5', user_id: 'usr-2', platform: 'youtube', url: 'https://youtube.com/@lamelo', title: 'YouTube Officiel', display_order: 4 },
+    ],
   },
   {
     id: 'usr-3',

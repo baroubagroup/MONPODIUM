@@ -13,7 +13,7 @@ import { ReleasesCarousel } from '@/components/artist/ReleasesCarousel'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { Release, SocialLink, PLATFORMS, AccountType } from '@/types'
 import { recordPageView } from '@/lib/tracker'
-import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { getPublicProfile, getArtistReleases, getDefaultSocialLinks } from '@/lib/authSync'
 import { INITIAL_ADMIN_USERS } from '@/lib/adminData'
 import { SafeImage } from '@/components/common/SafeImage'
 import { getCountryFlag } from '@/lib/countries'
@@ -77,6 +77,7 @@ function getInitialProfileSync(cleanUsername: string) {
     genres: ['Afrobeats'],
     verified: cleanUsername === 'himra' || cleanUsername === 'ksbloom',
     account_status: 'active',
+    social_links: getDefaultSocialLinks(cleanUsername),
   }
 }
 
@@ -153,6 +154,8 @@ function ArtistHubContent() {
         if (profile.booking_phone) setBookingPhone(profile.booking_phone)
         if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
           setSocialLinks(profile.social_links)
+        } else {
+          setSocialLinks(prev => (prev && prev.length > 0 ? prev : getDefaultSocialLinks(username, profile.id)))
         }
 
         // 2. Load releases specifically for musicians only
@@ -613,17 +616,19 @@ function ArtistHubContent() {
             )}
 
             {/* SECTION 2: RÉSEAUX SOCIAUX OFFICIELS (PROTÈGE CONTRE LES FAUX COMPTES) */}
-            {socialLinks.length > 0 && (
-              <div id="reseaux-sociaux" className="pt-2">
-                <SocialLinks
-                  links={socialLinks}
-                  artistName={artistName}
-                  artistUsername={username}
-                  themeMode={themeMode}
-                  themeColor={themeColor}
-                />
-              </div>
-            )}
+            <div id="reseaux-sociaux" className="pt-2">
+              <SocialLinks
+                links={
+                  socialLinks && socialLinks.some(l => l.url && l.url.trim() !== '')
+                    ? socialLinks
+                    : getDefaultSocialLinks(username)
+                }
+                artistName={artistName}
+                artistUsername={username}
+                themeMode={themeMode}
+                themeColor={themeColor}
+              />
+            </div>
           </>
         )}
       </main>

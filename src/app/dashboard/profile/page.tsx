@@ -26,7 +26,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { SocialPlatform, AccountType } from '@/types'
-import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
+import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured, formatSocialUrl } from '@/lib/authSync'
 import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
@@ -341,8 +341,15 @@ export default function ProfilePage() {
       booking_email: bookingEmail,
       booking_phone: bookingPhone,
       social_links: socialLinks
-        .filter(l => l.url.trim() !== '')
-        .map((l, idx) => ({ ...l, display_order: l.display_order ?? idx })),
+        .map((l, idx) => {
+          const rawUrl = (l.url || '').trim()
+          return {
+            ...l,
+            url: formatSocialUrl(l.platform, rawUrl),
+            display_order: l.display_order ?? idx,
+          }
+        })
+        .filter(l => l.url.trim() !== ''),
     }
 
     // 1. Sync to Supabase if available
@@ -1082,7 +1089,7 @@ export default function ProfilePage() {
                   </div>
 
                   <input
-                    type="url"
+                    type="text"
                     value={item.url}
                     onChange={(e) => handleSocialChange(item.platform, e.target.value)}
                     placeholder={netInfo.placeholder}

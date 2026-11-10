@@ -35,6 +35,86 @@ const STORAGE_KEY_RELEASES_PREFIX = 'monpodium_releases_'
 const STORAGE_KEY_ADMIN_USERS = 'monpodium_admin_users'
 
 /**
+ * Normalize and sanitize social media URLs, handles, or phone numbers
+ */
+export function formatSocialUrl(platform: string, raw: string): string {
+  const trimmed = (raw || '').trim()
+  if (!trimmed) return ''
+
+  // Already a full valid protocol URL
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+
+  // Handle WhatsApp (e.g. phone numbers like +225..., 07..., or wa.me/...)
+  if (platform === 'whatsapp') {
+    if (trimmed.includes('wa.me/')) {
+      return `https://${trimmed.replace(/^https?:\/\//, '')}`
+    }
+    const digitsOnly = trimmed.replace(/[^\d+]/g, '')
+    const cleanNum = digitsOnly.startsWith('+') ? digitsOnly.slice(1) : digitsOnly
+    return `https://wa.me/${cleanNum || '22507000000'}`
+  }
+
+  // Handle Instagram (@username or username or instagram.com/...)
+  if (platform === 'instagram') {
+    const handle = trimmed.replace(/^@/, '').replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '').replace(/\/$/, '')
+    return `https://instagram.com/${handle}`
+  }
+
+  // Handle Facebook (username or facebook.com/...)
+  if (platform === 'facebook') {
+    const handle = trimmed.replace(/^(https?:\/\/)?(www\.)?facebook\.com\//i, '').replace(/\/$/, '')
+    return `https://facebook.com/${handle}`
+  }
+
+  // Handle TikTok (@username or username)
+  if (platform === 'tiktok') {
+    const clean = trimmed.replace(/^(https?:\/\/)?(www\.)?tiktok\.com\/@?/i, '').replace(/\/$/, '')
+    const handle = clean.startsWith('@') ? clean : `@${clean}`
+    return `https://tiktok.com/${handle}`
+  }
+
+  // Handle YouTube (@channel or youtube.com/...)
+  if (platform === 'youtube') {
+    if (trimmed.includes('youtube.com/') || trimmed.includes('youtu.be/')) {
+      return `https://${trimmed.replace(/^https?:\/\//, '')}`
+    }
+    const handle = trimmed.startsWith('@') ? trimmed : `@${trimmed}`
+    return `https://youtube.com/${handle}`
+  }
+
+  // Handle Twitter / X
+  if (platform === 'twitter') {
+    const handle = trimmed.replace(/^@/, '').replace(/^(https?:\/\/)?(www\.)?(twitter\.com|x\.com)\//i, '').replace(/\/$/, '')
+    return `https://x.com/${handle}`
+  }
+
+  // Handle LinkedIn
+  if (platform === 'linkedin') {
+    if (trimmed.includes('linkedin.com/')) {
+      return `https://${trimmed.replace(/^https?:\/\//, '')}`
+    }
+    return `https://linkedin.com/in/${trimmed.replace(/^@/, '')}`
+  }
+
+  // Default web URL
+  return `https://${trimmed}`
+}
+
+export function getDefaultSocialLinks(username: string, userId?: string): SocialLink[] {
+  const clean = username.toLowerCase().trim()
+  const uid = userId || `usr-${clean}`
+  return [
+    { id: `sl-1-${clean}`, user_id: uid, platform: 'whatsapp', url: `https://wa.me/22507000000`, title: 'WhatsApp Pro', display_order: 0 },
+    { id: `sl-2-${clean}`, user_id: uid, platform: 'instagram', url: `https://instagram.com/${clean}`, title: 'Instagram Officiel', display_order: 1 },
+    { id: `sl-3-${clean}`, user_id: uid, platform: 'facebook', url: `https://facebook.com/${clean}`, title: 'Facebook Officiel', display_order: 2 },
+    { id: `sl-4-${clean}`, user_id: uid, platform: 'tiktok', url: `https://tiktok.com/@${clean}`, title: 'TikTok Officiel', display_order: 3 },
+    { id: `sl-5-${clean}`, user_id: uid, platform: 'youtube', url: `https://youtube.com/@${clean}`, title: 'YouTube Officiel', display_order: 4 },
+  ]
+}
+
+/**
  * Checks if Supabase has real configured credentials (not placeholder)
  */
 export function isSupabaseConfigured(): boolean {
@@ -53,7 +133,16 @@ export function isSupabaseConfigured(): boolean {
  * Get current authenticated user profile across Supabase and local storage
  */
 export async function getActiveUserProfile(): Promise<UserProfileData | null> {
-  // 1. Try Supabase Auth first if configured
+  // 1. Check local storage first for active user session data to prevent data loss
+  let localData: UserProfileData | null = null
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_USER)
+      if (raw) localData = JSON.parse(raw)
+    } catch {}
+  }
+
+  // 2. Try Supabase Auth first if configured
   if (isSupabaseConfigured()) {
     try {
       const supabase = createClient()
@@ -66,6 +155,30 @@ export async function getActiveUserProfile(): Promise<UserProfileData | null> {
           .single()
 
         if (profile) {
+          // Fetch social links from Supabase
+          const { data: supaLinks } = await supabase
+            .from('social_links')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('display_order', { ascending: true })
+
+          let dedicatedLocal: any = null
+          if (typeof window !== 'undefined') {
+            try {
+              const dRaw = localStorage.getItem(`monpodium_profile_${(profile.username || '').toLowerCase()}`)
+              if (dRaw) dedicatedLocal = JSON.parse(dRaw)
+            } catch {}
+          }
+
+          const effectiveLinks =
+            supaLinks && supaLinks.length > 0
+              ? supaLinks
+              : dedicatedLocal?.social_links && dedicatedLocal.social_links.length > 0
+              ? dedicatedLocal.social_links
+              : localData?.social_links && localData.social_links.length > 0
+              ? localData.social_links
+              : getDefaultSocialLinks(profile.username || 'artiste', user.id)
+
           const profileData: UserProfileData = {
             id: user.id,
             email: user.email || profile.email,
@@ -91,6 +204,7 @@ export async function getActiveUserProfile(): Promise<UserProfileData | null> {
             pwa_enabled: profile.pwa_enabled ?? true,
             pwa_name: profile.pwa_name || profile.artist_name,
             pwa_icon_url: profile.pwa_icon_url,
+            social_links: effectiveLinks,
           }
           // Mirror into local storage for zero-delay navigation
           if (typeof window !== 'undefined') {
@@ -105,14 +219,9 @@ export async function getActiveUserProfile(): Promise<UserProfileData | null> {
     }
   }
 
-  // 2. Read from localStorage if available
-  if (typeof window !== 'undefined') {
-    const raw = localStorage.getItem(STORAGE_KEY_USER)
-    if (raw) {
-      try {
-        return JSON.parse(raw)
-      } catch {}
-    }
+  // 3. Read from localStorage if available
+  if (localData) {
+    return localData
   }
 
   return null
@@ -125,8 +234,6 @@ export function registerInAdminUsers(user: UserProfileData) {
   if (typeof window === 'undefined') return
   try {
     const cleanUsername = user.username.toLowerCase().trim()
-    // Dedicated per-user key for 100% reliable instantaneous lookup
-    localStorage.setItem(`monpodium_profile_${cleanUsername}`, JSON.stringify(user))
 
     const raw = localStorage.getItem(STORAGE_KEY_ADMIN_USERS)
     const list: (AdminArtistUser & { banner_color?: string | null; social_links?: SocialLink[]; account_type?: AccountType })[] = raw ? JSON.parse(raw) : [...INITIAL_ADMIN_USERS]
@@ -134,6 +241,23 @@ export function registerInAdminUsers(user: UserProfileData) {
     const existingIdx = list.findIndex(
       (u) => u.username.toLowerCase() === cleanUsername
     )
+    const existingEntry = existingIdx >= 0 ? list[existingIdx] : null
+
+    // Determine final non-empty social links
+    const finalLinks =
+      user.social_links && user.social_links.length > 0
+        ? user.social_links
+        : existingEntry?.social_links && existingEntry.social_links.length > 0
+        ? existingEntry.social_links
+        : getDefaultSocialLinks(cleanUsername, user.id)
+
+    const userWithLinks = {
+      ...user,
+      social_links: finalLinks,
+    }
+
+    // Dedicated per-user key for 100% reliable instantaneous lookup
+    localStorage.setItem(`monpodium_profile_${cleanUsername}`, JSON.stringify(userWithLinks))
 
     const adminEntry = {
       id: user.id || `user-${cleanUsername}`,
@@ -167,7 +291,7 @@ export function registerInAdminUsers(user: UserProfileData) {
       is_flagged_impostor: false,
       moderation_report_count: 0,
       admin_notes: '',
-      social_links: user.social_links || [],
+      social_links: finalLinks,
     }
 
     if (existingIdx >= 0) {
@@ -230,7 +354,7 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
             ? links
             : localOverride?.social_links && localOverride.social_links.length > 0
             ? localOverride.social_links
-            : []
+            : getDefaultSocialLinks(cleanUsername, profile.id)
 
         return {
           id: profile.id,
@@ -272,6 +396,9 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
       const dedicatedRaw = localStorage.getItem(`monpodium_profile_${cleanUsername}`)
       if (dedicatedRaw) {
         const parsed: UserProfileData = JSON.parse(dedicatedRaw)
+        if (!parsed.social_links || parsed.social_links.length === 0) {
+          parsed.social_links = getDefaultSocialLinks(cleanUsername, parsed.id)
+        }
         return parsed
       }
 
@@ -280,6 +407,9 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
       if (currentDemo) {
         const parsed: UserProfileData = JSON.parse(currentDemo)
         if (parsed.username.toLowerCase() === cleanUsername) {
+          if (!parsed.social_links || parsed.social_links.length === 0) {
+            parsed.social_links = getDefaultSocialLinks(cleanUsername, parsed.id)
+          }
           return parsed
         }
       }
@@ -315,7 +445,9 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
             pwa_enabled: true,
             pwa_name: match.pwa_name || match.artist_name,
             pwa_icon_url: match.pwa_icon_url,
-            social_links: match.social_links || [],
+            social_links: match.social_links && match.social_links.length > 0
+              ? match.social_links
+              : getDefaultSocialLinks(cleanUsername, match.id),
           }
         }
       }
@@ -354,11 +486,31 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
       pwa_enabled: true,
       pwa_name: fallbackMatch.pwa_name || fallbackMatch.artist_name,
       pwa_icon_url: fallbackMatch.pwa_icon_url,
-      social_links: [],
+      social_links: (fallbackMatch as any).social_links && (fallbackMatch as any).social_links.length > 0
+        ? (fallbackMatch as any).social_links
+        : getDefaultSocialLinks(cleanUsername, fallbackMatch.id),
     }
   }
 
-  return null
+  // Priority 4: Default generated profile
+  return {
+    id: `usr-${cleanUsername}`,
+    email: `${cleanUsername}@monpodium.com`,
+    full_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
+    artist_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
+    username: cleanUsername,
+    account_type: 'musician',
+    bio: "Retrouvez ici toutes mes sorties officielles, mes clips et mes réseaux sociaux certifiés.",
+    genres: ['Afrobeats'],
+    country: "Côte d'Ivoire",
+    theme_color: '#10b981',
+    theme_mode: 'dark',
+    plan: 'free',
+    verified: false,
+    account_status: 'active',
+    pwa_enabled: true,
+    social_links: getDefaultSocialLinks(cleanUsername, `usr-${cleanUsername}`),
+  }
 }
 
 /**

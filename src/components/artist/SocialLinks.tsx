@@ -169,10 +169,11 @@ export function SocialLinks({
   themeMode = 'dark',
   themeColor = '#10b981',
 }: SocialLinksProps) {
-  if (!links || links.length === 0) return null
+  const validLinks = (links || []).filter(l => l && typeof l.url === 'string' && l.url.trim() !== '')
+  if (validLinks.length === 0) return null
 
   const isLight = themeMode === 'light'
-  const sortedLinks = [...links].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+  const sortedLinks = [...validLinks].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
 
   const handleLinkClick = (platform: SocialPlatform) => {
     if (artistUsername) {

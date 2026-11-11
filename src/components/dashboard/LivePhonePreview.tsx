@@ -165,7 +165,7 @@ export function LivePhonePreview({
             </div>
           </div>
 
-          {/* Hero Banner with Sticker Stamp */}
+          {/* Hero Banner */}
           <div
             className="w-full h-32 relative bg-zinc-950 overflow-hidden"
             style={{
@@ -175,30 +175,21 @@ export function LivePhonePreview({
             <div className={`absolute inset-0 bg-gradient-to-t ${
               isLight ? 'from-slate-100 via-slate-100/30' : 'from-black via-black/40'
             }`} />
-
-            {/* Sticker Stamp in preview */}
-            <div className="absolute top-2 right-2 z-10">
-              <span
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider text-white border border-white/80 shadow-md transform rotate-[2.5deg]"
-                style={{ backgroundColor: themeColor }}
-              >
-                ★ Sticker
-              </span>
-            </div>
           </div>
 
-          {/* Avatar & Profile Information (Die-Cut Sticker Photo) */}
+          {/* Avatar & Profile Information */}
           <div className="px-4 pb-6 pt-0 relative -mt-12 text-center space-y-3 z-10">
             {/* Avatar */}
             <div
-              className={`relative mx-auto w-24 h-24 rounded-[22px] overflow-hidden p-0.5 shadow-xl border-[3px] border-white ring-2 ring-black/20 ${
+              className={`relative mx-auto w-24 h-24 rounded-2xl overflow-hidden p-0.5 shadow-xl border-2 ${
                 isLight ? 'bg-white shadow-slate-300' : 'bg-zinc-950 shadow-black'
               }`}
               style={{
-                boxShadow: `0 0 25px ${themeColor}45, 0 10px 25px rgba(0,0,0,0.5)`,
+                borderColor: themeColor,
+                boxShadow: `0 0 20px ${themeColor}40, 0 8px 20px rgba(0,0,0,0.5)`,
               }}
             >
-              <div className="w-full h-full rounded-[16px] overflow-hidden bg-zinc-900">
+              <div className="w-full h-full rounded-xl overflow-hidden bg-zinc-900">
                 <SafeImage
                   src={avatarUrl}
                   alt={artistName}
@@ -219,11 +210,11 @@ export function LivePhonePreview({
                 <ShieldCheck className="w-4 h-4 text-blue-500 flex-shrink-0 fill-current" />
               </h3>
 
-              {/* Discrete Verified Sticker Pill */}
+              {/* Verified Pill */}
               <div className="flex justify-center pt-0.5">
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold border border-blue-400/50 bg-blue-500/15 text-blue-400 shadow-xs">
                   <ShieldCheck className="w-2.5 h-2.5" />
-                  <span>Sticker Certifié</span>
+                  <span>Compte Officiel Authentifié</span>
                 </span>
               </div>
 

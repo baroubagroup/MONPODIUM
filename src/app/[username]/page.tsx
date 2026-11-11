@@ -410,19 +410,15 @@ function ArtistHubContent() {
           </div>
         )}
 
-        {/* ULTRA DESIGN HERO: HEADER PROFIL SOUS FORME DE STICKER TACTILE */}
+        {/* Hero Card - Profil Artiste */}
         <div
-          className={`relative rounded-[36px] overflow-hidden border-[3px] transition-all backdrop-blur-2xl specular-edge group ${
+          className={`relative rounded-[32px] overflow-hidden border transition-all backdrop-blur-2xl specular-edge ${
             isLight
-              ? 'bg-white/95 border-white shadow-[0_20px_50px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.06),inset_0_2px_3px_rgba(255,255,255,1)] text-slate-900'
-              : 'bg-zinc-950/90 border-white/25 shadow-[0_25px_60px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.12),inset_0_2px_4px_rgba(255,255,255,0.25)] text-white'
+              ? 'bg-white/95 border-slate-200/80 shadow-2xl text-slate-900'
+              : 'bg-zinc-950/90 border-white/15 shadow-2xl text-white'
           }`}
         >
-          {/* Glossy vinyl reflection effect across sticker */}
-          <div className="pointer-events-none absolute -top-32 -left-32 w-80 h-80 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-full blur-2xl transform rotate-12 z-20" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.1] z-20" />
-
-          {/* Panoramic Cover Banner with Sticker Stamp */}
+          {/* Panoramic Cover Banner */}
           <div
             className="w-full h-48 sm:h-56 relative bg-zinc-950 overflow-hidden"
             style={{
@@ -430,36 +426,23 @@ function ArtistHubContent() {
               backgroundColor: '#09090b',
             }}
           >
-            {/* Gradient overlay for ultra sleek transition */}
+            {/* Gradient overlay */}
             <div className={`absolute inset-0 bg-gradient-to-t ${isLight ? 'from-white via-white/35 to-transparent' : 'from-zinc-950 via-zinc-950/40 to-transparent'}`} />
-
-            {/* Official Sticker Stamp - Macaron holographique en coin */}
-            <div className="absolute top-3.5 right-3.5 z-30">
-              <div
-                className="apple-spring inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xl border-2 border-white/90 transform rotate-[2.5deg] hover:rotate-0 transition-transform cursor-default select-none backdrop-blur-md"
-                style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
-                  boxShadow: '0 8px 24px -2px rgba(16, 185, 129, 0.55), 0 0 0 1px rgba(255,255,255,0.5)',
-                }}
-              >
-                <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
-                <span>Sticker Officiel</span>
-              </div>
-            </div>
           </div>
 
-          {/* Overlapping Avatar & Artist Header (Die-Cut Sticker Photo) */}
+          {/* Overlapping Avatar & Artist Header */}
           <div className="px-6 pb-6 pt-0 relative -mt-16 text-center space-y-4 z-20">
-            {/* Avatar styled like an embossed die-cut photo sticker */}
+            {/* Avatar */}
             <div
-              className={`relative mx-auto w-32 h-32 rounded-[28px] overflow-hidden p-1 shadow-2xl border-[3.5px] transition-all duration-300 transform group-hover:scale-[1.02] ${
-                isLight ? 'bg-white border-white ring-4 ring-slate-100 shadow-slate-300/60' : 'bg-zinc-950 border-white ring-4 ring-black/40 shadow-black'
+              className={`relative mx-auto w-32 h-32 rounded-3xl overflow-hidden p-1 shadow-2xl border-2 transition-all duration-300 ${
+                isLight ? 'bg-white border-white shadow-slate-300/60' : 'bg-zinc-950 border-white/20 shadow-black'
               }`}
               style={{
-                boxShadow: `0 0 35px ${themeColor}50, 0 16px 36px rgba(0,0,0,0.6)`,
+                borderColor: themeColor,
+                boxShadow: `0 0 25px ${themeColor}40, 0 12px 30px rgba(0,0,0,0.5)`,
               }}
             >
-              <div className="w-full h-full rounded-[22px] overflow-hidden bg-zinc-900">
+              <div className="w-full h-full rounded-2xl overflow-hidden bg-zinc-900">
                 <SafeImage
                   src={avatarUrl}
                   alt={artistName}

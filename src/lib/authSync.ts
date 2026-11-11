@@ -21,6 +21,10 @@ export interface UserProfileData {
   booking_email?: string | null
   booking_phone?: string | null
   booking_enabled?: boolean
+  tip_enabled?: boolean
+  tip_provider?: 'wave' | 'orange_money' | 'all'
+  tip_number?: string | null
+  tip_note?: string | null
   plan?: Plan
   verified?: boolean
   account_status?: 'active' | 'suspended' | 'banned'
@@ -198,6 +202,10 @@ export async function getActiveUserProfile(): Promise<UserProfileData | null> {
             booking_email: profile.booking_email,
             booking_phone: profile.booking_phone,
             booking_enabled: Boolean(profile.booking_email),
+            tip_enabled: profile.tip_enabled ?? dedicatedLocal?.tip_enabled ?? localData?.tip_enabled ?? false,
+            tip_provider: profile.tip_provider || dedicatedLocal?.tip_provider || localData?.tip_provider || 'wave',
+            tip_number: profile.tip_number || dedicatedLocal?.tip_number || localData?.tip_number || null,
+            tip_note: profile.tip_note || dedicatedLocal?.tip_note || localData?.tip_note || null,
             plan: profile.plan || 'free',
             verified: profile.is_verified || false,
             account_status: profile.account_status || 'active',
@@ -375,6 +383,10 @@ export async function getPublicProfile(username: string): Promise<UserProfileDat
           booking_email: localOverride?.booking_email || profile.booking_email,
           booking_phone: localOverride?.booking_phone || profile.booking_phone,
           booking_enabled: Boolean(localOverride?.booking_email || profile.booking_email),
+          tip_enabled: localOverride?.tip_enabled ?? profile.tip_enabled ?? false,
+          tip_provider: localOverride?.tip_provider || profile.tip_provider || 'wave',
+          tip_number: localOverride?.tip_number || profile.tip_number || null,
+          tip_note: localOverride?.tip_note || profile.tip_note || null,
           plan: profile.plan || 'free',
           verified: profile.is_verified || false,
           account_status: profile.account_status || 'active',

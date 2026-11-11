@@ -50,6 +50,10 @@ export interface User {
   booking_email: string | null
   booking_phone: string | null
   booking_enabled: boolean
+  tip_enabled?: boolean
+  tip_provider?: 'wave' | 'orange_money' | 'all'
+  tip_number?: string | null
+  tip_note?: string | null
   plan: Plan
   plan_expires_at: string | null
   theme_color: string

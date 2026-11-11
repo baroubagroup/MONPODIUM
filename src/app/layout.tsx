@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
+import { AudioPlayerProvider } from '@/context/AudioPlayerContext'
+import { FloatingPlayer } from '@/components/artist/FloatingPlayer'
 import './globals.css'
 
 const geistSans = Geist({
@@ -45,7 +47,10 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}>
-        {children}
+        <AudioPlayerProvider>
+          {children}
+          <FloatingPlayer />
+        </AudioPlayerProvider>
         <Toaster richColors position="top-center" closeButton duration={2500} />
       </body>
     </html>

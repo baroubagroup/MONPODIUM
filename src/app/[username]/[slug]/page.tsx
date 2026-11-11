@@ -273,7 +273,7 @@ function ReleaseDetailContent() {
           }`}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 group-hover:scale-125 transition-transform" />
-          <span>Plateforme officielle propulsée par</span>
+          <span>Propulsé par</span>
           <span className="text-emerald-500 font-extrabold group-hover:text-emerald-400 transition-colors">MonPodium</span>
         </a>
       </footer>

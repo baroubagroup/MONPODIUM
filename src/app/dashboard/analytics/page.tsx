@@ -8,7 +8,8 @@ import { AnalyticsTimeRange, ArtistDetailedAnalytics } from '@/types/analytics'
 import { computeArtistAnalytics, TIME_RANGE_LABELS } from '@/lib/analyticsEngine'
 import { Release } from '@/types'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
-import { getActiveUserProfile, getArtistReleases } from '@/lib/authSync'
+import { getActiveUserProfile, getArtistReleases, UserProfileData } from '@/lib/authSync'
+import { MediaKitModal } from '@/components/dashboard/MediaKitModal'
 import {
   BarChart3,
   TrendingUp,
@@ -35,10 +36,12 @@ export default function ArtistAnalyticsPage() {
   const [timeRange, setTimeRange] = useState<AnalyticsTimeRange>('30d')
   const [artistName, setArtistName] = useState('Artiste')
   const [username, setUsername] = useState('')
+  const [userProfile, setUserProfile] = useState<UserProfileData | null>(null)
   const [releases, setReleases] = useState<Release[]>([])
   const [analytics, setAnalytics] = useState<ArtistDetailedAnalytics | null>(null)
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isMediaKitOpen, setIsMediaKitOpen] = useState(false)
 
   // Load artist info & releases
   useEffect(() => {
@@ -47,6 +50,7 @@ export default function ArtistAnalyticsPage() {
       const currentUsername = profile?.username || 'artiste'
       const currentName = profile?.artist_name || 'Artiste'
 
+      setUserProfile(profile)
       setUsername(currentUsername)
       setArtistName(currentName)
 
@@ -141,6 +145,15 @@ export default function ArtistAnalyticsPage() {
             }`}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-500' : ''}`} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsMediaKitOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-md transition-all active:scale-95 cursor-pointer ml-1"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Media Kit Certifié</span>
           </button>
         </div>
       </div>
@@ -592,6 +605,25 @@ export default function ArtistAnalyticsPage() {
           </table>
         </div>
       </div>
+
+      {/* Media Kit Modal */}
+      {userProfile && (
+        <MediaKitModal
+          isOpen={isMediaKitOpen}
+          onClose={() => setIsMediaKitOpen(false)}
+          artistName={artistName}
+          username={username}
+          avatarUrl={userProfile.avatar_url}
+          bio={userProfile.bio}
+          country={userProfile.country}
+          genres={userProfile.genres || (userProfile.genre ? [userProfile.genre] : ['Afrobeats'])}
+          themeColor={userProfile.theme_color || '#10b981'}
+          bookingEmail={userProfile.booking_email}
+          bookingPhone={userProfile.booking_phone}
+          analytics={analytics}
+          releases={releases}
+        />
+      )}
     </div>
   )
 }

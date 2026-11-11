@@ -24,6 +24,9 @@ import {
   ArrowUp,
   ArrowDown,
   ExternalLink,
+  QrCode,
+  Smartphone,
+  Heart,
 } from 'lucide-react'
 import { SocialPlatform, AccountType } from '@/types'
 import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured, formatSocialUrl } from '@/lib/authSync'
@@ -31,6 +34,8 @@ import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
 import { CountrySelect } from '@/components/common/CountrySelect'
+import { LivePhonePreview } from '@/components/dashboard/LivePhonePreview'
+import { OfficialQRCodeModal } from '@/components/common/OfficialQRCodeModal'
 
 const PRESET_GENRES = [
   'Afrobeats',
@@ -153,6 +158,16 @@ export default function ProfilePage() {
   const [bookingEmail, setBookingEmail] = useState('')
   const [bookingPhone, setBookingPhone] = useState('')
 
+  // Fan Support / Tips (Wave & MoMo)
+  const [tipEnabled, setTipEnabled] = useState(false)
+  const [tipProvider, setTipProvider] = useState<'wave' | 'orange_money' | 'all'>('wave')
+  const [tipNumber, setTipNumber] = useState('')
+  const [tipNote, setTipNote] = useState('')
+
+  // Modals & Preview Drawer
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false)
+  const [showMobilePreview, setShowMobilePreview] = useState(false)
+
   // Social Links with position order
   const [socialLinks, setSocialLinks] = useState<{ platform: SocialPlatform; url: string; display_order?: number }[]>([
     { platform: 'whatsapp', url: '', display_order: 0 },
@@ -195,6 +210,10 @@ export default function ProfilePage() {
         else if (profile.booking_email) setBookingEnabled(true)
         if (profile.booking_email) setBookingEmail(profile.booking_email)
         if (profile.booking_phone) setBookingPhone(profile.booking_phone)
+        if (profile.tip_enabled !== undefined) setTipEnabled(profile.tip_enabled)
+        if (profile.tip_provider) setTipProvider(profile.tip_provider)
+        if (profile.tip_number) setTipNumber(profile.tip_number)
+        if (profile.tip_note) setTipNote(profile.tip_note)
         if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
           const sorted = [...profile.social_links].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
           setSocialLinks(sorted.map((item, idx) => ({ ...item, display_order: item.display_order ?? idx })))
@@ -340,6 +359,10 @@ export default function ProfilePage() {
       booking_enabled: bookingEnabled,
       booking_email: bookingEmail,
       booking_phone: bookingPhone,
+      tip_enabled: tipEnabled,
+      tip_provider: tipProvider,
+      tip_number: tipNumber,
+      tip_note: tipNote,
       social_links: socialLinks
         .map((l, idx) => {
           const rawUrl = (l.url || '').trim()
@@ -412,16 +435,56 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-300">
-      <div>
-        <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${
-          isLight ? 'text-slate-900' : 'text-white'
-        }`}>
-          Mon Profil & Page Bio
-        </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-          Personnalise ta couverture, ta photo de profil, tes styles musicaux et tes réseaux certifiés.
-        </p>
+    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
+      {/* Top Header with Quick Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${
+            isLight ? 'text-slate-900' : 'text-white'
+          }`}>
+            Mon Profil & Page Bio
+          </h1>
+          <p className={`text-xs sm:text-sm mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+            Personnalise ta couverture, ta photo de profil, tes styles musicaux et tes réseaux certifiés.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Mobile Preview Trigger */}
+          <button
+            type="button"
+            onClick={() => setShowMobilePreview(true)}
+            className="lg:hidden flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all cursor-pointer"
+          >
+            <Smartphone className="w-4 h-4" />
+            <span>Aperçu Mobile</span>
+          </button>
+
+          {/* Official HD QR Code Button */}
+          <button
+            type="button"
+            onClick={() => setIsQrModalOpen(true)}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+              isLight
+                ? 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800 shadow-sm'
+                : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-750 text-white'
+            }`}
+          >
+            <QrCode className="w-4 h-4 text-blue-500" />
+            <span>Mon QR Code HD</span>
+          </button>
+
+          {/* View Live Public Showcase */}
+          <a
+            href={`/${(username || 'artiste').toLowerCase().trim()}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition-all cursor-pointer"
+          >
+            <span>Voir en direct</span>
+            <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+          </a>
+        </div>
       </div>
 
       {saved && (
@@ -435,7 +498,11 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Main 2-Column Grid: Form + Live Phone Mockup */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Form Column */}
+        <div className="lg:col-span-7 space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
         {/* SELECTEUR DU TYPE DE COMPTE / AVATAR */}
         <div className={`rounded-3xl border p-5 sm:p-6 space-y-3 transition-all shadow-sm ${
           isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-zinc-900/90 border-zinc-800 text-white'
@@ -1203,6 +1270,112 @@ export default function ProfilePage() {
           )}
         </div>
 
+        {/* WAVE & MOBILE MONEY FAN SUPPORT / TIP SECTION */}
+        <div className={`p-6 rounded-3xl border transition-all ${
+          isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-zinc-900/60 border-zinc-800'
+        }`}>
+          <div className="flex items-center justify-between pb-3">
+            <div className="flex-1 pr-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🌊</span>
+                <h2 className={`text-sm font-bold flex items-center gap-2 ${
+                  isLight ? 'text-slate-900' : 'text-white'
+                }`}>
+                  <span>Soutien & Dons Directs des Fans (Wave / Mobile Money)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-500/15 text-cyan-500 border border-cyan-500/30">
+                    Direct & 0% Frais
+                  </span>
+                </h2>
+              </div>
+              <p className={`text-xs mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                Permets à tes fans et supporters de t'envoyer des dons et pourboires en 1 clic via Wave ou Mobile Money.
+              </p>
+            </div>
+
+            {/* Toggle Tipping */}
+            <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+              <input
+                type="checkbox"
+                checked={tipEnabled}
+                onChange={(e) => setTipEnabled(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-zinc-300 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+            </label>
+          </div>
+
+          {tipEnabled && (
+            <div className={`space-y-4 pt-4 border-t ${isLight ? 'border-slate-200' : 'border-zinc-800'}`}>
+              <div className="space-y-1">
+                <label className={`text-xs font-bold ${isLight ? 'text-cyan-700' : 'text-cyan-400'}`}>
+                  Moyen de paiement favori
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'wave', label: '🌊 Wave', desc: 'Lien direct 1-clic' },
+                    { id: 'orange_money', label: '🟠 Orange Money', desc: 'MoMo CI / SN' },
+                    { id: 'all', label: '⚡ Tous réseaux', desc: 'Wave + MoMo' },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setTipProvider(p.id as any)}
+                      className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${
+                        tipProvider === p.id
+                          ? 'border-cyan-500 bg-cyan-500/15 text-cyan-400 shadow-sm'
+                          : isLight
+                          ? 'border-slate-200 bg-slate-50 text-slate-700'
+                          : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <span className="block font-black">{p.label}</span>
+                      <span className="text-[10px] opacity-70 block">{p.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
+                  Numéro Wave / Mobile Money *
+                </label>
+                <input
+                  type="tel"
+                  required={tipEnabled}
+                  value={tipNumber}
+                  onChange={(e) => setTipNumber(e.target.value)}
+                  placeholder="Ex: +225 07 00 00 00 00"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
+                    isLight
+                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-cyan-500'
+                      : 'bg-zinc-950 border-zinc-800 text-white focus:border-cyan-500'
+                  }`}
+                />
+                <p className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-zinc-500'}`}>
+                  Indique l'indicatif international (ex: +225 pour la Côte d'Ivoire, +221 pour le Sénégal).
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <label className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
+                  Mot ou remerciement aux fans (Optionnel)
+                </label>
+                <input
+                  type="text"
+                  value={tipNote}
+                  onChange={(e) => setTipNote(e.target.value)}
+                  placeholder="Ex: Merci de soutenir mon art et mes prochains projets indépendants !"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${
+                    isLight
+                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-cyan-500'
+                      : 'bg-zinc-950 border-zinc-800 text-white focus:border-cyan-500'
+                  }`}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
         <button
           type="submit"
           className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer press-scale"
@@ -1212,5 +1385,85 @@ export default function ProfilePage() {
         </button>
       </form>
     </div>
+
+    {/* Right Column: Sticky Live iPhone Preview (Desktop) */}
+    <div className="hidden lg:block lg:col-span-5 sticky top-6 space-y-3">
+      <div className="flex items-center justify-between px-2">
+        <span className="text-xs font-bold text-zinc-400 flex items-center gap-1.5">
+          <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Aperçu iPhone en temps réel</span>
+        </span>
+        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold">
+          Live Sync 0ms
+        </span>
+      </div>
+
+      <LivePhonePreview
+        artistName={artistName}
+        username={username || 'artiste'}
+        accountType={accountType}
+        bio={bio}
+        country={country}
+        themeColor={customColor}
+        themeMode={themeMode}
+        avatarUrl={avatarUrl}
+        bannerUrl={coverMode === 'image' ? bannerUrl : null}
+        bannerColor={bannerColor}
+        genres={selectedGenres}
+        socialLinks={socialLinks}
+        bookingEnabled={bookingEnabled}
+        tipEnabled={tipEnabled}
+      />
+    </div>
+  </div>
+
+  {/* Mobile Preview Modal */}
+  {showMobilePreview && (
+    <div className="fixed inset-0 z-[140] bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center p-3 animate-in fade-in duration-200">
+      <div className="w-full max-w-sm flex items-center justify-between pb-3 text-white">
+        <span className="text-xs font-bold flex items-center gap-1.5">
+          <Smartphone className="w-4 h-4 text-emerald-400" />
+          <span>Rendu Mobile en Direct</span>
+        </span>
+        <button
+          onClick={() => setShowMobilePreview(false)}
+          className="p-1.5 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white"
+          aria-label="Fermer l'aperçu"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="overflow-y-auto max-h-[85vh] w-full flex justify-center">
+        <LivePhonePreview
+          artistName={artistName}
+          username={username || 'artiste'}
+          accountType={accountType}
+          bio={bio}
+          country={country}
+          themeColor={customColor}
+          themeMode={themeMode}
+          avatarUrl={avatarUrl}
+          bannerUrl={coverMode === 'image' ? bannerUrl : null}
+          bannerColor={bannerColor}
+          genres={selectedGenres}
+          socialLinks={socialLinks}
+          bookingEnabled={bookingEnabled}
+          tipEnabled={tipEnabled}
+        />
+      </div>
+    </div>
+  )}
+
+  {/* Official HD QR Code Modal */}
+  <OfficialQRCodeModal
+    isOpen={isQrModalOpen}
+    onClose={() => setIsQrModalOpen(false)}
+    artistName={artistName || 'Artiste'}
+    username={(username || 'artiste').toLowerCase().trim()}
+    avatarUrl={avatarUrl}
+    themeColor={customColor}
+    isLight={isLight}
+  />
+</div>
   )
 }

@@ -8,6 +8,8 @@ import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
 import { BookingModal } from '@/components/artist/BookingModal'
 import { ShareProfileModal } from '@/components/artist/ShareProfileModal'
 import { ReportProfileModal } from '@/components/artist/ReportProfileModal'
+import { OfficialQRCodeModal } from '@/components/common/OfficialQRCodeModal'
+import { TipModal } from '@/components/artist/TipModal'
 import { SocialLinks } from '@/components/artist/SocialLinks'
 import { ReleasesCarousel } from '@/components/artist/ReleasesCarousel'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
@@ -33,6 +35,8 @@ import {
   Moon,
   Lock,
   Flag,
+  QrCode,
+  Heart,
 } from 'lucide-react'
 
 function getInitialProfileSync(cleanUsername: string) {
@@ -106,6 +110,12 @@ function ArtistHubContent() {
   const [bookingEnabled, setBookingEnabled] = useState<boolean>(() => Boolean(initial.booking_email || initial.booking_enabled))
   const [bookingEmail, setBookingEmail] = useState<string | null>(() => initial.booking_email || null)
   const [bookingPhone, setBookingPhone] = useState<string | null>(() => initial.booking_phone || null)
+  const [tipEnabled, setTipEnabled] = useState<boolean>(() => Boolean(initial.tip_enabled))
+  const [tipProvider, setTipProvider] = useState<'wave' | 'orange_money' | 'all'>(() => initial.tip_provider || 'wave')
+  const [tipNumber, setTipNumber] = useState<string | null>(() => initial.tip_number || null)
+  const [tipNote, setTipNote] = useState<string | null>(() => initial.tip_note || null)
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false)
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false)
   const [pwaEnabled, setPwaEnabled] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -152,6 +162,10 @@ function ArtistHubContent() {
           setBookingEnabled(profile.booking_enabled ?? true)
         }
         if (profile.booking_phone) setBookingPhone(profile.booking_phone)
+        if (profile.tip_enabled !== undefined) setTipEnabled(profile.tip_enabled)
+        if (profile.tip_provider) setTipProvider(profile.tip_provider)
+        if (profile.tip_number) setTipNumber(profile.tip_number)
+        if (profile.tip_note) setTipNote(profile.tip_note)
         if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
           setSocialLinks(profile.social_links)
         } else {
@@ -346,6 +360,21 @@ function ArtistHubContent() {
               {isLight ? <Moon className="w-3.5 h-3.5" style={{ color: 'var(--artist-theme-color, ' + themeColor + ')' }} /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
             </button>
 
+            {/* Official QR Code trigger button */}
+            <button
+              onClick={() => setIsQrModalOpen(true)}
+              className={`p-1.5 sm:px-3 sm:py-1.5 rounded-full border text-xs font-bold transition-all apple-spring active:scale-95 shadow-md cursor-pointer flex items-center gap-1.5 ${
+                isLight
+                  ? 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700'
+                  : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-750 text-zinc-300'
+              }`}
+              title="Afficher et télécharger le QR Code officiel"
+              aria-label="QR Code Officiel"
+            >
+              <QrCode className="w-3.5 h-3.5 text-blue-500" />
+              <span className="hidden sm:inline">QR Code</span>
+            </button>
+
             {/* Partager modal trigger button */}
             <button
               onClick={() => setIsShareModalOpen(true)}
@@ -467,24 +496,18 @@ function ArtistHubContent() {
                     style={
                       isLight
                         ? {
-                            backgroundColor: `${themeColor}14`,
-                            borderColor: `${themeColor}35`,
+                            backgroundColor: `${themeColor}15`,
+                            borderColor: `${themeColor}40`,
                             color: themeColor,
                           }
                         : {
-                            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                            borderColor: 'rgba(255, 255, 255, 0.16)',
+                            backgroundColor: themeColor,
+                            borderColor: 'rgba(255, 255, 255, 0.25)',
                             color: '#ffffff',
-                            boxShadow: `0 2px 12px ${themeColor}25`,
+                            boxShadow: `0 3px 12px ${themeColor}45`,
                           }
                     }
                   >
-                    {!isLight && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full mr-1.5 flex-shrink-0"
-                        style={{ backgroundColor: themeColor, boxShadow: `0 0 6px ${themeColor}` }}
-                      />
-                    )}
                     {g}
                   </span>
                 ))}
@@ -516,18 +539,41 @@ function ArtistHubContent() {
               </p>
             )}
 
-            {/* Booking Button (Only if enabled and account is active) */}
-            {accountStatus !== 'suspended' && bookingEnabled && bookingEmail && (
-              <div className="pt-1">
-                <BookingModal
-                  artistName={artistName}
-                  artistUsername={username}
-                  bookingEmail={bookingEmail}
-                  bookingPhone={bookingPhone}
-                  bookingEnabled={bookingEnabled}
-                  themeColor={themeColor}
-                  themeMode={themeMode}
-                />
+            {/* Action Buttons: Booking & Support / Tip */}
+            {accountStatus !== 'suspended' && ((bookingEnabled && bookingEmail) || (tipEnabled && tipNumber)) && (
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full max-w-md mx-auto">
+                {bookingEnabled && bookingEmail && (
+                  <div className="w-full sm:flex-1">
+                    <BookingModal
+                      artistName={artistName}
+                      artistUsername={username}
+                      bookingEmail={bookingEmail}
+                      bookingPhone={bookingPhone}
+                      bookingEnabled={bookingEnabled}
+                      themeColor={themeColor}
+                      themeMode={themeMode}
+                    />
+                  </div>
+                )}
+
+                {tipEnabled && tipNumber && (
+                  <div className="w-full sm:flex-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsTipModalOpen(true)}
+                      className="apple-spring w-full py-3 px-4 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md border cursor-pointer"
+                      style={{
+                        backgroundColor: '#1dc4f9',
+                        color: '#041d2e',
+                        borderColor: '#0284c7',
+                        boxShadow: '0 4px 14px rgba(29, 196, 249, 0.35)',
+                      }}
+                    >
+                      <span className="text-base leading-none">🌊</span>
+                      <span>Soutenir {accountType === 'public_figure' ? 'le créateur' : "l'artiste"}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -694,6 +740,32 @@ function ArtistHubContent() {
         themeColor={themeColor}
         isLight={isLight}
       />
+
+      {/* Official HD QR Code Modal */}
+      <OfficialQRCodeModal
+        isOpen={isQrModalOpen}
+        onClose={() => setIsQrModalOpen(false)}
+        artistName={artistName}
+        username={username}
+        avatarUrl={avatarUrl}
+        themeColor={themeColor}
+        isLight={isLight}
+      />
+
+      {/* Fan Support / Direct Tipping Modal */}
+      {tipNumber && (
+        <TipModal
+          isOpen={isTipModalOpen}
+          onClose={() => setIsTipModalOpen(false)}
+          artistName={artistName}
+          username={username}
+          tipNumber={tipNumber}
+          tipProvider={tipProvider}
+          tipNote={tipNote || undefined}
+          themeColor={themeColor}
+          isLight={isLight}
+        />
+      )}
     </div>
   )
 }

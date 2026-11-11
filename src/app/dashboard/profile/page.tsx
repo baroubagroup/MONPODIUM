@@ -33,7 +33,7 @@ import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured, forma
 import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
-import { syncPwaProfileToServer } from '@/lib/pwaClient'
+import { syncPwaProfileToServer, uploadImageToSupabaseIfConfigured } from '@/lib/pwaClient'
 import { CountrySelect } from '@/components/common/CountrySelect'
 import { LivePhonePreview } from '@/components/dashboard/LivePhonePreview'
 import { OfficialQRCodeModal } from '@/components/common/OfficialQRCodeModal'
@@ -339,9 +339,16 @@ export default function ProfilePage() {
     const current = localUser ? JSON.parse(localUser) : {}
 
     const cleanUser = (username || current.username || 'artiste').toLowerCase().trim()
+    const resolvedAvatarUrl = avatarUrl
+      ? await uploadImageToSupabaseIfConfigured(avatarUrl, 'avatar')
+      : avatarUrl
+    if (resolvedAvatarUrl && resolvedAvatarUrl !== avatarUrl) {
+      setAvatarUrl(resolvedAvatarUrl)
+    }
+
     const shouldMirrorAvatarToPwa =
       !current.pwa_icon_url || current.pwa_icon_url === current.avatar_url
-    const nextPwaIconUrl = shouldMirrorAvatarToPwa ? avatarUrl : current.pwa_icon_url
+    const nextPwaIconUrl = shouldMirrorAvatarToPwa ? resolvedAvatarUrl : current.pwa_icon_url
 
     const updated = {
       ...current,
@@ -357,8 +364,8 @@ export default function ProfilePage() {
       banner_color: bannerColor,
       theme_color: customColor,
       theme_mode: themeMode,
-      avatar_url: avatarUrl,
-      pwa_icon_url: nextPwaIconUrl || avatarUrl,
+      avatar_url: resolvedAvatarUrl,
+      pwa_icon_url: nextPwaIconUrl || resolvedAvatarUrl,
       pwa_name: current.pwa_name || artistName,
       booking_enabled: bookingEnabled,
       booking_email: bookingEmail,
@@ -398,8 +405,8 @@ export default function ProfilePage() {
             banner_color: bannerColor,
             theme_color: customColor,
             theme_mode: themeMode,
-            avatar_url: avatarUrl,
-            pwa_icon_url: nextPwaIconUrl || avatarUrl,
+            avatar_url: resolvedAvatarUrl,
+            pwa_icon_url: nextPwaIconUrl || resolvedAvatarUrl,
             pwa_name: current.pwa_name || artistName,
             booking_email: bookingEmail,
             booking_phone: bookingPhone,

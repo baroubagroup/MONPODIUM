@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Disc3, Sparkles, ArrowRight, Music2, User, Star, Mail, Lock, AlertCircle } from 'lucide-react'
 import { registerInAdminUsers, UserProfileData, isSupabaseConfigured } from '@/lib/authSync'
+import { syncPwaProfileToServer } from '@/lib/pwaClient'
 import { AccountType } from '@/types'
 import { CountrySelect } from '@/components/common/CountrySelect'
 
@@ -124,6 +125,7 @@ export default function RegisterPage() {
       // Start new user with their own fresh releases list
       localStorage.setItem('monpodium_releases', JSON.stringify([]))
       localStorage.setItem(`monpodium_releases_${cleanUsername}`, JSON.stringify([]))
+      await syncPwaProfileToServer(profileData, { force: true })
 
       router.push('/dashboard')
     } catch (err: unknown) {

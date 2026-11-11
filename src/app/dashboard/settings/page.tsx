@@ -6,7 +6,7 @@ import { useDashboardTheme } from '@/context/DashboardThemeContext'
 import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
-import { syncPwaProfileToServer } from '@/lib/pwaClient'
+import { syncPwaProfileToServer, uploadImageToSupabaseIfConfigured } from '@/lib/pwaClient'
 import {
   Smartphone,
   Globe,
@@ -116,6 +116,17 @@ export default function SettingsPage() {
     const localUser = localStorage.getItem('monpodium_demo_user')
     const current = localUser ? JSON.parse(localUser) : {}
     const cleanUser = (username || current.username || 'artiste').toLowerCase().trim()
+    const resolvedPwaIcon = pwaIconUrl
+      ? await uploadImageToSupabaseIfConfigured(pwaIconUrl, 'pwa-icon')
+      : null
+    const resolvedAvatar = avatarUrl
+      ? await uploadImageToSupabaseIfConfigured(avatarUrl, 'avatar')
+      : null
+    if (resolvedPwaIcon && resolvedPwaIcon !== pwaIconUrl) setPwaIconUrl(resolvedPwaIcon)
+    if (resolvedAvatar && resolvedAvatar !== avatarUrl) setAvatarUrl(resolvedAvatar)
+
+    const effectiveIcon = resolvedPwaIcon || resolvedAvatar || current.pwa_icon_url || current.avatar_url
+    const effectiveAvatar = resolvedAvatar || resolvedPwaIcon || current.avatar_url
 
     const updated = {
       ...current,
@@ -124,8 +135,8 @@ export default function SettingsPage() {
       username: cleanUser,
       pwa_enabled: pwaEnabled,
       pwa_name: pwaName || artistName,
-      pwa_icon_url: pwaIconUrl || avatarUrl,
-      avatar_url: avatarUrl || pwaIconUrl || current.avatar_url,
+      pwa_icon_url: effectiveIcon,
+      avatar_url: effectiveAvatar,
       banner_url: bannerUrl || current.banner_url,
       theme_color: themeColor,
       theme_mode: themeMode,
@@ -137,8 +148,8 @@ export default function SettingsPage() {
         await supabase.from('profiles').update({
           pwa_enabled: pwaEnabled,
           pwa_name: pwaName || artistName,
-          pwa_icon_url: pwaIconUrl || avatarUrl,
-          avatar_url: avatarUrl || pwaIconUrl || current.avatar_url,
+          pwa_icon_url: effectiveIcon,
+          avatar_url: effectiveAvatar,
           banner_url: bannerUrl || current.banner_url,
           theme_color: themeColor,
           theme_mode: themeMode,

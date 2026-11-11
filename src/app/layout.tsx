@@ -47,6 +47,30 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (!window.__monpodiumPwaBootstrapped) {
+                    window.__monpodiumPwaBootstrapped = true;
+                    window.addEventListener('beforeinstallprompt', function(e) {
+                      e.preventDefault();
+                      window.__pwaPrompt = e;
+                      window.dispatchEvent(new Event('monpodium:pwa-prompt-ready'));
+                    });
+                    window.addEventListener('appinstalled', function() {
+                      window.__pwaPrompt = null;
+                    });
+                    if ('serviceWorker' in navigator) {
+                      navigator.serviceWorker.register('/sw.js').catch(function() {});
+                    }
+                  }
+                } catch (err) {}
+              })();
+            `,
+          }}
+        />
         <AudioPlayerProvider>
           {children}
           <FloatingPlayer />

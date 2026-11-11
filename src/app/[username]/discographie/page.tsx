@@ -73,9 +73,11 @@ function DiscographyContent() {
       }
     }
     loadDiscography()
+  }, [username])
 
+  useEffect(() => {
     document.title = `Discographie complète — ${artistName} (MonPodium)`
-  }, [artistName, username])
+  }, [artistName])
 
   useEffect(() => {
     applyArtistPwaHeadLinks(

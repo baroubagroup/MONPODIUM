@@ -31,9 +31,10 @@ export function PWAInstallBanner({
   const [isIOS, setIsIOS] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
   const [dismissed, setDismissed] = useState(false)
+  const [isPrompting, setIsPrompting] = useState(false)
 
   useEffect(() => {
-    // 1. Register service worker for Chromium PWA installability requirements
+    // 1. Register service worker immediately for Chromium PWA installability
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch((err) => {
         console.warn('MonPodium PWA SW register notice:', err)
@@ -54,10 +55,14 @@ export function PWAInstallBanner({
     const iosDevice = /iphone|ipad|ipod/.test(userAgent)
     setIsIOS(iosDevice)
 
-    // Check if prompt was already captured globally
-    if (typeof window !== 'undefined' && (window as any).__pwaPrompt) {
-      setDeferredPrompt((window as any).__pwaPrompt)
+    const syncFromWindowPrompt = () => {
+      if (typeof window !== 'undefined' && (window as any).__pwaPrompt) {
+        setDeferredPrompt((window as any).__pwaPrompt as BeforeInstallPromptEvent)
+      }
     }
+
+    // Pick up early beforeinstallprompt captured before React mounted
+    syncFromWindowPrompt()
 
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault()
@@ -68,19 +73,43 @@ export function PWAInstallBanner({
       }
     }
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
       setIsInstalled(true)
       setDeferredPrompt(null)
       if (typeof window !== 'undefined') {
         ;(window as any).__pwaPrompt = null
       }
-    })
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
+    window.addEventListener('monpodium:pwa-prompt-ready', syncFromWindowPrompt)
+    window.addEventListener('appinstalled', handleAppInstalled)
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
+      window.removeEventListener('monpodium:pwa-prompt-ready', syncFromWindowPrompt)
+      window.removeEventListener('appinstalled', handleAppInstalled)
     }
   }, [])
+
+  const triggerNativePrompt = async (promptEvent: BeforeInstallPromptEvent) => {
+    try {
+      await promptEvent.prompt()
+      const choice = await promptEvent.userChoice
+      if (choice && choice.outcome === 'accepted') {
+        setIsInstalled(true)
+        toast.success("Application installée avec succès sur votre écran d'accueil !")
+      }
+    } catch (err) {
+      console.error('PWA prompt error:', err)
+      setShowGuide(true)
+    } finally {
+      setDeferredPrompt(null)
+      if (typeof window !== 'undefined') {
+        ;(window as any).__pwaPrompt = null
+      }
+    }
+  }
 
   const handleInstallClick = async (e?: React.MouseEvent) => {
     if (e) {
@@ -90,29 +119,50 @@ export function PWAInstallBanner({
 
     const promptEvent =
       deferredPrompt ||
-      (typeof window !== 'undefined' ? (window as any).__pwaPrompt : null)
+      (typeof window !== 'undefined' ? ((window as any).__pwaPrompt as BeforeInstallPromptEvent | null) : null)
 
     if (promptEvent) {
-      try {
-        await promptEvent.prompt()
-        const choice = await promptEvent.userChoice
-        if (choice && choice.outcome === 'accepted') {
-          setIsInstalled(true)
-          toast.success("Application installée avec succès sur votre écran d'accueil !")
-        }
-      } catch (err) {
-        console.error('PWA prompt error:', err)
-        setShowGuide(true)
-      } finally {
-        setDeferredPrompt(null)
-        if (typeof window !== 'undefined') {
-          ;(window as any).__pwaPrompt = null
-        }
-      }
+      await triggerNativePrompt(promptEvent)
       return
     }
 
-    // Direct instructions guide display
+    // On Chromium/Android, if beforeinstallprompt is still arriving right after load, wait briefly before showing manual guide
+    if (!isIOS && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      setIsPrompting(true)
+      const waitedPrompt = await new Promise<BeforeInstallPromptEvent | null>((resolve) => {
+        let done = false
+        const finish = (ev: BeforeInstallPromptEvent | null) => {
+          if (done) return
+          done = true
+          window.removeEventListener('beforeinstallprompt', onBip)
+          window.removeEventListener('monpodium:pwa-prompt-ready', onReady)
+          clearTimeout(timer)
+          resolve(ev)
+        }
+        const onReady = () => {
+          const p = (window as any).__pwaPrompt as BeforeInstallPromptEvent | null
+          if (p) finish(p)
+        }
+        const onBip = (ev: Event) => {
+          ev.preventDefault()
+          const p = ev as BeforeInstallPromptEvent
+          ;(window as any).__pwaPrompt = p
+          finish(p)
+        }
+        window.addEventListener('beforeinstallprompt', onBip)
+        window.addEventListener('monpodium:pwa-prompt-ready', onReady)
+        const timer = setTimeout(() => {
+          finish(((window as any).__pwaPrompt as BeforeInstallPromptEvent | null) || null)
+        }, 1200)
+      })
+      setIsPrompting(false)
+
+      if (waitedPrompt) {
+        await triggerNativePrompt(waitedPrompt)
+        return
+      }
+    }
+
     setShowGuide(true)
   }
 
@@ -197,15 +247,16 @@ export function PWAInstallBanner({
           <div className="flex items-center gap-1.5 relative z-10 flex-shrink-0">
             <button
               type="button"
+              disabled={isPrompting}
               onClick={(e) => handleInstallClick(e)}
-              className="apple-spring flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black text-white shadow-xl cursor-pointer z-20 pointer-events-auto"
+              className="apple-spring flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black text-white shadow-xl cursor-pointer z-20 pointer-events-auto disabled:opacity-75"
               style={{
                 backgroundColor: themeColor,
                 boxShadow: `0 4px 18px ${themeColor}60, 0 0 0 1px rgba(255,255,255,0.2) inset`,
               }}
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Installer</span>
+              <span>{isPrompting ? 'Activation...' : 'Installer'}</span>
             </button>
 
             {/* Dismiss X button */}

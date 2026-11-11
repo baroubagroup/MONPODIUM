@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Disc3, ArrowRight, AlertCircle } from 'lucide-react'
 import { isSupabaseConfigured, UserProfileData, registerInAdminUsers } from '@/lib/authSync'
+import { syncPwaProfileToServer } from '@/lib/pwaClient'
 import { AdminArtistUser, INITIAL_ADMIN_USERS } from '@/lib/adminData'
 
 export default function LoginPage() {
@@ -68,10 +69,12 @@ export default function LoginPage() {
               account_status: profile.account_status || 'active',
               pwa_enabled: profile.pwa_enabled ?? true,
               pwa_name: profile.pwa_name || profile.artist_name,
+              pwa_icon_url: profile.pwa_icon_url || profile.avatar_url || null,
             }
             localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
             localStorage.setItem(`monpodium_profile_${profile.username.toLowerCase()}`, JSON.stringify(profileData))
             registerInAdminUsers(profileData)
+            await syncPwaProfileToServer(profileData, { force: true })
 
             // Fetch releases
             const { data: dbReleases } = await supabase
@@ -121,10 +124,12 @@ export default function LoginPage() {
           account_status: matchedUser.account_status || 'active',
           pwa_enabled: true,
           pwa_name: matchedUser.pwa_name || matchedUser.artist_name,
+          pwa_icon_url: matchedUser.pwa_icon_url || matchedUser.avatar_url || null,
           social_links: matchedUser.social_links || [],
         }
         localStorage.setItem('monpodium_demo_user', JSON.stringify(profileData))
         localStorage.setItem(`monpodium_profile_${matchedUser.username.toLowerCase()}`, JSON.stringify(profileData))
+        await syncPwaProfileToServer(profileData, { force: true })
 
         // Retrieve user specific releases or start empty
         const userReleases = localStorage.getItem(`monpodium_releases_${matchedUser.username}`)

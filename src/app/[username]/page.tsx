@@ -215,14 +215,16 @@ function ArtistHubContent() {
 
     loadArtistPage()
 
-    document.title = `${artistName} — Hub Officiel & Discographie`
-
     // Track public profile page view
     recordPageView({
       artistUsername: username,
       pagePath: window.location.pathname,
     })
-  }, [artistName, username])
+  }, [username])
+
+  useEffect(() => {
+    document.title = `${artistName} — Hub Officiel & Discographie`
+  }, [artistName])
 
   useEffect(() => {
     applyArtistPwaHeadLinks(

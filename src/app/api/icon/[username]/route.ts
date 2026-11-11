@@ -2,7 +2,14 @@ import React from 'react'
 import { NextRequest } from 'next/server'
 import { ImageResponse } from 'next/og'
 import { resolveServerArtistPwaProfile } from '@/lib/pwaServerStore'
-import { getEffectivePwaIconSource } from '@/lib/pwa'
+import {
+  decodeThumbToDataUri,
+  getEffectivePwaIconSource,
+  getPwaCookieName,
+  parseCompactPwaCookie,
+  sanitizeCompactThumbParam,
+  sanitizePublicHttpImageUrl,
+} from '@/lib/pwa'
 
 function parseRequestedSize(request: NextRequest): number {
   const raw = request.nextUrl.searchParams.get('size')
@@ -22,11 +29,44 @@ function getCacheHeaders(request: NextRequest, contentType = 'image/png'): Heade
   }
 }
 
-function renderRasterSquarePng(
+function isExactSquarePngBuffer(buf: Buffer, size: number): boolean {
+  if (buf.length < 24) return false
+  const isPng =
+    buf[0] === 0x89 &&
+    buf[1] === 0x50 &&
+    buf[2] === 0x4e &&
+    buf[3] === 0x47 &&
+    buf[4] === 0x0d &&
+    buf[5] === 0x0a &&
+    buf[6] === 0x1a &&
+    buf[7] === 0x0a
+  if (!isPng) return false
+  const width = buf.readUInt32BE(16)
+  const height = buf.readUInt32BE(20)
+  return width === size && height === size
+}
+
+function sniffRasterMime(buf: Buffer, rawContentType: string): 'image/png' | 'image/jpeg' | 'image/gif' | null {
+  if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
+    return 'image/png'
+  }
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
+    return 'image/jpeg'
+  }
+  if (buf.length >= 6 && buf.subarray(0, 6).toString('ascii').startsWith('GIF8')) {
+    return 'image/gif'
+  }
+  const ct = rawContentType.split(';')[0].trim().toLowerCase()
+  if (ct === 'image/png') return 'image/png'
+  if (ct === 'image/jpeg' || ct === 'image/jpg') return 'image/jpeg'
+  if (ct === 'image/gif') return 'image/gif'
+  return null
+}
+
+async function renderRasterSquarePngBytes(
   srcDataUri: string,
-  size: number,
-  headers: HeadersInit
-): Response {
+  size: number
+): Promise<ArrayBuffer> {
   const imageResponse = new ImageResponse(
     React.createElement(
       'div',
@@ -43,6 +83,8 @@ function renderRasterSquarePng(
       },
       React.createElement('img', {
         src: srcDataUri,
+        width: size,
+        height: size,
         alt: '',
         style: {
           width: '100%',
@@ -51,9 +93,41 @@ function renderRasterSquarePng(
         },
       })
     ),
-    { width: size, height: size, headers }
+    { width: size, height: size }
   )
-  return imageResponse
+  const out = await imageResponse.arrayBuffer()
+  if (out.byteLength < 64) {
+    throw new Error('Rendered PNG was unexpectedly empty')
+  }
+  return out
+}
+
+async function renderDataUriCandidate(
+  dataUri: string,
+  size: number,
+  headers: HeadersInit
+): Promise<Response | null> {
+  const match = dataUri.match(
+    /^\s*data:(image\/(?:png|jpeg|jpg|gif));(?:charset=[^;]+;)?base64,([A-Za-z0-9+/=\s]+)\s*$/i
+  )
+  if (!match) return null
+
+  try {
+    const rawMime = match[1].toLowerCase()
+    const mime = rawMime === 'image/jpg' ? 'image/jpeg' : rawMime
+    const cleanB64 = match[2].replace(/\s+/g, '')
+    const rawBuf = Buffer.from(cleanB64, 'base64')
+
+    if (mime === 'image/png' && isExactSquarePngBuffer(rawBuf, size)) {
+      return new Response(new Uint8Array(rawBuf), { headers })
+    }
+
+    const normalizedUri = `data:${mime};base64,${cleanB64}`
+    const pngBytes = await renderRasterSquarePngBytes(normalizedUri, size)
+    return new Response(pngBytes, { headers })
+  } catch {
+    return null
+  }
 }
 
 function renderFallbackBadgePng(
@@ -128,36 +202,48 @@ export async function GET(
   const size = parseRequestedSize(request)
   const headers = getCacheHeaders(request, 'image/png')
 
-  const profile = await resolveServerArtistPwaProfile(cleanUsername)
+  const cookieOverrides = parseCompactPwaCookie(
+    request.cookies.get(getPwaCookieName(cleanUsername))?.value
+  )
+  const querySrc = sanitizePublicHttpImageUrl(request.nextUrl.searchParams.get('src'))
+  const queryFb = sanitizeCompactThumbParam(request.nextUrl.searchParams.get('fb'))
+
+  const overrides =
+    querySrc || queryFb || cookieOverrides
+      ? {
+          ...cookieOverrides,
+          src: querySrc || cookieOverrides?.src || null,
+          fb: queryFb || cookieOverrides?.fb || null,
+        }
+      : null
+
+  const profile = await resolveServerArtistPwaProfile(cleanUsername, overrides)
   const artistName =
     cleanUsername === 'monpodium'
       ? 'MonPodium'
       : profile.pwa_name || profile.artist_name || cleanUsername
   const themeColor =
     cleanUsername === 'monpodium' ? '#9333ea' : profile.theme_color || '#10b981'
-  const appIconUrl = getEffectivePwaIconSource(profile)
 
-  // 1. Custom base64 Data URL (e.g. uploaded from dashboard)
+  const appIconUrl =
+    getEffectivePwaIconSource(profile) ||
+    querySrc ||
+    decodeThumbToDataUri(queryFb)
+
+  // 1. Custom base64 Data URL (from dashboard upload or server store)
   if (appIconUrl && appIconUrl.startsWith('data:image/')) {
-    const match = appIconUrl.match(/^data:(image\/(?:png|jpeg|jpg));base64,([A-Za-z0-9+/=]+)$/i)
-    if (match) {
-      try {
-        const mime = match[1].toLowerCase() === 'image/jpg' ? 'image/jpeg' : match[1].toLowerCase()
-        const normalizedUri = `data:${mime};base64,${match[2]}`
-        return renderRasterSquarePng(normalizedUri, size, headers)
-      } catch {
-        // Fall through to fallback
-      }
-    }
+    const rendered = await renderDataUriCandidate(appIconUrl, size, headers)
+    if (rendered) return rendered
   }
 
-  // 2. External HTTP(S) image URL (e.g. Unsplash, Supabase Storage, CDN)
-  if (appIconUrl && appIconUrl.startsWith('http')) {
+  // 2. External HTTP(S) image URL (Unsplash, Supabase Storage, CDN)
+  const safeRemoteUrl = sanitizePublicHttpImageUrl(appIconUrl)
+  if (safeRemoteUrl) {
     try {
-      let fetchUrl = appIconUrl
+      let fetchUrl = safeRemoteUrl
       let isUnsplashPng = false
       try {
-        const parsed = new URL(appIconUrl)
+        const parsed = new URL(safeRemoteUrl)
         if (parsed.hostname === 'images.unsplash.com') {
           parsed.searchParams.set('w', String(size))
           parsed.searchParams.set('h', String(size))
@@ -168,33 +254,44 @@ export async function GET(
           isUnsplashPng = true
         }
       } catch {
-        // Use raw URL
+        // Keep raw sanitized URL
       }
 
       const imgRes = await fetch(fetchUrl, {
-        headers: { Accept: 'image/png, image/jpeg, */*;q=0.1' },
+        headers: {
+          Accept: 'image/png, image/jpeg, */*;q=0.1',
+          'User-Agent': 'MonPodiumPWA/1.0',
+        },
         next: { revalidate: 86400 },
       })
 
       if (imgRes.ok) {
-        const rawCt = (imgRes.headers.get('content-type') || '').split(';')[0].trim().toLowerCase()
-        const arrayBuffer = await imgRes.arrayBuffer()
+        const rawCt = imgRes.headers.get('content-type') || ''
+        const buf = Buffer.from(await imgRes.arrayBuffer())
+        const sniffedMime = sniffRasterMime(buf, rawCt)
 
-        if (isUnsplashPng && rawCt === 'image/png') {
-          return new Response(arrayBuffer, { headers })
+        if ((isUnsplashPng || isExactSquarePngBuffer(buf, size)) && sniffedMime === 'image/png') {
+          return new Response(new Uint8Array(buf), { headers })
         }
 
-        if (rawCt === 'image/png' || rawCt === 'image/jpeg' || rawCt === 'image/jpg') {
-          const mime = rawCt === 'image/jpg' ? 'image/jpeg' : rawCt
-          const dataUri = `data:${mime};base64,${Buffer.from(arrayBuffer).toString('base64')}`
-          return renderRasterSquarePng(dataUri, size, headers)
+        if (sniffedMime) {
+          const dataUri = `data:${sniffedMime};base64,${buf.toString('base64')}`
+          const rendered = await renderRasterSquarePngBytes(dataUri, size)
+          return new Response(rendered, { headers })
         }
       }
     } catch {
-      // Fall through to initial badge PNG
+      // Fall through to compact fb thumbnail if available
     }
   }
 
-  // 3. Always return a real square PNG (iOS & Android PWA compatible)
+  // 3. Stateless compact photo fallback (?fb=...) across serverless containers / WebAPK
+  const fbDataUri = decodeThumbToDataUri(queryFb || overrides?.fb)
+  if (fbDataUri && fbDataUri !== appIconUrl) {
+    const rendered = await renderDataUriCandidate(fbDataUri, size, headers)
+    if (rendered) return rendered
+  }
+
+  // 4. Final fallback only when no artist photo exists anywhere
   return renderFallbackBadgePng(artistName, themeColor, size, headers)
 }

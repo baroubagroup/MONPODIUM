@@ -89,15 +89,17 @@ function ReleaseDetailContent() {
 
     loadReleasePage()
 
-    document.title = `${release.title} — ${artistName} (Liens Officiels)`
-
     // Track public single track page view
     recordPageView({
       artistUsername: username,
       pagePath: window.location.pathname,
       trackSlug: slug,
     })
-  }, [slug, release.title, artistName, username])
+  }, [slug, username])
+
+  useEffect(() => {
+    document.title = `${release.title} — ${artistName} (Liens Officiels)`
+  }, [release.title, artistName])
 
   useEffect(() => {
     applyArtistPwaHeadLinks(

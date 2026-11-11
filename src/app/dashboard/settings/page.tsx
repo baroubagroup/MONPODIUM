@@ -6,6 +6,7 @@ import { useDashboardTheme } from '@/context/DashboardThemeContext'
 import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured } from '@/lib/authSync'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
+import { syncPwaProfileToServer } from '@/lib/pwaClient'
 import {
   Smartphone,
   Globe,
@@ -61,7 +62,7 @@ export default function SettingsPage() {
     const file = e.target.files?.[0]
     if (file) {
       try {
-        const compressed = await compressImage(file, 400, 400, 0.85)
+        const compressed = await compressImage(file, 512, 512, 0.88, true)
         setPwaIconUrl(compressed)
         if (!avatarUrl) setAvatarUrl(compressed)
         toast.success('Icône PWA sélectionnée !')
@@ -76,7 +77,7 @@ export default function SettingsPage() {
     const file = e.target.files?.[0]
     if (file) {
       try {
-        const compressed = await compressImage(file, 400, 400, 0.85)
+        const compressed = await compressImage(file, 512, 512, 0.88, true)
         setAvatarUrl(compressed)
         if (!pwaIconUrl) setPwaIconUrl(compressed)
         toast.success('Photo de profil sélectionnée !')
@@ -150,6 +151,7 @@ export default function SettingsPage() {
     localStorage.setItem('monpodium_demo_user', JSON.stringify(updated))
     localStorage.setItem(`monpodium_profile_${cleanUser}`, JSON.stringify(updated))
     registerInAdminUsers(updated)
+    await syncPwaProfileToServer(updated, { force: true })
 
     setSaved(true)
     toast.success('Paramètres enregistrés !', {
@@ -440,7 +442,7 @@ export default function SettingsPage() {
                   }`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={pwaIconUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&auto=format&fit=crop&q=80'}
+                      src={pwaIconUrl || avatarUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&auto=format&fit=crop&q=80'}
                       alt="Icon Preview"
                       className="w-full h-full object-cover"
                     />

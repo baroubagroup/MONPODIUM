@@ -33,6 +33,7 @@ import { getActiveUserProfile, registerInAdminUsers, isSupabaseConfigured, forma
 import { SafeImage } from '@/components/common/SafeImage'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/imageCompressor'
+import { syncPwaProfileToServer } from '@/lib/pwaClient'
 import { CountrySelect } from '@/components/common/CountrySelect'
 import { LivePhonePreview } from '@/components/dashboard/LivePhonePreview'
 import { OfficialQRCodeModal } from '@/components/common/OfficialQRCodeModal'
@@ -227,7 +228,7 @@ export default function ProfilePage() {
     const file = e.target.files?.[0]
     if (file) {
       try {
-        const compressed = await compressImage(file, 400, 400, 0.85)
+        const compressed = await compressImage(file, 512, 512, 0.88, true)
         setAvatarUrl(compressed)
         toast.success('Photo de profil sélectionnée !')
       } catch (err) {
@@ -338,6 +339,9 @@ export default function ProfilePage() {
     const current = localUser ? JSON.parse(localUser) : {}
 
     const cleanUser = (username || current.username || 'artiste').toLowerCase().trim()
+    const shouldMirrorAvatarToPwa =
+      !current.pwa_icon_url || current.pwa_icon_url === current.avatar_url
+    const nextPwaIconUrl = shouldMirrorAvatarToPwa ? avatarUrl : current.pwa_icon_url
 
     const updated = {
       ...current,
@@ -354,7 +358,7 @@ export default function ProfilePage() {
       theme_color: customColor,
       theme_mode: themeMode,
       avatar_url: avatarUrl,
-      pwa_icon_url: current.pwa_icon_url || avatarUrl,
+      pwa_icon_url: nextPwaIconUrl || avatarUrl,
       pwa_name: current.pwa_name || artistName,
       booking_enabled: bookingEnabled,
       booking_email: bookingEmail,
@@ -395,6 +399,8 @@ export default function ProfilePage() {
             theme_color: customColor,
             theme_mode: themeMode,
             avatar_url: avatarUrl,
+            pwa_icon_url: nextPwaIconUrl || avatarUrl,
+            pwa_name: current.pwa_name || artistName,
             booking_email: bookingEmail,
             booking_phone: bookingPhone,
           }).eq('id', effectiveId)
@@ -426,6 +432,7 @@ export default function ProfilePage() {
     localStorage.setItem('monpodium_demo_user', JSON.stringify(updated))
     localStorage.setItem(`monpodium_profile_${cleanUser}`, JSON.stringify(updated))
     registerInAdminUsers(updated)
+    await syncPwaProfileToServer(updated, { force: true })
 
     setSaved(true)
     toast.success('Profil artiste mis à jour !', {

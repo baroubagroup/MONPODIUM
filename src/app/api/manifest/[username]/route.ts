@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { generateManifest } from '@/lib/pwa'
-import { INITIAL_ADMIN_USERS } from '@/lib/adminData'
-import { User } from '@/types'
+import { generateManifest, computePwaIconVersion, getEffectivePwaIconSource } from '@/lib/pwa'
+import { resolveServerArtistPwaProfile, saveSyncedPwaProfile } from '@/lib/pwaServerStore'
 
 export async function GET(
   request: NextRequest,
@@ -10,53 +8,52 @@ export async function GET(
 ) {
   const { username } = await params
   const cleanUsername = (username || '').toLowerCase().trim()
-  let profile: any = null
-
-  try {
-    const supabase = await createClient()
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('username', cleanUsername)
-      .single()
-    if (data) profile = data
-  } catch {}
-
-  const adminMatch = INITIAL_ADMIN_USERS.find(
-    (u) => u.username.toLowerCase() === cleanUsername
-  )
-
-  const artist: User = profile || adminMatch || {
-    id: `demo-${cleanUsername}`,
-    email: `${cleanUsername}@monpodium.com`,
-    full_name: cleanUsername,
-    artist_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
-    username: cleanUsername,
-    avatar_url: null,
-    banner_url: null,
-    banner_color: null,
-    bio: `Page officielle de ${cleanUsername}`,
-    genres: ['Musique'],
-    country: "Côte d'Ivoire",
-    booking_email: null,
-    booking_phone: null,
-    booking_enabled: false,
-    plan: 'free',
-    plan_expires_at: null,
-    theme_color: '#9333ea',
-    pwa_enabled: true,
-    pwa_name: cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1),
-    pwa_icon_url: null,
-    pwa_splash_url: null,
-    created_at: new Date().toISOString(),
-  }
-
+  const artist = await resolveServerArtistPwaProfile(cleanUsername)
   const manifest = generateManifest(artist)
 
   return new NextResponse(JSON.stringify(manifest), {
     headers: {
-      'Content-Type': 'application/manifest+json',
-      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      'Content-Type': 'application/manifest+json; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
     },
   })
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ username: string }> }
+) {
+  try {
+    const { username } = await params
+    const cleanUsername = (username || '').toLowerCase().trim()
+    if (!cleanUsername) {
+      return NextResponse.json({ error: 'Username required' }, { status: 400 })
+    }
+
+    const body = await request.json()
+    saveSyncedPwaProfile(cleanUsername, {
+      artist_name: body?.artist_name,
+      pwa_name: body?.pwa_name,
+      pwa_icon_url: body?.pwa_icon_url,
+      avatar_url: body?.avatar_url,
+      theme_color: body?.theme_color,
+      bio: body?.bio,
+    })
+
+    const resolved = await resolveServerArtistPwaProfile(cleanUsername)
+    const version = computePwaIconVersion(
+      resolved.artist_name,
+      resolved.pwa_name,
+      getEffectivePwaIconSource(resolved),
+      resolved.theme_color
+    )
+
+    return NextResponse.json({
+      ok: true,
+      version,
+      manifestUrl: `/api/manifest/${cleanUsername}?v=${version}`,
+    })
+  } catch {
+    return NextResponse.json({ error: 'Invalid PWA sync payload' }, { status: 400 })
+  }
 }

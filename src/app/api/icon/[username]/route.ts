@@ -1,6 +1,123 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { INITIAL_ADMIN_USERS } from '@/lib/adminData'
-import { createClient } from '@/lib/supabase/server'
+import React from 'react'
+import { NextRequest } from 'next/server'
+import { ImageResponse } from 'next/og'
+import { resolveServerArtistPwaProfile } from '@/lib/pwaServerStore'
+import { getEffectivePwaIconSource } from '@/lib/pwa'
+
+function parseRequestedSize(request: NextRequest): number {
+  const raw = request.nextUrl.searchParams.get('size')
+  const parsed = raw ? parseInt(raw, 10) : 512
+  if (!Number.isFinite(parsed) || parsed < 64) return 192
+  if (parsed > 1024) return 512
+  return parsed
+}
+
+function getCacheHeaders(request: NextRequest, contentType = 'image/png'): HeadersInit {
+  const hasVersion = Boolean(request.nextUrl.searchParams.get('v'))
+  return {
+    'Content-Type': contentType,
+    'Cache-Control': hasVersion
+      ? 'public, max-age=86400, stale-while-revalidate=604800'
+      : 'no-cache, must-revalidate',
+  }
+}
+
+function renderRasterSquarePng(
+  srcDataUri: string,
+  size: number,
+  headers: HeadersInit
+): Response {
+  const imageResponse = new ImageResponse(
+    React.createElement(
+      'div',
+      {
+        style: {
+          width: size,
+          height: size,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#09090b',
+          overflow: 'hidden',
+        },
+      },
+      React.createElement('img', {
+        src: srcDataUri,
+        alt: '',
+        style: {
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        },
+      })
+    ),
+    { width: size, height: size, headers }
+  )
+  return imageResponse
+}
+
+function renderFallbackBadgePng(
+  artistName: string,
+  themeColor: string,
+  size: number,
+  headers: HeadersInit
+): Response {
+  const initial = (artistName || 'M').trim().charAt(0).toUpperCase() || 'M'
+  const ringOuter = Math.round(size * 0.78)
+  const ringInner = Math.round(size * 0.56)
+  const fontSize = Math.round(size * 0.3)
+
+  return new ImageResponse(
+    React.createElement(
+      'div',
+      {
+        style: {
+          width: size,
+          height: size,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: `linear-gradient(135deg, ${themeColor} 0%, #18181b 65%, #09090b 100%)`,
+          position: 'relative',
+        },
+      },
+      React.createElement(
+        'div',
+        {
+          style: {
+            width: ringOuter,
+            height: ringOuter,
+            borderRadius: '9999px',
+            border: `${Math.max(2, Math.round(size * 0.01))}px solid rgba(255,255,255,0.12)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+        },
+        React.createElement(
+          'div',
+          {
+            style: {
+              width: ringInner,
+              height: ringInner,
+              borderRadius: '9999px',
+              backgroundColor: '#09090b',
+              border: `${Math.max(3, Math.round(size * 0.015))}px solid ${themeColor}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontSize,
+              fontWeight: 900,
+            },
+          },
+          initial
+        )
+      )
+    ),
+    { width: size, height: size, headers }
+  )
+}
 
 export async function GET(
   request: NextRequest,
@@ -8,122 +125,76 @@ export async function GET(
 ) {
   const { username } = await params
   const cleanUsername = (username || 'monpodium').toLowerCase().trim()
+  const size = parseRequestedSize(request)
+  const headers = getCacheHeaders(request, 'image/png')
 
-  let artistName = cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1)
-  let themeColor = '#9333ea'
-  let appIconUrl: string | null = null
+  const profile = await resolveServerArtistPwaProfile(cleanUsername)
+  const artistName =
+    cleanUsername === 'monpodium'
+      ? 'MonPodium'
+      : profile.pwa_name || profile.artist_name || cleanUsername
+  const themeColor =
+    cleanUsername === 'monpodium' ? '#9333ea' : profile.theme_color || '#10b981'
+  const appIconUrl = getEffectivePwaIconSource(profile)
 
-  // 1. Check in-memory admin/demo registry
-  const matchedUser = INITIAL_ADMIN_USERS.find(
-    (u) => u.username.toLowerCase() === cleanUsername
-  )
-  if (matchedUser) {
-    artistName = matchedUser.artist_name || artistName
-    themeColor = matchedUser.theme_color || '#9333ea'
-    appIconUrl = matchedUser.pwa_icon_url || matchedUser.avatar_url || null
-  }
-
-  // 2. Try Supabase if available
-  try {
-    const supabase = await createClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('artist_name, theme_color, pwa_icon_url, avatar_url')
-      .eq('username', cleanUsername)
-      .single()
-
-    if (profile) {
-      if (profile.artist_name) artistName = profile.artist_name
-      if (profile.theme_color) themeColor = profile.theme_color
-      if (profile.pwa_icon_url || profile.avatar_url) {
-        appIconUrl = profile.pwa_icon_url || profile.avatar_url
+  // 1. Custom base64 Data URL (e.g. uploaded from dashboard)
+  if (appIconUrl && appIconUrl.startsWith('data:image/')) {
+    const match = appIconUrl.match(/^data:(image\/(?:png|jpeg|jpg));base64,([A-Za-z0-9+/=]+)$/i)
+    if (match) {
+      try {
+        const mime = match[1].toLowerCase() === 'image/jpg' ? 'image/jpeg' : match[1].toLowerCase()
+        const normalizedUri = `data:${mime};base64,${match[2]}`
+        return renderRasterSquarePng(normalizedUri, size, headers)
+      } catch {
+        // Fall through to fallback
       }
     }
-  } catch {}
-
-  // Special brand fallback for monpodium
-  if (cleanUsername === 'monpodium') {
-    artistName = 'MonPodium'
-    themeColor = '#9333ea'
   }
 
-  // If the user has a custom base64 image data URL
-  if (appIconUrl && appIconUrl.startsWith('data:image/')) {
+  // 2. External HTTP(S) image URL (e.g. Unsplash, Supabase Storage, CDN)
+  if (appIconUrl && appIconUrl.startsWith('http')) {
     try {
-      const matches = appIconUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
-      if (matches && matches.length === 3) {
-        const mimeType = matches[1]
-        const buffer = Buffer.from(matches[2], 'base64')
-        return new Response(buffer, {
-          headers: {
-            'Content-Type': mimeType,
-            'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-          },
-        })
+      let fetchUrl = appIconUrl
+      let isUnsplashPng = false
+      try {
+        const parsed = new URL(appIconUrl)
+        if (parsed.hostname === 'images.unsplash.com') {
+          parsed.searchParams.set('w', String(size))
+          parsed.searchParams.set('h', String(size))
+          parsed.searchParams.set('fit', 'crop')
+          parsed.searchParams.set('fm', 'png')
+          parsed.searchParams.set('q', '85')
+          fetchUrl = parsed.toString()
+          isUnsplashPng = true
+        }
+      } catch {
+        // Use raw URL
       }
-    } catch {}
-  }
 
-  // If the user has an external image URL (e.g. Supabase Storage, CDN, Unsplash)
-  if (appIconUrl && appIconUrl.startsWith('http') && !appIconUrl.includes('placeholder')) {
-    try {
-      const imgRes = await fetch(appIconUrl, { next: { revalidate: 86400 } })
+      const imgRes = await fetch(fetchUrl, {
+        headers: { Accept: 'image/png, image/jpeg, */*;q=0.1' },
+        next: { revalidate: 86400 },
+      })
+
       if (imgRes.ok) {
-        const contentType = imgRes.headers.get('content-type') || 'image/jpeg'
+        const rawCt = (imgRes.headers.get('content-type') || '').split(';')[0].trim().toLowerCase()
         const arrayBuffer = await imgRes.arrayBuffer()
-        return new Response(arrayBuffer, {
-          headers: {
-            'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-          },
-        })
+
+        if (isUnsplashPng && rawCt === 'image/png') {
+          return new Response(arrayBuffer, { headers })
+        }
+
+        if (rawCt === 'image/png' || rawCt === 'image/jpeg' || rawCt === 'image/jpg') {
+          const mime = rawCt === 'image/jpg' ? 'image/jpeg' : rawCt
+          const dataUri = `data:${mime};base64,${Buffer.from(arrayBuffer).toString('base64')}`
+          return renderRasterSquarePng(dataUri, size, headers)
+        }
       }
-    } catch {}
+    } catch {
+      // Fall through to initial badge PNG
+    }
   }
 
-  // Dynamic Ultra-HD SVG App Icon (Custom initial, vinyl groove, theme color gradient)
-  const initial = artistName.trim().charAt(0).toUpperCase()
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${themeColor}" />
-      <stop offset="60%" stop-color="#18181b" />
-      <stop offset="100%" stop-color="#09090b" />
-    </linearGradient>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fbbf24" />
-      <stop offset="100%" stop-color="#f59e0b" />
-    </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.5" />
-    </filter>
-  </defs>
-
-  <!-- iOS / Android Squircle Base -->
-  <rect width="512" height="512" rx="115" fill="url(#bgGrad)" />
-
-  <!-- Outer Vinyl Rim -->
-  <circle cx="256" cy="256" r="210" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4" />
-  <circle cx="256" cy="256" r="185" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2" />
-  <circle cx="256" cy="256" r="160" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="3" />
-
-  <!-- Center Vinyl Disc Hub -->
-  <circle cx="256" cy="256" r="120" fill="#09090b" filter="url(#shadow)" stroke="${themeColor}" stroke-width="6" />
-
-  <!-- Artist Initial Typography -->
-  <text x="256" y="295" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="115" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-2">
-    ${initial}
-  </text>
-
-  <!-- Official Music Pod Sparkle Badge -->
-  <circle cx="340" cy="170" r="28" fill="${themeColor}" stroke="#ffffff" stroke-width="4" filter="url(#shadow)" />
-  <path d="M334 163v14c-1.2-.7-2.6-1-4-1-4.4 0-8 2.7-8 6s3.6 6 8 6 8-2.7 8-6v-13h10v-6h-14z" fill="#ffffff" />
-</svg>`
-
-  return new Response(svg, {
-    headers: {
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-    },
-  })
+  // 3. Always return a real square PNG (iOS & Android PWA compatible)
+  return renderFallbackBadgePng(artistName, themeColor, size, headers)
 }

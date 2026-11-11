@@ -12,6 +12,7 @@ import { Release, SocialLink } from '@/types'
 import { Share2, Check, ArrowLeft, Disc3, ShieldCheck, Sparkles } from 'lucide-react'
 import { recordPageView } from '@/lib/tracker'
 import { getPublicProfile, getArtistReleases, getDefaultSocialLinks } from '@/lib/authSync'
+import { applyArtistPwaHeadLinks } from '@/lib/pwaClient'
 import { SafeImage } from '@/components/common/SafeImage'
 
 function ReleaseDetailContent() {
@@ -23,9 +24,11 @@ function ReleaseDetailContent() {
   const [artistName, setArtistName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaName, setPwaName] = useState(username === 'himra' ? 'HIMRA' : username === 'ksbloom' ? 'KS Bloom' : username)
   const [pwaIconUrl, setPwaIconUrl] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [themeColor, setThemeColor] = useState('#10b981')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
+  const [isPwaProfileResolved, setIsPwaProfileResolved] = useState(false)
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => getDefaultSocialLinks(username))
 
   // Find release from database or storage
@@ -53,7 +56,10 @@ function ReleaseDetailContent() {
       if (profile) {
         if (profile.artist_name) setArtistName(profile.artist_name)
         setPwaName(profile.pwa_name || profile.artist_name)
-        if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
+        if (profile.avatar_url) setAvatarUrl(profile.avatar_url)
+        if (profile.pwa_icon_url || profile.avatar_url) {
+          setPwaIconUrl(profile.pwa_icon_url || profile.avatar_url || null)
+        }
         if (profile.theme_color) setThemeColor(profile.theme_color)
         if (profile.theme_mode) setThemeMode(profile.theme_mode)
         if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
@@ -70,6 +76,7 @@ function ReleaseDetailContent() {
         if (match) {
           setRelease(match)
         }
+        setIsPwaProfileResolved(true)
       } else if (username === 'himra' || username === 'ksbloom') {
         setSocialLinks(getDefaultSocialLinks(username))
         const userReleases = await getArtistReleases(username)
@@ -84,30 +91,6 @@ function ReleaseDetailContent() {
 
     document.title = `${release.title} — ${artistName} (Liens Officiels)`
 
-    let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
-    if (!manifestLink) {
-      manifestLink = document.createElement('link')
-      manifestLink.rel = 'manifest'
-      document.head.appendChild(manifestLink)
-    }
-    manifestLink.href = `/api/manifest/${username}`
-
-    let appleIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement
-    if (!appleIcon) {
-      appleIcon = document.createElement('link')
-      appleIcon.rel = 'apple-touch-icon'
-      document.head.appendChild(appleIcon)
-    }
-    appleIcon.href = `/api/icon/${username}`
-
-    let favIcon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
-    if (!favIcon) {
-      favIcon = document.createElement('link')
-      favIcon.rel = 'icon'
-      document.head.appendChild(favIcon)
-    }
-    favIcon.href = `/api/icon/${username}`
-
     // Track public single track page view
     recordPageView({
       artistUsername: username,
@@ -115,6 +98,20 @@ function ReleaseDetailContent() {
       trackSlug: slug,
     })
   }, [slug, release.title, artistName, username])
+
+  useEffect(() => {
+    applyArtistPwaHeadLinks(
+      {
+        username,
+        artist_name: artistName,
+        pwa_name: pwaName,
+        pwa_icon_url: pwaIconUrl,
+        avatar_url: avatarUrl,
+        theme_color: themeColor,
+      },
+      { isResolvedProfile: isPwaProfileResolved }
+    )
+  }, [username, artistName, pwaName, pwaIconUrl, avatarUrl, themeColor, isPwaProfileResolved])
 
   const copyUrl = () => {
     navigator.clipboard.writeText(window.location.href)

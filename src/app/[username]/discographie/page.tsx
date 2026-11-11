@@ -7,6 +7,7 @@ import { Release, Platform, PLATFORMS } from '@/types'
 import { PlatformIcon } from '@/components/artist/PlatformIcons'
 import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
 import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { applyArtistPwaHeadLinks } from '@/lib/pwaClient'
 import { SafeImage } from '@/components/common/SafeImage'
 import {
   ArrowLeft,
@@ -48,6 +49,7 @@ function DiscographyContent() {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
 
   const [releases, setReleases] = useState<Release[]>([])
+  const [isPwaProfileResolved, setIsPwaProfileResolved] = useState(false)
 
   useEffect(() => {
     const loadDiscography = async () => {
@@ -62,6 +64,7 @@ function DiscographyContent() {
 
         const userReleases = await getArtistReleases(username, profile.id)
         setReleases(userReleases)
+        setIsPwaProfileResolved(true)
       } else if (username === 'himra' || username === 'ksbloom') {
         const userReleases = await getArtistReleases(username)
         setReleases(userReleases)
@@ -72,31 +75,21 @@ function DiscographyContent() {
     loadDiscography()
 
     document.title = `Discographie complète — ${artistName} (MonPodium)`
-
-    let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
-    if (!manifestLink) {
-      manifestLink = document.createElement('link')
-      manifestLink.rel = 'manifest'
-      document.head.appendChild(manifestLink)
-    }
-    manifestLink.href = `/api/manifest/${username}`
-
-    let appleIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement
-    if (!appleIcon) {
-      appleIcon = document.createElement('link')
-      appleIcon.rel = 'apple-touch-icon'
-      document.head.appendChild(appleIcon)
-    }
-    appleIcon.href = `/api/icon/${username}`
-
-    let favIcon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
-    if (!favIcon) {
-      favIcon = document.createElement('link')
-      favIcon.rel = 'icon'
-      document.head.appendChild(favIcon)
-    }
-    favIcon.href = `/api/icon/${username}`
   }, [artistName, username])
+
+  useEffect(() => {
+    applyArtistPwaHeadLinks(
+      {
+        username,
+        artist_name: artistName,
+        pwa_name: pwaName,
+        pwa_icon_url: pwaIconUrl,
+        avatar_url: avatarUrl,
+        theme_color: themeColor,
+      },
+      { isResolvedProfile: isPwaProfileResolved }
+    )
+  }, [username, artistName, pwaName, pwaIconUrl, avatarUrl, themeColor, isPwaProfileResolved])
 
   // Handle in-page audio preview
   const handleTogglePlay = (rel: Release) => {

@@ -18,7 +18,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -168,8 +168,10 @@ button, a, input, select {
 }
 
 /* Specular light catch edge for cards and buttons */
-.specular-edge {
-  position: relative;
+@layer components {
+  .specular-edge {
+    position: relative;
+  }
 }
 .specular-edge::before {
   content: "";

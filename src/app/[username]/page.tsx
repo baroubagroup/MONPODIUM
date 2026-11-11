@@ -279,7 +279,7 @@ function ArtistHubContent() {
   return (
     <div
       style={{ '--artist-theme-color': themeColor } as React.CSSProperties}
-      className={`min-h-screen flex flex-col items-center justify-between relative overflow-x-hidden transition-colors duration-300 ${isLight ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#070709] text-white'}`}
+      className={`min-h-screen flex flex-col items-center justify-between relative overflow-x-clip transition-colors duration-300 ${isLight ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#070709] text-white'}`}
     >
       {/* Early inline script to guarantee zero-flash of unstyled or default colors */}
       <script
@@ -314,29 +314,29 @@ function ArtistHubContent() {
         style={{ backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')' }}
       />
 
-      {/* Top Floating Glass Navigation Bar */}
-      <header className={`sticky top-0 z-40 w-full backdrop-blur-2xl border-b py-3 px-4 transition-colors specular-edge ${isLight ? 'apple-glass-light border-slate-200/90 text-slate-900 shadow-xs' : 'apple-glass border-white/10 text-white'}`}>
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+      {/* Top Sticky Glass Navigation Bar */}
+      <header className={`sticky top-0 left-0 right-0 z-40 w-full backdrop-blur-2xl border-b py-3 px-4 transition-colors specular-edge ${isLight ? 'apple-glass-light border-slate-200/90 text-slate-900 shadow-xs' : 'apple-glass border-white/10 text-white'}`}>
+        <div className="max-w-lg mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-lg apple-spring"
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-lg apple-spring flex-shrink-0"
               style={{ backgroundColor: 'var(--artist-theme-color, ' + themeColor + ')' }}
             >
               <Disc3 className="w-4 h-4 animate-[spin_8s_linear_infinite]" />
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className={`font-black text-sm tracking-wide ${isLight ? 'text-slate-900' : 'text-white'}`}>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className={`font-black text-sm tracking-wide truncate ${isLight ? 'text-slate-900' : 'text-white'}`}>
                 {artistName}
               </span>
               {isVerified && (
-                <span title="Artiste officiel certifié">
+                <span title="Artiste officiel certifié" className="flex-shrink-0">
                   <ShieldCheck className="w-4 h-4 text-blue-500 inline" />
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Report discreet button */}
             <button
               onClick={() => setIsReportModalOpen(true)}
@@ -392,7 +392,7 @@ function ArtistHubContent() {
       </header>
 
       {/* Main Hub Container */}
-      <main className="w-full max-w-lg mx-auto px-4 pb-4 space-y-6 relative z-10 animate-in fade-in duration-300">
+      <main className="w-full max-w-lg mx-auto px-4 pt-4 sm:pt-5 pb-4 space-y-6 relative z-10 animate-in fade-in duration-300">
         {/* Moderation Suspension Security Notice */}
         {accountStatus === 'suspended' && (
           <div className="w-full p-4 rounded-3xl bg-red-950/90 border-2 border-red-500 text-red-200 text-xs flex items-start gap-3.5 shadow-2xl animate-pulse">

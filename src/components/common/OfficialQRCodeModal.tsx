@@ -5,21 +5,15 @@ import QRCode from 'qrcode'
 import {
   X,
   Download,
-  Share2,
   Copy,
   Check,
   ShieldCheck,
   Sparkles,
   QrCode as QrIcon,
-  Palette,
   Globe,
-  Wifi,
-  ExternalLink,
   Smartphone,
-  HelpCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { SafeImage } from '@/components/common/SafeImage'
 
 interface OfficialQRCodeModalProps {
   isOpen: boolean
@@ -30,8 +24,6 @@ interface OfficialQRCodeModalProps {
   themeColor?: string
   isLight?: boolean
 }
-
-type UrlMode = 'production' | 'wifi' | 'custom'
 
 export function OfficialQRCodeModal({
   isOpen,
@@ -45,41 +37,11 @@ export function OfficialQRCodeModal({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [dataUrl, setDataUrl] = useState<string>('')
   const [qrStyle, setQrStyle] = useState<'brand' | 'dark' | 'light'>('brand')
-  const [urlMode, setUrlMode] = useState<UrlMode>('production')
-  const [networkIp, setNetworkIp] = useState<string>('192.168.11.104')
-  const [customUrl, setCustomUrl] = useState<string>('')
   const [copied, setCopied] = useState(false)
 
-  // Fetch local Wi-Fi IP for direct local mobile scanning
-  useEffect(() => {
-    if (!isOpen) return
-    fetch('/api/network-ip')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.ip && data.ip !== '127.0.0.1') {
-          setNetworkIp(data.ip)
-        }
-      })
-      .catch(() => {})
-  }, [isOpen])
-
-  // Compute the exact URL to encode in the QR Code
+  // Pure, certified official public production URL
   const cleanUser = (username || 'artiste').toLowerCase().trim()
-
-  const profileUrl = React.useMemo(() => {
-    if (urlMode === 'production') {
-      return `https://monpodium.com/${cleanUser}`
-    }
-    if (urlMode === 'wifi') {
-      const port = typeof window !== 'undefined' && window.location.port ? `:${window.location.port}` : ':3000'
-      return `http://${networkIp}${port}/${cleanUser}`
-    }
-    if (urlMode === 'custom' && customUrl.trim()) {
-      const trimmed = customUrl.trim()
-      return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`
-    }
-    return `https://monpodium.com/${cleanUser}`
-  }, [urlMode, cleanUser, networkIp, customUrl])
+  const profileUrl = `https://monpodium.com/${cleanUser}`
 
   useEffect(() => {
     if (!isOpen) return
@@ -208,7 +170,7 @@ export function OfficialQRCodeModal({
   const copyUrl = () => {
     navigator.clipboard.writeText(profileUrl)
     setCopied(true)
-    toast.success('Lien copié dans le presse-papier !', {
+    toast.success('Lien officiel copié dans le presse-papier !', {
       description: profileUrl,
     })
     setTimeout(() => setCopied(false), 2500)
@@ -217,7 +179,7 @@ export function OfficialQRCodeModal({
   return (
     <div className="fixed inset-0 z-[160] bg-black/80 backdrop-blur-xl flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div
-        className={`w-full max-w-md rounded-[32px] border shadow-2xl p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-6 duration-300 max-h-[92vh] overflow-y-auto ${
+        className={`w-full max-w-sm rounded-[32px] border shadow-2xl p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-6 duration-300 max-h-[92vh] overflow-y-auto ${
           isLight
             ? 'apple-glass-light border-slate-200/90 text-slate-900 shadow-slate-200/80'
             : 'apple-glass border-white/10 text-white shadow-2xl'
@@ -241,7 +203,7 @@ export function OfficialQRCodeModal({
                 <ShieldCheck className="w-4 h-4 text-blue-500" />
               </h3>
               <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
-                {artistName} • Redirection directe vers le navigateur
+                {artistName} • Redirection directe navigateur
               </p>
             </div>
           </div>
@@ -257,56 +219,8 @@ export function OfficialQRCodeModal({
           </button>
         </div>
 
-        {/* DESTINATION SELECTOR: Production vs Local Wi-Fi */}
-        <div className="space-y-1.5">
-          <label className={`text-[11px] font-bold block ${isLight ? 'text-slate-700' : 'text-zinc-300'}`}>
-            Destination du QR Code (Reconnaissance Navigateur 1-Clic)
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setUrlMode('production')}
-              className={`p-2.5 rounded-2xl border text-left transition-all apple-spring active:scale-95 cursor-pointer ${
-                urlMode === 'production'
-                  ? 'border-emerald-500 bg-emerald-500/15 text-emerald-400 shadow-sm'
-                  : isLight
-                  ? 'bg-slate-50 border-slate-200 text-slate-700'
-                  : 'bg-white/5 border-white/10 text-zinc-300'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 font-bold text-xs">
-                <Globe className="w-3.5 h-3.5 flex-shrink-0 text-emerald-400" />
-                <span>Officiel Public</span>
-              </div>
-              <p className="text-[10px] opacity-70 mt-0.5 truncate">
-                monpodium.com/{cleanUser}
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setUrlMode('wifi')}
-              className={`p-2.5 rounded-2xl border text-left transition-all apple-spring active:scale-95 cursor-pointer ${
-                urlMode === 'wifi'
-                  ? 'border-cyan-500 bg-cyan-500/15 text-cyan-400 shadow-sm'
-                  : isLight
-                  ? 'bg-slate-50 border-slate-200 text-slate-700'
-                  : 'bg-white/5 border-white/10 text-zinc-300'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 font-bold text-xs">
-                <Wifi className="w-3.5 h-3.5 flex-shrink-0 text-cyan-400" />
-                <span>Test Wi-Fi Mobile</span>
-              </div>
-              <p className="text-[10px] opacity-70 mt-0.5 truncate">
-                {networkIp}:3000
-              </p>
-            </button>
-          </div>
-        </div>
-
         {/* Color Style Switcher */}
-        <div className="flex items-center justify-center gap-2 pt-1">
+        <div className="flex items-center justify-center gap-2">
           <button
             onClick={() => setQrStyle('brand')}
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all apple-spring active:scale-95 cursor-pointer border flex items-center gap-1.5 ${
@@ -342,22 +256,10 @@ export function OfficialQRCodeModal({
               <Sparkles className="w-3 h-3" />
               <span>Ouvre directement le navigateur mobile</span>
             </span>
-            <p className="text-[10px] text-zinc-600 font-mono font-medium truncate px-2">
+            <p className="text-[11px] text-zinc-700 font-mono font-bold truncate px-2">
               {profileUrl}
             </p>
           </div>
-        </div>
-
-        {/* Informative Tip */}
-        <div className={`p-3 rounded-2xl text-[11px] flex items-start gap-2 border ${
-          isLight ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-blue-950/40 border-blue-800/40 text-blue-200'
-        }`}>
-          <Smartphone className="w-4 h-4 flex-shrink-0 mt-0.5 text-blue-400" />
-          <span>
-            {urlMode === 'production'
-              ? 'L’appareil photo iOS et Android détecte automatiquement ce lien web et affiche la bannière jaune/bleue pour ouvrir Safari ou Chrome en 1 toucher.'
-              : `Connectez votre smartphone au même réseau Wi-Fi pour tester l'ouverture immédiate sur http://${networkIp}:3000.`}
-          </span>
         </div>
 
         {/* Action Buttons */}
@@ -383,7 +285,7 @@ export function OfficialQRCodeModal({
             }`}
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Lien copié !' : 'Copier l\'adresse URL exacte'}</span>
+            <span>{copied ? 'Lien officiel copié !' : 'Copier l\'adresse officielle'}</span>
           </button>
         </div>
       </div>

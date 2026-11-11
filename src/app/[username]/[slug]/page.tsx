@@ -7,10 +7,11 @@ import { toast } from 'sonner'
 import { PlatformButton } from '@/components/artist/PlatformButton'
 import { AudioPreview } from '@/components/artist/AudioPreview'
 import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
-import { Release } from '@/types'
+import { SocialLinks } from '@/components/artist/SocialLinks'
+import { Release, SocialLink } from '@/types'
 import { Share2, Check, ArrowLeft, Disc3, ShieldCheck, Sparkles } from 'lucide-react'
 import { recordPageView } from '@/lib/tracker'
-import { getPublicProfile, getArtistReleases } from '@/lib/authSync'
+import { getPublicProfile, getArtistReleases, getDefaultSocialLinks } from '@/lib/authSync'
 import { SafeImage } from '@/components/common/SafeImage'
 
 function ReleaseDetailContent() {
@@ -25,6 +26,7 @@ function ReleaseDetailContent() {
   const [themeColor, setThemeColor] = useState('#10b981')
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => getDefaultSocialLinks(username))
 
   // Find release from database or storage
   const [release, setRelease] = useState<Release>({
@@ -54,6 +56,11 @@ function ReleaseDetailContent() {
         if (profile.pwa_icon_url) setPwaIconUrl(profile.pwa_icon_url)
         if (profile.theme_color) setThemeColor(profile.theme_color)
         if (profile.theme_mode) setThemeMode(profile.theme_mode)
+        if (profile.social_links && Array.isArray(profile.social_links) && profile.social_links.length > 0) {
+          setSocialLinks(profile.social_links)
+        } else {
+          setSocialLinks(getDefaultSocialLinks(username, profile.id))
+        }
 
         // 2. Fetch releases for this artist
         const userReleases = await getArtistReleases(username, profile.id)
@@ -64,6 +71,7 @@ function ReleaseDetailContent() {
           setRelease(match)
         }
       } else if (username === 'himra' || username === 'ksbloom') {
+        setSocialLinks(getDefaultSocialLinks(username))
         const userReleases = await getArtistReleases(username)
         const match = userReleases.find(
           r => r.slug === slug || r.title.toLowerCase().replace(/\s+/g, '-') === slug
@@ -229,6 +237,21 @@ function ReleaseDetailContent() {
               themeMode={themeMode}
             />
           ))}
+        </div>
+
+        {/* Verified Official Social Media Links */}
+        <div className="pt-2 text-left">
+          <SocialLinks
+            links={
+              socialLinks && socialLinks.some(l => l.url && l.url.trim() !== '')
+                ? socialLinks
+                : getDefaultSocialLinks(username)
+            }
+            artistName={artistName}
+            artistUsername={username}
+            themeMode={themeMode}
+            themeColor={themeColor}
+          />
         </div>
 
         {/* Link to view full artist profile & other songs */}

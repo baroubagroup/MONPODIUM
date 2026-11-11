@@ -32,6 +32,69 @@ interface LivePhonePreviewProps {
   tipEnabled?: boolean
 }
 
+const SOCIAL_PREVIEW_STYLES: Record<string, { bg: string; btnBg: string; text: string; label: string }> = {
+  instagram: {
+    bg: 'linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%)',
+    btnBg: 'linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%)',
+    text: '#ffffff',
+    label: 'Instagram',
+  },
+  tiktok: {
+    bg: '#000000',
+    btnBg: 'linear-gradient(135deg, #00F2FE 0%, #FE0979 100%)',
+    text: '#ffffff',
+    label: 'TikTok',
+  },
+  youtube: {
+    bg: '#FF0000',
+    btnBg: '#FF0000',
+    text: '#ffffff',
+    label: 'YouTube',
+  },
+  facebook: {
+    bg: '#1877F2',
+    btnBg: '#1877F2',
+    text: '#ffffff',
+    label: 'Facebook',
+  },
+  twitter: {
+    bg: '#000000',
+    btnBg: '#1D9BF0',
+    text: '#ffffff',
+    label: 'X (Twitter)',
+  },
+  whatsapp: {
+    bg: '#25D366',
+    btnBg: '#25D366',
+    text: '#ffffff',
+    label: 'WhatsApp',
+  },
+  snapchat: {
+    bg: '#FFFC00',
+    btnBg: '#FFFC00',
+    text: '#000000',
+    label: 'Snapchat',
+  },
+  linkedin: {
+    bg: '#0A66C2',
+    btnBg: '#0A66C2',
+    text: '#ffffff',
+    label: 'LinkedIn',
+  },
+  telegram: {
+    bg: '#229ED9',
+    btnBg: '#229ED9',
+    text: '#ffffff',
+    label: 'Telegram',
+  },
+  threads: {
+    bg: '#101010',
+    btnBg: '#101010',
+    text: '#ffffff',
+    label: 'Threads',
+  },
+}
+
 export function LivePhonePreview({
   artistName,
   username,
@@ -217,26 +280,43 @@ export function LivePhonePreview({
                   Ajoute tes liens ci-contre pour les voir apparaître ici
                 </div>
               ) : (
-                validLinks.slice(0, 5).map((l, i) => (
-                  <div
-                    key={`${l.platform}-${i}`}
-                    className={`p-2 rounded-xl border flex items-center justify-between shadow-xs ${
-                      isLight ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-white">
-                        <PlatformIcon platform={l.platform as any} size={14} />
+                validLinks.slice(0, 5).map((l, i) => {
+                  const styleCfg = SOCIAL_PREVIEW_STYLES[l.platform] || {
+                    bg: themeColor,
+                    btnBg: themeColor,
+                    text: '#ffffff',
+                    label: l.platform,
+                  }
+                  return (
+                    <div
+                      key={`${l.platform}-${i}`}
+                      className={`p-2 rounded-xl border flex items-center justify-between shadow-xs ${
+                        isLight ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-white shadow-sm ring-1 ring-white/10"
+                          style={{ background: styleCfg.bg }}
+                        >
+                          <PlatformIcon platform={l.platform as any} size={14} />
+                        </div>
+                        <span className="text-xs font-bold capitalize">
+                          {styleCfg.label || l.platform}
+                        </span>
                       </div>
-                      <span className="text-xs font-bold capitalize">
-                        {l.platform}
+                      <span
+                        className="text-[9px] font-black px-2.5 py-0.5 rounded-full shadow-xs"
+                        style={{
+                          background: styleCfg.btnBg,
+                          color: styleCfg.text,
+                        }}
+                      >
+                        Accéder
                       </span>
                     </div>
-                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full text-white bg-emerald-500">
-                      Ouvrir
-                    </span>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </div>

@@ -165,9 +165,9 @@ export function LivePhonePreview({
             </div>
           </div>
 
-          {/* Hero Banner */}
+          {/* Hero Banner with Sticker Stamp */}
           <div
-            className="w-full h-32 relative bg-zinc-950"
+            className="w-full h-32 relative bg-zinc-950 overflow-hidden"
             style={{
               background: bannerUrl ? `url(${bannerUrl}) center/cover no-repeat` : bannerColor,
             }}
@@ -175,21 +175,30 @@ export function LivePhonePreview({
             <div className={`absolute inset-0 bg-gradient-to-t ${
               isLight ? 'from-slate-100 via-slate-100/30' : 'from-black via-black/40'
             }`} />
+
+            {/* Sticker Stamp in preview */}
+            <div className="absolute top-2 right-2 z-10">
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider text-white border border-white/80 shadow-md transform rotate-[2.5deg]"
+                style={{ backgroundColor: themeColor }}
+              >
+                ★ Sticker
+              </span>
+            </div>
           </div>
 
-          {/* Avatar & Profile Information */}
-          <div className="px-4 pb-6 pt-0 relative -mt-12 text-center space-y-3">
+          {/* Avatar & Profile Information (Die-Cut Sticker Photo) */}
+          <div className="px-4 pb-6 pt-0 relative -mt-12 text-center space-y-3 z-10">
             {/* Avatar */}
             <div
-              className={`relative mx-auto w-24 h-24 rounded-2xl overflow-hidden p-0.5 shadow-xl border-2 ${
-                isLight ? 'bg-white' : 'bg-zinc-950'
+              className={`relative mx-auto w-24 h-24 rounded-[22px] overflow-hidden p-0.5 shadow-xl border-[3px] border-white ring-2 ring-black/20 ${
+                isLight ? 'bg-white shadow-slate-300' : 'bg-zinc-950 shadow-black'
               }`}
               style={{
-                borderColor: themeColor,
-                boxShadow: `0 0 20px ${themeColor}40`,
+                boxShadow: `0 0 25px ${themeColor}45, 0 10px 25px rgba(0,0,0,0.5)`,
               }}
             >
-              <div className="w-full h-full rounded-[14px] overflow-hidden bg-zinc-900">
+              <div className="w-full h-full rounded-[16px] overflow-hidden bg-zinc-900">
                 <SafeImage
                   src={avatarUrl}
                   alt={artistName}
@@ -198,8 +207,8 @@ export function LivePhonePreview({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] border border-black shadow-sm">
-                <ShieldCheck className="w-3 h-3" />
+              <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] border border-white shadow-sm ring-1 ring-black/10">
+                <ShieldCheck className="w-3 h-3 fill-current" />
               </div>
             </div>
 
@@ -207,8 +216,16 @@ export function LivePhonePreview({
             <div className="space-y-1">
               <h3 className="text-lg font-black tracking-tight flex items-center justify-center gap-1 truncate">
                 <span>{artistName || 'Votre Nom'}</span>
-                <ShieldCheck className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-blue-500 flex-shrink-0 fill-current" />
               </h3>
+
+              {/* Discrete Verified Sticker Pill */}
+              <div className="flex justify-center pt-0.5">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold border border-blue-400/50 bg-blue-500/15 text-blue-400 shadow-xs">
+                  <ShieldCheck className="w-2.5 h-2.5" />
+                  <span>Sticker Certifié</span>
+                </span>
+              </div>
 
               {/* Tag Pills */}
               <div className="flex flex-wrap items-center justify-center gap-1 pt-0.5">

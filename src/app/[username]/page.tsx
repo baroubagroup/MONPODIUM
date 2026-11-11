@@ -410,33 +410,56 @@ function ArtistHubContent() {
           </div>
         )}
 
-        {/* ULTRA DESIGN HERO: COVER BANNER + OVERLAPPING AVATAR */}
-        <div className={`rounded-[32px] overflow-hidden border shadow-2xl backdrop-blur-2xl transition-all specular-edge ${isLight ? 'apple-glass-light border-slate-200/90 shadow-slate-200/80 text-slate-900' : 'apple-glass border-white/10 text-white'}`}>
-          {/* Panoramic Cover Banner */}
+        {/* ULTRA DESIGN HERO: HEADER PROFIL SOUS FORME DE STICKER TACTILE */}
+        <div
+          className={`relative rounded-[36px] overflow-hidden border-[3px] transition-all backdrop-blur-2xl specular-edge group ${
+            isLight
+              ? 'bg-white/95 border-white shadow-[0_20px_50px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.06),inset_0_2px_3px_rgba(255,255,255,1)] text-slate-900'
+              : 'bg-zinc-950/90 border-white/25 shadow-[0_25px_60px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.12),inset_0_2px_4px_rgba(255,255,255,0.25)] text-white'
+          }`}
+        >
+          {/* Glossy vinyl reflection effect across sticker */}
+          <div className="pointer-events-none absolute -top-32 -left-32 w-80 h-80 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-full blur-2xl transform rotate-12 z-20" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.1] z-20" />
+
+          {/* Panoramic Cover Banner with Sticker Stamp */}
           <div
-            className="w-full h-48 sm:h-56 relative bg-zinc-950"
+            className="w-full h-48 sm:h-56 relative bg-zinc-950 overflow-hidden"
             style={{
               background: bannerUrl ? `url(${bannerUrl}) center/cover no-repeat` : bannerColor,
               backgroundColor: '#09090b',
             }}
           >
             {/* Gradient overlay for ultra sleek transition */}
-            <div className={`absolute inset-0 bg-gradient-to-t ${isLight ? 'from-white via-white/35 to-transparent' : 'from-zinc-900 via-zinc-900/40 to-transparent'}`} />
+            <div className={`absolute inset-0 bg-gradient-to-t ${isLight ? 'from-white via-white/35 to-transparent' : 'from-zinc-950 via-zinc-950/40 to-transparent'}`} />
+
+            {/* Official Sticker Stamp - Macaron holographique en coin */}
+            <div className="absolute top-3.5 right-3.5 z-30">
+              <div
+                className="apple-spring inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xl border-2 border-white/90 transform rotate-[2.5deg] hover:rotate-0 transition-transform cursor-default select-none backdrop-blur-md"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
+                  boxShadow: '0 8px 24px -2px rgba(16, 185, 129, 0.55), 0 0 0 1px rgba(255,255,255,0.5)',
+                }}
+              >
+                <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+                <span>Sticker Officiel</span>
+              </div>
+            </div>
           </div>
 
-          {/* Overlapping Avatar & Artist Header */}
-          <div className="px-6 pb-6 pt-0 relative -mt-16 text-center space-y-4">
-            {/* Avatar with customized glowing ring */}
+          {/* Overlapping Avatar & Artist Header (Die-Cut Sticker Photo) */}
+          <div className="px-6 pb-6 pt-0 relative -mt-16 text-center space-y-4 z-20">
+            {/* Avatar styled like an embossed die-cut photo sticker */}
             <div
-              className={`relative mx-auto w-32 h-32 rounded-3xl overflow-hidden p-1 shadow-2xl border-2 transition-all duration-300 ${
-                isLight ? 'bg-white ring-4 ring-slate-100' : 'bg-zinc-950'
+              className={`relative mx-auto w-32 h-32 rounded-[28px] overflow-hidden p-1 shadow-2xl border-[3.5px] transition-all duration-300 transform group-hover:scale-[1.02] ${
+                isLight ? 'bg-white border-white ring-4 ring-slate-100 shadow-slate-300/60' : 'bg-zinc-950 border-white ring-4 ring-black/40 shadow-black'
               }`}
               style={{
-                borderColor: 'var(--artist-theme-color, ' + themeColor + ')',
-                boxShadow: `0 0 30px ${themeColor}45, 0 12px 30px rgba(0,0,0,0.5)`,
+                boxShadow: `0 0 35px ${themeColor}50, 0 16px 36px rgba(0,0,0,0.6)`,
               }}
             >
-              <div className="w-full h-full rounded-[20px] overflow-hidden bg-zinc-900">
+              <div className="w-full h-full rounded-[22px] overflow-hidden bg-zinc-900">
                 <SafeImage
                   src={avatarUrl}
                   alt={artistName}
@@ -449,10 +472,10 @@ function ArtistHubContent() {
               </div>
               {isVerified && (
                 <div
-                  className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg border-2 border-zinc-950"
+                  className="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg border-2 border-white ring-1 ring-black/20"
                   title="Compte officiel vérifié"
                 >
-                  <ShieldCheck className="w-4 h-4" />
+                  <ShieldCheck className="w-4 h-4 fill-current" />
                 </div>
               )}
             </div>
@@ -470,14 +493,14 @@ function ArtistHubContent() {
                 )}
               </div>
 
-              {/* Discrete Verified Sticker */}
+              {/* Discrete Verified Sticker Pill */}
               {isVerified && (
                 <div className="flex justify-center pt-0.5">
                   <div
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-extrabold border shadow-xs backdrop-blur-md transition-colors ${
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-extrabold border-2 shadow-sm backdrop-blur-md transition-colors select-none ${
                       isLight
-                        ? 'bg-blue-500/10 border-blue-500/30 text-blue-700'
-                        : 'bg-blue-600/25 border-blue-400/50 text-white shadow-blue-500/20'
+                        ? 'bg-blue-500/10 border-blue-500/40 text-blue-700'
+                        : 'bg-blue-600/30 border-blue-400/60 text-white shadow-blue-500/30'
                     }`}
                     title="Compte officiel vérifié et certifié par l'équipe MonPodium"
                   >

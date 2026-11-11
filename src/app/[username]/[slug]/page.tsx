@@ -138,26 +138,49 @@ function ReleaseDetailContent() {
         style={{ backgroundColor: themeColor }}
       />
 
-      {/* Top Bar with back link to artist bio */}
+      {/* Top Bar with Artist Profile Sticker Header */}
       <header className="w-full max-w-md flex items-center justify-between py-2 relative z-20">
         <Link
           href={`/${username}`}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+          className={`group apple-spring flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all active:scale-95 shadow-md hover:shadow-xl ${
             isLight
-              ? 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 shadow-sm'
-              : 'bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300'
+              ? 'bg-white/95 hover:bg-white border-white text-slate-900 shadow-slate-200/90 ring-1 ring-slate-900/5'
+              : 'bg-zinc-900/90 hover:bg-zinc-850 border-white/25 text-white ring-1 ring-white/10'
           }`}
+          style={{
+            boxShadow: '0 6px 20px -2px rgba(0,0,0,0.35)',
+          }}
+          title={`Accéder au profil officiel de ${artistName}`}
         >
-          <ArrowLeft className="w-3.5 h-3.5" style={{ color: themeColor }} />
-          <span>Bio de {artistName}</span>
+          <div className="w-6 h-6 rounded-full overflow-hidden border border-white/80 shadow-xs flex-shrink-0 bg-zinc-800">
+            <SafeImage
+              src={pwaIconUrl || release.cover_url}
+              alt={artistName}
+              fallbackType="avatar"
+              fallbackText={artistName}
+              themeColor={themeColor}
+              isLight={isLight}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="font-black truncate max-w-[120px]">{artistName}</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 fill-current" />
+          </div>
+          <span
+            className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white shadow-xs ml-0.5"
+            style={{ backgroundColor: themeColor }}
+          >
+            Bio &rarr;
+          </span>
         </Link>
 
         <button
           onClick={copyUrl}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors border ${
             isLight
-              ? 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 shadow-sm'
-              : 'bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300'
+              ? 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'
+              : 'bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-300'
           }`}
         >
           {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Share2 className="w-3.5 h-3.5" />}

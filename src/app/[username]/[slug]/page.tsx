@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { PlatformButton } from '@/components/artist/PlatformButton'
 import { AudioPreview } from '@/components/artist/AudioPreview'
 import { PWAInstallBanner } from '@/components/artist/PWAInstallBanner'
-import { SocialLinks } from '@/components/artist/SocialLinks'
 import { Release, SocialLink } from '@/types'
 import { Share2, Check, ArrowLeft, Disc3, ShieldCheck, Sparkles } from 'lucide-react'
 import { recordPageView } from '@/lib/tracker'
@@ -259,21 +258,6 @@ function ReleaseDetailContent() {
               themeMode={themeMode}
             />
           ))}
-        </div>
-
-        {/* Verified Official Social Media Links */}
-        <div className="pt-2 text-left">
-          <SocialLinks
-            links={
-              socialLinks && socialLinks.some(l => l.url && l.url.trim() !== '')
-                ? socialLinks
-                : getDefaultSocialLinks(username)
-            }
-            artistName={artistName}
-            artistUsername={username}
-            themeMode={themeMode}
-            themeColor={themeColor}
-          />
         </div>
 
         {/* Link to view full artist profile & other songs */}

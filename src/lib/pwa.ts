@@ -36,7 +36,7 @@ export function sanitizePublicHttpImageUrl(raw?: string | null): string | null {
 export function sanitizeCompactThumbParam(raw?: string | null): string | null {
   if (!raw || typeof raw !== 'string') return null
   const trimmed = raw.trim()
-  if (!trimmed || trimmed.length > 2800) return null
+  if (!trimmed || trimmed.length > 8000) return null
   if (!/^[A-Za-z0-9\-_]+$/.test(trimmed)) return null
   return trimmed
 }

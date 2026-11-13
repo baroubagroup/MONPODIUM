@@ -51,6 +51,16 @@ export function PWAInstallBanner({
       return
     }
 
+    // 3. Check per-artist localStorage installed flag (persists across page navigations)
+    try {
+      if (username && localStorage.getItem(`pwa_installed_${username}`) === '1') {
+        setIsInstalled(true)
+        return
+      }
+    } catch {
+      // localStorage may be unavailable in private mode
+    }
+
     const userAgent = window.navigator.userAgent.toLowerCase()
     const iosDevice = /iphone|ipad|ipod/.test(userAgent)
     setIsIOS(iosDevice)
@@ -79,6 +89,12 @@ export function PWAInstallBanner({
       if (typeof window !== 'undefined') {
         ;(window as any).__pwaPrompt = null
       }
+      // Persist installed state per artist so it survives page navigations
+      try {
+        if (username) localStorage.setItem(`pwa_installed_${username}`, '1')
+      } catch {
+        // localStorage may be unavailable in private mode
+      }
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall)
@@ -99,6 +115,12 @@ export function PWAInstallBanner({
       if (choice && choice.outcome === 'accepted') {
         setIsInstalled(true)
         toast.success("Application installée avec succès sur votre écran d'accueil !")
+        // Persist installed state per artist so the banner doesn't reappear on next visit
+        try {
+          if (username) localStorage.setItem(`pwa_installed_${username}`, '1')
+        } catch {
+          // localStorage may be unavailable in private mode
+        }
       }
     } catch (err) {
       console.error('PWA prompt error:', err)

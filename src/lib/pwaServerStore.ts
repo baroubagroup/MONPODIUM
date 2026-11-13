@@ -206,7 +206,7 @@ export async function resolveServerArtistPwaBundle(
   )
 
   const overrideSrc = sanitizePublicHttpImageUrl(overrides?.src)
-  const overrideFb = !overrideSrc ? sanitizeCompactThumbParam(overrides?.fb || synced?.pwa_thumb) : null
+  const overrideFb = !overrideSrc ? sanitizeCompactThumbParam(overrides?.fb || synced?.pwa_thumb || supaProfile?.pwa_thumb) : null
   const overrideDataUri = decodeThumbToDataUri(overrideFb)
   const overrideName =
     typeof overrides?.pwa_name === 'string' && overrides.pwa_name.trim()

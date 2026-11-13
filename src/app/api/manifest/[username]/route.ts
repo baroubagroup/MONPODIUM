@@ -8,7 +8,8 @@ import {
   sanitizeCompactThumbParam,
   sanitizePublicHttpImageUrl,
 } from '@/lib/pwa'
-import { resolveServerArtistPwaBundle, saveSyncedPwaProfile } from '@/lib/pwaServerStore'
+import { resolveServerArtistPwaBundle, saveSyncedPwaProfile, isSupabaseServerConfigured } from '@/lib/pwaServerStore'
+import { createClient } from '@/lib/supabase/server'
 
 function extractQueryOverrides(request: NextRequest): CompactPwaOverrides | null {
   const sp = request.nextUrl.searchParams
@@ -93,6 +94,41 @@ export async function POST(
       theme_color: body?.theme_color,
       bio: body?.bio,
     })
+
+    // Persist pwa_thumb and any https:// icon URL back to Supabase DB so manifest
+    // GET requests on cold lambdas (no RAM/disk store) can resolve the icon correctly.
+    if (isSupabaseServerConfigured()) {
+      try {
+        const supabase = await createClient()
+        const { data: matchedUser } = await supabase
+          .from('profiles')
+          .select('id, pwa_icon_url, avatar_url')
+          .ilike('username', cleanUsername)
+          .limit(1)
+          .maybeSingle()
+        if (matchedUser?.id) {
+          const updatePayload: Record<string, string | null> = {}
+          const cleanIcon = sanitizePublicHttpImageUrl(body?.pwa_icon_url)
+          const cleanAvatar = sanitizePublicHttpImageUrl(body?.avatar_url)
+          const cleanThumb = sanitizeCompactThumbParam(body?.pwa_thumb)
+          // Only overwrite with https:// URLs — don't store data URIs in DB
+          if (cleanIcon && cleanIcon !== matchedUser.pwa_icon_url) {
+            updatePayload.pwa_icon_url = cleanIcon
+          }
+          if (cleanAvatar && cleanAvatar !== matchedUser.avatar_url) {
+            updatePayload.avatar_url = cleanAvatar
+          }
+          if (cleanThumb) {
+            updatePayload.pwa_thumb = cleanThumb
+          }
+          if (Object.keys(updatePayload).length > 0) {
+            await supabase.from('profiles').update(updatePayload).eq('id', matchedUser.id)
+          }
+        }
+      } catch {
+        // Non-fatal: Supabase write failure should not break manifest sync
+      }
+    }
 
     const bundle = await resolveServerArtistPwaBundle(cleanUsername)
     const manifestUrl = buildManifestHref(

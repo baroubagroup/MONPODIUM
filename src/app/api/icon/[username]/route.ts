@@ -108,7 +108,7 @@ async function renderDataUriCandidate(
   headers: HeadersInit
 ): Promise<Response | null> {
   const match = dataUri.match(
-    /^\s*data:(image\/(?:png|jpeg|jpg|gif));(?:charset=[^;]+;)?base64,([A-Za-z0-9+/=\s]+)\s*$/i
+    /^\s*data:(image\/(?:png|jpeg|jpg|gif|webp));(?:charset=[^;]+;)?base64,([A-Za-z0-9+/=\s]+)\s*$/i
   )
   if (!match) return null
 
@@ -125,7 +125,8 @@ async function renderDataUriCandidate(
     const normalizedUri = `data:${mime};base64,${cleanB64}`
     const pngBytes = await renderRasterSquarePngBytes(normalizedUri, size)
     return new Response(pngBytes, { headers })
-  } catch {
+  } catch (err) {
+    console.warn('PWA icon renderDataUriCandidate warn:', err)
     return null
   }
 }

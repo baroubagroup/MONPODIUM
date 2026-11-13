@@ -37,15 +37,13 @@ export async function generateMetadata({
     cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1)
   const pwaTitle = (profile.pwa_name || displayName).trim()
 
-  const manifestHref = hasStatelessOverrides
-    ? buildManifestHref(cleanUsername, version, {
-        artist_name: profile.artist_name,
-        pwa_name: profile.pwa_name,
-        theme_color: profile.theme_color,
-        src: iconSrc,
-        fb: iconFallbackThumb,
-      })
-    : `/api/manifest/${cleanUsername}?v=${version}`
+  const manifestHref = buildManifestHref(cleanUsername, version, {
+    artist_name: profile.artist_name,
+    pwa_name: profile.pwa_name,
+    theme_color: profile.theme_color,
+    src: iconSrc,
+    fb: iconFallbackThumb,
+  })
 
   const icon192 = buildArtistIconUrl(cleanUsername, 192, version, {
     src: iconSrc,

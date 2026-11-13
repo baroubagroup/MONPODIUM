@@ -144,10 +144,13 @@ async function createCompactPwaThumb(src: string | null): Promise<string | null>
     img.onload = () => {
       try {
         const attempts: Array<[number, number]> = [
+          [128, 0.7],
           [112, 0.65],
           [96, 0.58],
           [80, 0.5],
           [64, 0.45],
+          [48, 0.4],
+          [36, 0.35],
         ]
         for (const [size, quality] of attempts) {
           const canvas = document.createElement('canvas')
@@ -162,7 +165,7 @@ async function createCompactPwaThumb(src: string | null): Promise<string | null>
           const dataUrl = canvas.toDataURL('image/jpeg', quality)
           const b64 = dataUrl.split(',')[1] || ''
           const urlSafe = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-          if (urlSafe && urlSafe.length <= 2200) {
+          if (urlSafe && urlSafe.length <= 6000) {
             resolve(urlSafe)
             return
           }
@@ -368,17 +371,15 @@ export async function applyArtistPwaHeadLinks(
   const safeSrc = meta?.src ?? sanitizePublicHttpImageUrl(effectiveIcon)
   const thumb = meta?.thumb ?? (!safeSrc ? await createCompactPwaThumb(effectiveIcon) : null)
 
-  // Fast exit if SSR manifest link already matches the current artist & version
+  // Build deterministic manifest href with photo thumbnail/source
   const existingManifest = document.head.querySelector('link[rel="manifest"]')?.getAttribute('href') || ''
-  const targetManifest = hasLocal
-    ? buildManifestHref(cleanUsername, version, {
-        artist_name: profile.artist_name,
-        pwa_name: appName,
-        theme_color: profile.theme_color,
-        src: safeSrc,
-        fb: thumb,
-      })
-    : `/api/manifest/${cleanUsername}?v=${version}`
+  const targetManifest = buildManifestHref(cleanUsername, version, {
+    artist_name: profile.artist_name,
+    pwa_name: appName,
+    theme_color: profile.theme_color,
+    src: safeSrc,
+    fb: thumb,
+  })
 
   const icon192 = buildArtistIconUrl(cleanUsername, 192, version, { src: safeSrc, fb: thumb })
   const icon512 = buildArtistIconUrl(cleanUsername, 512, version, { src: safeSrc, fb: thumb })
@@ -413,22 +414,14 @@ export async function applyArtistPwaHeadLinks(
   })
 
   if (existingManifest !== targetManifest) {
-    // Only replace manifest if SSR did not already match v=${version} for same-origin resolved profiles
-    const ssrAlreadyMatchesVersion =
-      !hasLocal &&
-      existingManifest.startsWith(`/api/manifest/${cleanUsername}`) &&
-      existingManifest.includes(`v=${version}`)
-
-    if (!ssrAlreadyMatchesVersion) {
-      upsertHeadLink(
-        'link[rel="manifest"]',
-        {
-          rel: 'manifest',
-          href: targetManifest,
-        },
-        true
-      )
-    }
+    upsertHeadLink(
+      'link[rel="manifest"]',
+      {
+        rel: 'manifest',
+        href: targetManifest,
+      },
+      true
+    )
   }
 
   upsertMeta('apple-mobile-web-app-capable', 'yes')

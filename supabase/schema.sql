@@ -53,6 +53,7 @@ create table if not exists public.profiles (
   pwa_name text,
   pwa_icon_url text,
   pwa_splash_url text,
+  pwa_thumb text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -344,3 +345,6 @@ create policy "Users can delete their previews" on storage.objects for delete us
 create policy "Users can upload avatars" on storage.objects for insert with check (bucket_id = 'avatars' and auth.role() = 'authenticated');
 create policy "Users can update their avatars" on storage.objects for update using (bucket_id = 'avatars' and auth.role() = 'authenticated');
 create policy "Users can delete their avatars" on storage.objects for delete using (bucket_id = 'avatars' and auth.role() = 'authenticated');
+
+-- Migration: add pwa_thumb column if not exists (safe to re-run on existing databases)
+alter table public.profiles add column if not exists pwa_thumb text;
